@@ -1,9 +1,12 @@
-public class Product {
+import java.util.*;
+
+public class Product { // most basic class, everything is built off of this
     private String name;
     private String storeName;
     private String description;
     private int quantAvailable;
     private double price;
+    private ArrayList<String> reviews;
 
     public Product(String name, String storeName, String description, int quantAvailable, double price) {
         this.name = name;
@@ -11,6 +14,7 @@ public class Product {
         this.description = description;
         this.quantAvailable = quantAvailable;
         this.price = price;
+        this.reviews = null;
     }
 
     public String getName() {
@@ -51,5 +55,13 @@ public class Product {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public ArrayList<String> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(ArrayList<String> reviews) {
+        this.reviews = reviews;
     }
 }
