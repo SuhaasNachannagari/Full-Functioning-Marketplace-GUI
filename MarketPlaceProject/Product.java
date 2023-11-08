@@ -7,6 +7,8 @@ public class Product { // most basic class, everything is built off of this
     private int quantAvailable;
     private double price;
     private ArrayList<String> reviews;
+    
+    private int limit;
 
     public Product(String name, String storeName, String description, int quantAvailable, double price) {
         this.name = name;
@@ -63,5 +65,13 @@ public class Product { // most basic class, everything is built off of this
 
     public void setReviews(ArrayList<String> reviews) {
         this.reviews = reviews;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
     }
 }
