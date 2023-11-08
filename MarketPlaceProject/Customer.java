@@ -24,17 +24,17 @@ public class Customer {
     public void setShoppingCar(ArrayList<Product> shoppingCar) {
         this.shoppingCar = shoppingCar;
     }
-
+//not done
     public void addShoppingCar(Product product) {
         shoppingCar.add(product);
         //multiple
     }
-
+//not done
     public void deleteShoppingCar(Product product) {
         shoppingCar.remove(product);
         //multiple
     }
-
+//not done
     public void buyShoppingCar () {
         // export arraylist into txt
         //clean the arraylist
