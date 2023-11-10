@@ -1,10 +1,3 @@
-package Project.Project4.SellerMarketplace;
-
-import Project.Project4.Marketplace;
-import Project.Project4.Product;
-import Project.Project4.Seller;
-import Project.Project4.Store;
-
 import java.util.ArrayList;
 import java.util.Scanner;
 
