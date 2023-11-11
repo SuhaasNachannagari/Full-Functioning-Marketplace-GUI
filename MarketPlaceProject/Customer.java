@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Scanner;
 
 public class Customer {
@@ -30,41 +29,49 @@ public class Customer {
     public void addShoppingCar(Product product) {
 
         Scanner scan = new Scanner (System.in);
-        System.out.println("Enter the product you want to buy:");
-        String input = scan.nextLine();
+        boolean keepShopping = true;
 
-        
-        shoppingCart.add(product);
-        //multiple
-    }
-
-    public void deleteShoppingCar(Product product) {
-        shoppingCart.remove(product);
-        //multiple
-    }
-
-    public void deleteMultipleItemsShoppingCar() {
-        //Get user input for products to remove
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter products you want to remove(use comma to separate");
-        String input = scanner.nextLine();
-        String[] productsToRemove = input.split(",");
-
-        //Use Iterator to remove products specified by the user
-        Iterator<Product> iterator = shoppingCart.iterator();
-        while (iterator.hasNext()) {
-            Product items = iterator.next();
-            for (String products : productsToRemove) {
-                if (items.equals(products.trim())) {
-                    iterator.remove();
-                    break;
+        while (keepShopping) {
+            keepShopping = false;
+            System.out.println("Enter the product you want to buy:");
+            String input = scan.nextLine();
+            for (Product items : shoppingCart) {
+                if (items.getName().equalsIgnoreCase(input)) {
+                    shoppingCart.add(items);
+                } else {
+                    System.out.println("The product you enter does not exist please try again");
                 }
+            }
+            System.out.println("Do you want to keep shopping?");
+            String answer = scan.nextLine();
+            if (answer.equalsIgnoreCase("yes")) {
+                keepShopping = true;
             }
         }
     }
 
-    public void buyShoppingCar () {
-        // export arraylist into txt
-        //clean the arraylist
+    public void deleteShoppingCar(Product product) {
+
+        Scanner scan = new Scanner (System.in);
+        boolean keepRemoving = true;
+
+        while (keepRemoving) {
+            keepRemoving = false;
+            System.out.println("Enter the product you want to remove:");
+            String input = scan.nextLine();
+
+            for (Product items : shoppingCart) {
+                if (items.getName().equalsIgnoreCase(input)) {
+                    shoppingCart.remove((items));
+                } else {
+                    System.out.println("The product you enter does not exist please try again");
+                }
+                System.out.println("Do you want to keep removing?");
+                String answer = scan.nextLine();
+                if (answer.equalsIgnoreCase("yes")) {
+                    keepRemoving = true;
+                }
+            }
+        }
     }
 }
