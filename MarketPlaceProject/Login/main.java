@@ -158,6 +158,10 @@ public class main {
         } while (!correctInput);
 
        //body
+       boolean checkIndexUser ;
+       boolean checkIndexDoAgain;
+       int checkDoAgain; 
+        
        if ( custOrSell == 1) {
             do {
                 do {
