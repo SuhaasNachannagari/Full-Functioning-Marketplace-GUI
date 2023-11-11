@@ -9,6 +9,15 @@ public class main {
         int custOrSell;
         //
         String username;
+        private ArrayList<Seller> sellers;
+        public ArrayList<Seller> getSellers() {
+            return sellers;
+        }
+        private ArrayList<Customer> customers;
+        public ArrayList<Customer> getCustomers() {
+            return customers;
+        }
+
         do {
             System.out.println("Are you a customer or a seller?" +
                     "(1 - Seller, 2 - Customer, 3 - Exit)");
