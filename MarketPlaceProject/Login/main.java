@@ -5,11 +5,14 @@ public class main {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Filler");//Fill in the welcome message.
         boolean correctInput = true;
+        // Tri: I bring this out so that I can use this variable later;
+        int custOrSell;
+        //
         String username;
         do {
             System.out.println("Are you a customer or a seller?" +
                     "(1 - Seller, 2 - Customer, 3 - Exit)");
-            int custOrSell = scanner.nextInt();
+            custOrSell = scanner.nextInt();
             scanner.nextLine();
             if (custOrSell == 1) { //Seller
                 SellerLogin sellerLogin = new SellerLogin();
@@ -153,5 +156,85 @@ public class main {
                 correctInput = false;
             }
         } while (!correctInput);
+
+       //body
+       if ( custOrSell == 1) {
+            do {
+                do {
+                    checkIndexUser = true;
+                    System.out.println("What do you want to do?");
+                    System.out.println("1 - Delete, 2 - Edit, 3 - Create, 4 - View, 5 - Import/Export, 6 - Dashboard ");
+                    int option = scanner.nextInt();
+                    scanner.nextLine();
+
+                    switch (option) {
+                        case 1:
+                            Delete delete = null;
+                            delete.setSeller(dummyUserName);
+                        case 2:
+                            Edit edit = null;
+                            edit.setSeller(dummyUserName);
+                        case 3:
+                            Create create = null;
+                            create.setSeller(dummyUserName);
+
+                        default:
+                            System.out.println("Please enter the correct number!");
+                            checkIndexUser = false;
+                    }
+                } while (!checkIndexUser);
+
+                do {
+                    checkIndexDoAgain = true;
+                    System.out.println("Do you want to use the program again? ( 1 - Yes, 2 - No");
+                    checkDoAgain = scanner.nextInt();
+                    scanner.nextLine();
+
+                    if (checkDoAgain != 2 || checkDoAgain != 1) {
+                        checkIndexDoAgain = false;
+                        System.out.println("Please enter the correct number");
+                    }
+                } while (!checkIndexDoAgain);
+
+            } while ( checkDoAgain == 1);
+        }
+
+        if (custOrSell == 2) {
+            do {
+                do {
+                    checkIndexUser = true;
+                    System.out.println("What do you want to do?");
+                    System.out.println("1 - Sort, 2 - View, 3 - Search, 4 - Shopping Carts, 5 - Purchased Items, 6 - Dashboard ");
+                    int option = scanner.nextInt();
+                    scanner.nextLine();
+
+                    switch (option) {
+                        // Thomas, Suhaas, and Rohan
+                        default:
+                            System.out.println("Please enter the correct number!");
+                            checkIndexUser = false;
+                    }
+                } while (!checkIndexUser);
+
+                do {
+                    checkIndexDoAgain = true;
+                    System.out.println("Do you want to use the program again? ( 1 - Yes, 2 - No");
+                    checkDoAgain = scanner.nextInt();
+                    scanner.nextLine();
+
+                    if (checkDoAgain != 2 || checkDoAgain != 1) {
+                        checkIndexDoAgain = false;
+                        System.out.println("Please enter the correct number");
+                    }
+                } while (!checkIndexDoAgain);
+
+            } while ( checkDoAgain == 1);
+
+            if (checkDoAgain == 2) {
+                System.out.println("Have a good day");
+            }
+
+        }
+
     }
 }
