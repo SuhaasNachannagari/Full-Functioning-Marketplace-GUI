@@ -183,13 +183,13 @@ public class main {
                     switch (option) {
                         case 1:
                             Delete delete = null;
-                            delete.setSeller(dummyUserName);
+                            delete.setSeller(username);
                         case 2:
                             Edit edit = null;
-                            edit.setSeller(dummyUserName);
+                            edit.setSeller(username);
                         case 3:
                             Create create = null;
-                            create.setSeller(dummyUserName);
+                            create.setSeller(username);
 
                         default:
                             System.out.println("Please enter the correct number!");
