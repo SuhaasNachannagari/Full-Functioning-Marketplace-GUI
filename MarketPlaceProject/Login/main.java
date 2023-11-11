@@ -8,7 +8,7 @@ public class main {
         // Tri: I bring this out so that I can use this variable later;
         int custOrSell;
         //
-        String username;
+        String username = null;
         private ArrayList<Seller> sellers;
         public ArrayList<Seller> getSellers() {
             return sellers;
