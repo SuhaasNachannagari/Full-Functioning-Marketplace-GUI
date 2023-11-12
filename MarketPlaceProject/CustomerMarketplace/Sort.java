@@ -126,7 +126,7 @@ public class Sort extends main {
                 if (quantity > productFromSeller.getLimit() ){
                     System.out.println("You are attempting to add more than the limit of " + productFromSeller.getLimit() + " units set by the seller");
                 } else if (quantity > productFromSeller.getQuantAvailable()) {
-                    System.out.println("There is only " + productFromSeller.getQuantAvailable() + " units left, you are attempting to add above that limit");
+                    System.out.println("There is only " + productFromSeller.getQuantAvailable() + " units left, you are attempting to add above that available quantity");
                 } else {
                     Product productToAdd = new Product(productFromSeller.getName(), productFromSeller.getStoreName(), productFromSeller.getDescription(), quantity, productFromSeller.getPrice())
                     updatedShoppingCart.add(productToAdd);
