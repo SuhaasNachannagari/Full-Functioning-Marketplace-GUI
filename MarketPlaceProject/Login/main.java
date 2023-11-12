@@ -83,6 +83,9 @@ public class main {
                                 System.out.println("This username already exists.");
                             }
                         } while (usernameExists);
+                        // add new seller to Sellers ArrayList
+                        sellers.add(new Seller(null, username));
+                        //
                         if (username.equals("back")) {
                             break;
                         }
