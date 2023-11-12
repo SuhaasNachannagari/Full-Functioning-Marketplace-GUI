@@ -213,16 +213,16 @@ public class main {
                 } while (!checkIndexUser);
 
                 do {
-                    checkIndexDoAgain = true;
+                    checkIndexDoAgain = false;
                     System.out.println("Do you want to use the program again? ( 1 - Yes, 2 - No");
                     checkDoAgain = scanner.nextInt();
                     scanner.nextLine();
 
-                    if (checkDoAgain != 2 || checkDoAgain != 1) {
-                        checkIndexDoAgain = false;
+                    if (checkDoAgain != 2 && checkDoAgain != 1) {
+                        checkIndexDoAgain = true;
                         System.out.println("Please enter the correct number");
                     }
-                } while (!checkIndexDoAgain);
+                } while (checkIndexDoAgain);
 
             } while ( checkDoAgain == 1);
         }
@@ -245,16 +245,16 @@ public class main {
                 } while (!checkIndexUser);
 
                 do {
-                    checkIndexDoAgain = true;
-                    System.out.println("Do you want to use the program again? ( 1 - Yes, 2 - No");
+                    checkIndexDoAgain = false;
+                    System.out.println("Do you want to use the program again? ( 1 - Yes, 2 - No)");
                     checkDoAgain = scanner.nextInt();
                     scanner.nextLine();
 
-                    if (checkDoAgain != 2 || checkDoAgain != 1) {
-                        checkIndexDoAgain = false;
+                    if (checkDoAgain != 2 && checkDoAgain != 1) {
+                        checkIndexDoAgain = true;
                         System.out.println("Please enter the correct number");
                     }
-                } while (!checkIndexDoAgain);
+                } while (checkIndexDoAgain);
 
             } while ( checkDoAgain == 1);
 
@@ -267,7 +267,7 @@ public class main {
     }
     
     // write information of each Seller in the Sellers ArrayList to a file called SellerInfo.bi using Object Output Stream
-    // purpose: store sellers' data (which also include Products and Stores data
+    // purpose: store sellers' data (which also include Products and Stores data)
     public static void writeDateSeller() {
         ArrayList<Seller> sellerData = getSellers();
         try (FileOutputStream fos = new FileOutputStream("SellerInfo.bin");
