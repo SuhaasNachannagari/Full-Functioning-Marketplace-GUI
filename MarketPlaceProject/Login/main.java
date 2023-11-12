@@ -2,18 +2,29 @@ import java.util.Scanner;
 
 public class main {
     private static ArrayList<Seller> sellers;
-    public ArrayList<Seller> getSellers() {
+    
+    public static ArrayList<Seller> getSellers() {
         return sellers;
     }
     private static ArrayList<Customer> customers;
-    public ArrayList<Customer> getCustomers() {
+    
+    public static ArrayList<Customer> getCustomers() {
         return customers;
     }
-    public void setCustomers(ArrayList<Customer> customers) {
+    public static void setCustomers(ArrayList<Customer> customers) {
         this.customers = customers;
     }
     
     public static void main(String[] args) {
+        // this block of code checkes if this is the first time the program is run.
+        // If first time, call a class and generate a dataset, else it will call the readDataSeller method to read the existing dataset.
+        if (readDataSeller().isEmpty()) {
+            InitialDataset sellerData = null;
+            sellers = sellerData.createSeller();
+        } else {
+            sellers = readDataSeller();
+        }
+        
         Scanner scanner = new Scanner(System.in);
         System.out.println("Filler");//Fill in the welcome message.
         boolean correctInput = true;
@@ -251,6 +262,38 @@ public class main {
             }
 
         }
-
+        writeDataSeller();    
     }
+    
+    // write information of each Seller in the Sellers ArrayList to a file called SellerInfo.bi using Object Output Stream
+    // purpose: store sellers' data (which also include Products and Stores data
+    public static void writeDateSeller() {
+        ArrayList<Seller> sellerData = getSellers();
+        try (FileOutputStream fos = new FileOutputStream("SellerInfo.bin");
+             ObjectOutput oos = new ObjectOutputStream(fos);) {
+            for (int i = 0; i < sellerData.size(); i++) {
+                oos.writeObject(sellerData.get(i));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    // read the file (SellerInfo.bi) that contains Sellers' data, this method will return an ArrayList<Seller>
+    public static ArrayList<Seller> readDataSeller() {
+        ArrayList<Seller> result = null;
+        try (FileInputStream fis = new FileInputStream("SellerInfo.bin");
+             ObjectInputStream ois = new ObjectInputStream(fis);) {
+            result = new ArrayList<>();
+            for (; ; ) {
+                result.add((Seller) ois.readObject());
+            }
+        } catch (EOFException eof) {  // check if for loop reaches End Of File, and catch the error
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        return result;
+    }
+
+    
 }
