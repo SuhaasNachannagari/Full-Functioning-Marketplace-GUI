@@ -39,26 +39,42 @@ public class Create extends Marketplace {
         boolean checkFormat;
         Product product = null;
         do {
-            checkFormat = true;
+            checkFormat = false;
             try {
-                System.out.println("Enter the information of the product: ");
-                System.out.println("Name: ");
-                String name = scan.nextLine();
-                String storeName = store.getName();
-                System.out.println("Description: ");
-                String desc = scan.nextLine();
-                System.out.println("Quantity Available: ");
-                int quantAvail = scan.nextInt();
-                scan.nextLine();
-                System.out.println("Price ");
-                double price = scan.nextDouble();
-                scan.nextLine();
-                product = new Product(name, storeName, desc, quantAvail, price);
+                boolean checkProductExist;
+                do {
+                    checkProductExist = false;
+                    System.out.println("Enter the information of the product: ");
+                    System.out.println("Name: ");
+                    String name = scan.nextLine();
+                    boolean checkExistName = false;
+                    for (int i = 0; i < store.getProducts().size(); i++) {
+                        if (name.equals(store.getProducts().get(i).getName())) {
+                            checkExistName = true;
+                            break;
+                        }
+                    }
+                    if (!checkExistName) {
+                        String storeName = store.getName();
+                        System.out.println("Description: ");
+                        String desc = scan.nextLine();
+                        System.out.println("Quantity Available: ");
+                        int quantAvail = scan.nextInt();
+                        scan.nextLine();
+                        System.out.println("Price ");
+                        double price = scan.nextDouble();
+                        scan.nextLine();
+                        product = new Product(name, storeName, desc, quantAvail, price);
+                    } else {
+                        System.out.println("This product has already existed, please add another product");
+                        checkProductExist = true;
+                    }
+                } while (checkProductExist);
             } catch (NumberFormatException e) {
                 System.out.println("Please enter the right format!");
-                checkFormat = false;
+                checkFormat = true;
             }
-        } while (!checkFormat);
+        } while (checkFormat);
         // add the newly created product to the picked store
         seller.getStores().get(index).addProduct(product);
     }
