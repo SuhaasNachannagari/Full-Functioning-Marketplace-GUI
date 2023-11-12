@@ -4,6 +4,8 @@ import java.util.Scanner;
 public class Customer {
     String customerUserName;
     ArrayList<Product> shoppingCart;
+    
+    ArrayList<Product> purchaseHistory;
 
     public Customer(ArrayList<Product> shoppingCart, String customerUserName) {
         this.customerUserName = customerUserName;
@@ -24,6 +26,14 @@ public class Customer {
 
     public void setShoppingCar(ArrayList<Product> shoppingCar) {
         this.shoppingCart = shoppingCar;
+    }
+
+    public ArrayList<Product> getPurchaseHistory() {
+        return purchaseHistory;
+    }
+
+    public void setPurchaseHistory(ArrayList<Product> purchaseHistory) {
+        this.purchaseHistory = purchaseHistory;
     }
 
     public void addShoppingCar(Product product) {
