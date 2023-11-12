@@ -193,16 +193,20 @@ public class main {
                         case 1:
                             Delete delete = null;
                             delete.setSeller(username);
+                            break;
                         case 2:
                             Edit edit = null;
                             edit.setSeller(username);
+                            break;
                         case 3:
                             Create create = null;
                             create.setSeller(username);
+                            break;
 
                         default:
                             System.out.println("Please enter the correct number!");
                             checkIndexUser = false;
+                            break;
                     }
                 } while (!checkIndexUser);
 
