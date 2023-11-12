@@ -6,14 +6,14 @@ import java.io.*;
 
 
 public class View extends main {
-    private ArrayList<Seller> sellers = getSellers();
+    private ArrayList<Seller> listedSellers = getSellers();
 
-    private ArrayList<Customer> customers = getCustomers();
+    private ArrayList<Customer> listedCustomers = getCustomers();
 
     ArrayList<Product> listedProducts;
 
     public void createList() {
-        for (Seller seller : sellers) {
+        for (Seller seller : listedSellers) {
             ArrayList<Store> stores = seller.getStores();
             for (Store store : stores) {
                 ArrayList<Product> products = store.getProducts();
@@ -27,7 +27,7 @@ public class View extends main {
         System.out.println("Here are your available items: ");
         int i = 1;
         for (Product product : listedProducts) {
-            System.out.printf("%d. Store: %s, Name: %s, Price: %d\n",
+            System.out.printf("%d. Store: %s, Name: %s, Price: %.2f\n",
                     i,
                     product.getStoreName(),
                     product.getName(),
@@ -41,7 +41,7 @@ public class View extends main {
             return false;
         }
         Product product = listedProducts.get(num - 1);
-        System.out.printf("Name: %s\n" + "  Store Name: %s\n" + "  Price: %.2d\n" +
+        System.out.printf("Name: %s\n" + "  Store Name: %s\n" + "  Price: %.2f\n" +
                         "  Quantity Available: %d\n" + "Description: %s\n",
                 product.getName(),
                 product.getStoreName(),
@@ -64,17 +64,51 @@ public class View extends main {
 
     public void addToShoppingCart(String username, int quantity, int num) {
         Product productFromSeller = listedProducts.get(num - 1);
-        for (Customer customer : customers) {
+        for (Customer customer : listedCustomers) {
             if (customer.getCustomerUserName().equals(username)) {
                 ArrayList<Product> updatedShoppingCart = customer.getShoppingCar();
                 if (quantity > productFromSeller.getLimit() ){
-                    System.out.println("You are attempting to add more than the limit of " + productFromSeller.getLimit() + " units set by the seller");
+                    System.out.println("You are attempting to add more than the limit of "
+                            + productFromSeller.getLimit() + " units set by the seller");
                 } else if (quantity > productFromSeller.getQuantAvailable()) {
-                    System.out.println("There is only " + productFromSeller.getQuantAvailable() + " units left, you are attempting to add above that limit");
+                    System.out.println("There is only " + productFromSeller.getQuantAvailable()
+                            + " units left, you are attempting to add above that limit");
                 } else {
-                    Product productToAdd = new Product(productFromSeller.getName(), productFromSeller.getStoreName(), productFromSeller.getDescription(), quantity, productFromSeller.getPrice())
+                    Product productToAdd = new Product(productFromSeller.getName(),
+                            productFromSeller.getStoreName(),
+                            productFromSeller.getDescription(),
+                            quantity,
+                            productFromSeller.getPrice());
                     updatedShoppingCart.add(productToAdd);
                     customer.setShoppingCar(updatedShoppingCart);
+                }
+
+            }
+        }
+    }
+    public void purchaseItem(String username, int quantity, int num) {
+        Product productFromSeller = listedProducts.get(num - 1);
+        for (Customer customer : listedCustomers) {
+            if (customer.getCustomerUserName().equals(username)) {
+                ArrayList<Product> updatedPurchaseHistory = customer.getPurchaseHistory();
+                if (quantity > productFromSeller.getLimit() ){
+                    System.out.println("You are attempting to add more than the limit of "
+                            + productFromSeller.getLimit() + " units set by the seller");
+                } else if (quantity > productFromSeller.getQuantAvailable()) {
+                    System.out.println("There is only " + productFromSeller.getQuantAvailable()
+                            + " units left, you are attempting to add above that limit");
+                } else {
+                    Product productToBuy = new Product(productFromSeller.getName(),
+                            productFromSeller.getStoreName(),
+                            productFromSeller.getDescription(),
+                            quantity,
+                            productFromSeller.getPrice());
+                    updatedPurchaseHistory.add(productToBuy);
+                    customer.setPurchaseHistory(updatedPurchaseHistory);
+                    productFromSeller.setQuantAvailable(productFromSeller.getQuantAvailable()-quantity);
+                    if (productFromSeller.getQuantAvailable()-quantity == 0) {
+                        System.out.println("You have bought ");
+                    }
                 }
 
             }
