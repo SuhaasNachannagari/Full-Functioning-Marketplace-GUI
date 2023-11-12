@@ -1,16 +1,16 @@
 import java.util.Scanner;
 
 public class main {
-    private ArrayList<Seller> sellers;
-    
+    private static ArrayList<Seller> sellers;
     public ArrayList<Seller> getSellers() {
         return sellers;
     }
-    
-    private ArrayList<Customer> customers;
-    
+    private static ArrayList<Customer> customers;
     public ArrayList<Customer> getCustomers() {
         return customers;
+    }
+    public void setCustomers(ArrayList<Customer> customers) {
+        this.customers = customers;
     }
     
     public static void main(String[] args) {
