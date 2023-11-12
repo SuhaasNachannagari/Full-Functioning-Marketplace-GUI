@@ -1,11 +1,12 @@
 import java.util.ArrayList;
 
 public class Seller {
+    public String userName;
+    public ArrayList<Store> stores;
 
-    ArrayList<Store> stores = new ArrayList();
-
-    public Seller(ArrayList<Store> stores) {
+    public Seller(ArrayList<Store> stores, String userName) {
         this.stores = stores;
+        this.userName = userName;
     }
 
     public ArrayList<Store> getStores() {
