@@ -16,14 +16,9 @@ public class main {
     }
     
     public static void main(String[] args) {
-        // this block of code checkes if this is the first time the program is run.
-        // If first time, call a class and generate a dataset, else it will call the readDataSeller method to read the existing dataset.
-        if (readDataSeller().isEmpty()) {
-            InitialDataset sellerData = null;
-            sellers = sellerData.createSeller();
-        } else {
-            sellers = readDataSeller();
-        }
+
+        // this read the file and set the "sellers" variable 
+        sellers = readDataSeller();
         
         Scanner scanner = new Scanner(System.in);
         System.out.println("Filler");//Fill in the welcome message.
