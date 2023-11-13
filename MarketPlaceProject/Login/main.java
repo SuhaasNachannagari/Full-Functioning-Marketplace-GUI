@@ -4,22 +4,29 @@ import java.util.Scanner;
 
 public class main {
     public static ArrayList<Seller> sellers;
+
     // added static, but not updated
     public static ArrayList<Seller> getSellers() {
         return sellers;
     }
+
     public static ArrayList<Customer> customers;
+
     // added static for getCust, but not updated;
     public static ArrayList<Customer> getCustomers() {
         return customers;
     }
-    public static void setCustomers (ArrayList<Customer> customers) { this.customers = customers; }
+
+    public static void setCustomers(ArrayList<Customer> customers) {
+        this.customers = customers;
+    }
 
     public static void main(String[] args) {
 
         // this read the file and set the "sellers" variable
         //sellers = readDataSeller();
         sellers = readDataSeller();
+        customers = readDataCustomer();
 
 
         Scanner scanner = new Scanner(System.in);
@@ -40,7 +47,8 @@ public class main {
                 boolean correctInput1 = true;
                 do {
                     System.out.println("Does the account already exist? (1 - Exists, 2 - New Account)");
-                    int input = scanner.nextInt(); scanner.nextLine();
+                    int input = scanner.nextInt();
+                    scanner.nextLine();
                     if (input == 1) {
                         boolean usernameExists;
                         boolean passwordIsCorrect;
@@ -181,11 +189,11 @@ public class main {
         } while (!correctInput);
 
         //body
-        boolean checkIndexUser ;
+        boolean checkIndexUser;
         boolean checkIndexDoAgain;
         int checkDoAgain;
 
-        if ( custOrSell == 1) {
+        if (custOrSell == 1) {
             do {
                 do {
                     checkIndexUser = true;
@@ -256,7 +264,7 @@ public class main {
                                             sellers.get(i).getStores().add(store);
                                         }
                                     }
-                                } else if(choice == 3){
+                                } else if (choice == 3) {
                                     flag = false;
                                 } else {
                                     System.out.println("Invalid choice. Try again");
@@ -266,11 +274,11 @@ public class main {
 
                         case 6:
                             //Dashboard
-                            for(int i = 0; i < sellers.size(); i++) {
+                            for (int i = 0; i < sellers.size(); i++) {
                                 System.out.println("Store:");
                                 System.out.println(sellers.get(i).getStores().get(i));
                                 System.out.println("Products\tPrice");
-                                for(int j = 0; j < sellers.get(i).getStores().get(i).getProducts().size(); j++) {
+                                for (int j = 0; j < sellers.get(i).getStores().get(i).getProducts().size(); j++) {
                                     System.out.println(sellers.get(i).getStores().get(i).getProducts().get(j) + "\t"
                                             + sellers.get(i).getStores().get(i).getProducts().get(j).getSales());
                                 }
@@ -296,7 +304,7 @@ public class main {
                     }
                 } while (checkIndexDoAgain);
 
-            } while ( checkDoAgain == 1);
+            } while (checkDoAgain == 1);
         }
 
         if (custOrSell == 2) {
@@ -328,7 +336,7 @@ public class main {
                     }
                 } while (checkIndexDoAgain);
 
-            } while ( checkDoAgain == 1);
+            } while (checkDoAgain == 1);
 
             if (checkDoAgain == 2) {
                 System.out.println("Have a good day");
@@ -337,6 +345,7 @@ public class main {
         }
         // added but haven't updated
         writeDateSeller();
+        writeDataCustomer();
     }
 
     // write information of each Seller in the Sellers ArrayList to a file called SellerInfo.bi using Object Output Stream
@@ -372,8 +381,8 @@ public class main {
 
     public static void writeDataCustomer() {
         ArrayList<Customer> customerData = getCustomers();
-        try(FileOutputStream fos = new FileOutputStream("CustomerInfo.bin");
-            ObjectOutputStream oos = new ObjectOutputStream(fos);) {
+        try (FileOutputStream fos = new FileOutputStream("CustomerInfo.bin");
+             ObjectOutputStream oos = new ObjectOutputStream(fos);) {
             for (int i = 0; i < customerData.size(); i++) {
                 oos.writeObject(customerData.get(i));
             }
