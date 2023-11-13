@@ -622,8 +622,13 @@ public class main {
                     //Rohan
                     case 6:
                         CustomerDashboard dashboard = new CustomerDashboard();
-                        dashboard.printDashboard();
-                        break;
+                            Customer customer = null;
+                            for (int i = 0; i < customers.size(); i++) {
+                                if (customers.get(i).getCustomerUserName().equals(username)) {
+                                    customer = customers.get(i);
+                                }
+                            }
+                            dashboard.printDashboard(customer);
                     default:
                         System.out.println("Please enter the correct number!");
                         checkIndexUser = false;
