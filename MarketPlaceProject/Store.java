@@ -6,7 +6,7 @@ import java.util.ArrayList;
 //
 // Note: for Add, Edit, and Delete, they will return a boolean value (see method's explanation for more info)
 
-public class Store implements Serialization {
+public class Store implements Serializable {
 
     String name;
     ArrayList<Product> products;
