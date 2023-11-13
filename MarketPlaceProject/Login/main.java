@@ -543,10 +543,28 @@ public class main {
                         } while (searchAgain == 1);
                         break;
                     case 4:
-                        // add code for purchase history
+                        System.out.println("What do you want to do? ");
+                        System.out.println("1 - Add to cart, 2 - Remove from cart, 3 - Check out");
+                        int choice = scanner.nextInt();
+                        scanner.nextLine();
+                        switch(choice) {
+                            case 1:
+                                Customer.addShoppingCart();
+                                break;
+                            case 2:
+                                Customer.deleteShoppingCart();
+                                break;
+                            case 3:
+                                CheckOut.checkOutAndExportToCSV();
+                                ShoppingCartExporter.exportToCSV(shoppingCart, "shopping_cart.csv");
+                                CSVReader.readCSV("shopping_cart.csv");
+                                break;
+                            default:
+                                System.out.println("Invalid choice. Please enter a number between 1 and 5.");
+                        }
                         break;
                     case 5:
-                        // add code for shopping cart
+                        // add code for purchase history
                         break;
                     //Rohan
                     //case 6:
