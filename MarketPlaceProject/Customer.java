@@ -6,6 +6,17 @@ public class Customer {
     ArrayList<Product> shoppingCart;
     
     ArrayList<Product> purchaseHistory;
+    
+    // Tri Nov 13
+    int purchaseNumber;
+    public int getPurchaseNumber() {
+        return purchaseNumber;
+    }
+
+    public void setPurchaseNumber(int purchaseNumber) {
+        this.purchaseNumber = purchaseNumber;
+    }
+    //
 
     public Customer(ArrayList<Product> shoppingCart, String customerUserName) {
         this.customerUserName = customerUserName;
