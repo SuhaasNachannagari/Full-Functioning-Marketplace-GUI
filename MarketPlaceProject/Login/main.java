@@ -305,7 +305,7 @@ public class main {
                         //view
                         for (int i = 0; i < sellers.size(); i++) {
                             if (sellers.get(i).getUserName().equals(username)) {
-                                //sellers.get(i).view();
+                                sellers.get(i).view();
                             }
                         }
                         break;
@@ -321,10 +321,12 @@ public class main {
                             if (choice == 1) {
                                 for (int i = 0; i < sellers.size(); i++) {
                                     if (sellers.get(i).getUserName().equals(username)) {
-                                        sellers.get(i).loadFromFileProduct();
+                                        System.out.println("Enter file name:");
+                                        String fileName = scanner.nextLine();
+                                        sellers.get(i).loadFromFileProduct(fileName);
+                                        break;
                                     }
                                 }
-
                             } else if (choice == 2) {
                                 System.out.println("Enter product details you want to add to export file:");
                                 String productName = scanner.nextLine();
