@@ -1,21 +1,23 @@
 import java.util.*;
-import java.io.Serializable;
-
 /**
- * Project 4 - Product
- * <p>
- * This class represents a product.
+ * A product class that contains all the information for a product that will be used multiple 
+ * times throughout the marketplace.
+ *
+ * <p>Purdue University -- CS18000 -- Fall 2023</p>
+ *
+ * @version November 13, 2023
  */
-
-public class Product implements Serializable { // most basic class, everything is built off of this
+public class Product { // most basic class, everything is built off of this
     private String name;
     private String storeName;
     private String description;
     private int quantAvailable;
     private double price;
     private ArrayList<String> reviews;
-    
+
     private int limit;
+
+    private int sales;
 
     public Product(String name, String storeName, String description, int quantAvailable, double price) {
         this.name = name;
@@ -24,6 +26,7 @@ public class Product implements Serializable { // most basic class, everything i
         this.quantAvailable = quantAvailable;
         this.price = price;
         this.reviews = null;
+        this.limit = -1;
     }
 
     public String getName() {
