@@ -8,20 +8,20 @@ Tri - Submitted the code on Vocareum
 
 Classes:  
   Login -  
-    CustomerLogin - Login for customers:
-      Once the user says they are a customer,
-      ask them whether they have an existing account or not.
-      If: The account exists, check if the username exists and return an error if it doesn't.
-      Ask for the password and if its correct go into the rest of the code.
-      If: The account doesn't exist, ask them for a username and return an error if the username already exists. 
-      Ask them for a password.
-    SellerLogin -  Login for sellers:
-      Once the user says they are a seller,
-      ask them whether they have an existing account or not.
-      If: The account exists, check if the username exists and return an error if it doesn't.
-      Ask for the password and if its correct go into the rest of the code.
-      If: The account doesn't exist, ask them for a username and return an error if the username already exists.
-      ask them for a password.  
+    CustomerLogin - Login for customers:  
+      Once the user says they are a customer,   
+      ask them whether they have an existing account or not.   
+      If: The account exists, check if the username exists and return an error if it doesn't.  
+      Ask for the password and if its correct go into the rest of the code.   
+      If: The account doesn't exist, ask them for a username and return an error if the username already exists.  
+      Ask them for a password.  
+    SellerLogin -  Login for sellers:   
+      Once the user says they are a seller,  
+      ask them whether they have an existing account or not.  
+      If: The account exists, check if the username exists and return an error if it doesn't.   
+      Ask for the password and if its correct go into the rest of the code.   
+      If: The account doesn't exist, ask them for a username and return an error if the username already exists.   
+      ask them for a password.   
     User - This class helps implement the login features of the code by allowing easy storage of username and passwords.  
   Seller -  
   Product - 
