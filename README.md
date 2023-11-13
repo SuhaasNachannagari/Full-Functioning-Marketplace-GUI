@@ -6,27 +6,27 @@ After the customer/seller signs into their account they are prompted with all th
 Raghav - Submitted report on Brightspace
 Tri - Submitted the code on Vocareum
 
-Classes:\n
-  Login -\n
-    CustomerLogin - \n
-    SellerLogin - \n
-    User - \n
-  Seller -\n
-  Product -\n
-  Store - \n
-  buyShoppingCart - \n
-  CSVReader - \n
-  Dashboard(Seller) - \n
-  CustomerSwitchCase - \n
-  Customer -\n
-  SellerMarketplace - \n
-    Create - \n
-    Dashboard - \n
-    Delete - \n
-    Edit - \n
-  CustomerMarketplace - \n
-    CustomerDashboard -\n
-    Search - \n
-    Sort - \n 
-    View - \n
-\n
+Classes:
+  Login -
+    CustomerLogin - 
+    SellerLogin - 
+    User - 
+  Seller -
+  Product -
+  Store - 
+  buyShoppingCart - 
+  CSVReader - 
+  Dashboard(Seller) - 
+  CustomerSwitchCase - 
+  Customer 
+  SellerMarketplace - 
+    Create - 
+    Dashboard - 
+    Delete - 
+    Edit - 
+  CustomerMarketplace - 
+    CustomerDashboard -
+    Search - 
+    Sort -  
+    View - 
+
