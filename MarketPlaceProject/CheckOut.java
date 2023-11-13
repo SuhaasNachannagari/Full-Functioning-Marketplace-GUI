@@ -12,7 +12,7 @@ public class CheckOut extends main {
                 customer.setShoppingCar(null);
                 Store storeToUpdate = null;
 
-                for (Product product : updateShoppingCart) {
+                for (Product product : updatedShoppingCart) {
                     for (Seller seller : sellers) {
                         ArrayList<Store> stores = seller.getStores();
                         for (Store store : stores) {
