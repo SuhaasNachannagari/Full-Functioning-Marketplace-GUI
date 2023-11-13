@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.io.Serializable;
 
 /**
  * Project 4 - Seller
