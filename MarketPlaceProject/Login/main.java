@@ -28,11 +28,10 @@ public class main {
     }
 
     public static void main(String[] args) {
-
         // this read the file and set the "sellers" variable
         //sellers = readDataSeller();
-        sellers = readDataSeller();
-        customers = readDataCustomer();
+        if (!readDataSeller().isEmpty()) { sellers = readDataSeller(); }
+        if (!readDataCustomer().isEmpty()) { customers = readDataCustomer(); }
 
 
         Scanner scanner = new Scanner(System.in);
@@ -156,6 +155,7 @@ public class main {
                          */
 
 
+
                     } else if (input == 2) {
                         boolean usernameExists;
                         do {
@@ -228,7 +228,7 @@ public class main {
                             //view
                             for (int i = 0; i < sellers.size(); i++) {
                                 if (sellers.get(i).getUserName().equals(username)) {
-                                    sellers.get(i).view();
+                                    //sellers.get(i).view();
                                 }
                             }
                             break;
@@ -373,7 +373,7 @@ public class main {
                                         validQuantityNum = sorter.quantityShowProduct(quantityNum);
                                         if (!validQuantityNum) {
                                             System.out.println("Enter a valid input please:");
-                                            priceNum = scanner.nextInt();
+                                            int priceNum = scanner.nextInt();
                                         }
                                     } while (!validQuantityNum);
                                     boolean validActionProduct = true;
@@ -506,15 +506,9 @@ public class main {
                             // add code for shopping cart
                             break;
                         //Rohan
-                        case 6:
-                            CustomerDashboard dashboard = new CustomerDashboard();
-                            Customer customer = null;
-                            for (int i = 0; i < customers.size(); i++) {
-                                if (customers.get(i).getCustomerUserName().equals(username)) {
-                                    customer = customers.get(i);
-                                }
-                            }
-                            dashboard.printDashboard(customer);
+                        //case 6:
+                          //  CustomerDashboard dashboard = new CustomerDashboard();
+                            //dashboard.printDashboard();
                         default:
                             System.out.println("Please enter the correct number!");
                             checkIndexUser = false;
