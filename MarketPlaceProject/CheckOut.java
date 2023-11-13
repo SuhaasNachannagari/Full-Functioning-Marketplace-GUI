@@ -1,6 +1,12 @@
 import java.io.*;
 import java.util.ArrayList;
 
+/**
+*project 4 CheckOut
+*
+*this class check out the item from the user's shopping cart and clean it while delete it from the seller then export it to cvs file
+*/
+
 public class CheckOut extends main {
     private ArrayList<Product> updatedShoppingCart;
 
