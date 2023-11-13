@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class Product { // most basic class, everything is built off of this
+public class Product implements Serializable { // most basic class, everything is built off of this
     private String name;
     private String storeName;
     private String description;
