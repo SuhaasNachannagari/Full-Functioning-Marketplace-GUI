@@ -39,7 +39,7 @@ public class main {
 
 
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Filler");//Fill in the welcome message.
+        System.out.println("Welcome to the marketplace.");//Fill in the welcome message.
         boolean correctInput = true;
         // Tri: I bring this out so that I can use this variable later;
         int custOrSell;
