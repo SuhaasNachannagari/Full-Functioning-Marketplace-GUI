@@ -564,7 +564,7 @@ public class main {
                         }
                         break;
                     case 5:
-                        // add code for purchase history
+                        System.out.println(Customer.getPurchaseHistory());
                         break;
                     //Rohan
                     //case 6:
