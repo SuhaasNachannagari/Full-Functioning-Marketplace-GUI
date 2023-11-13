@@ -30,6 +30,7 @@ Classes:
   Seller -  
   
   Product - 
+  A product class that contains all the information for a product that will be used multiple times throughout the marketplace.
   
   Store -  
   
