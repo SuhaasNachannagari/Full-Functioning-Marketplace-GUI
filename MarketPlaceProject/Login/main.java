@@ -2,6 +2,12 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Project 4 - Main
+ *
+ * This class represents the marketplace.
+ */
+
 public class main {
     public static ArrayList<Seller> sellers;
 
