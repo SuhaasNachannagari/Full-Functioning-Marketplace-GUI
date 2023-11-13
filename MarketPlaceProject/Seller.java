@@ -53,14 +53,13 @@ public class Seller implements Serializable {
         }
     }
 
-    public ArrayList<String> loadFromFileProduct() {
+    public void loadFromFileProduct(String file) {
         ArrayList<String> productData = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("SellerProductDetails.txt")) ){
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                productData.add(line);
+                System.out.println(line);
             }
-            return productData;
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
