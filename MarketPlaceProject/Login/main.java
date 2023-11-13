@@ -195,6 +195,7 @@ public class main {
                     scanner.nextLine();
 
                     switch (option) {
+                        // Tri
                         case 1:
                             Delete delete = new Delete();
                             delete.setSeller(username);
@@ -207,6 +208,75 @@ public class main {
                             Create create = new Create();
                             create.setSeller(username);
                             break;
+                        //Raghav
+                        case 4:
+                            //view
+                            for (int i = 0; i < sellers.size(); i++) {
+                                if (sellers.get(i).getUsername().equals(username)) {
+                                    sellers.get(i).view();
+                                }
+                            }
+                            break;
+                        case 5:
+                            //import export files
+                            int choice;
+                            boolean flag = true;
+                            do {
+                                System.out.println("Do you want to import or export files (1 - Import, 2 - Export, " +
+                                        "3 - exit");
+                                choice = scanner.nextInt();
+
+                                if (choice == 1) {
+                                    for (int i = 0; i < sellers.size(); i++) {
+                                        if (sellers.get(i).getUsername().equals(username)) {
+                                            sellers.get(i).loadFromFileProduct();
+                                        }
+                                    }
+
+                                } else if (choice == 2) {
+                                    System.out.println("Enter product details you want to add to export file:");
+                                    String productName = scanner.nextLine();
+                                    String storeName = scanner.nextLine();
+                                    String description = scanner.nextLine();
+                                    int quantity = scanner.nextInt();
+                                    double price = scanner.nextDouble();
+
+                                    Product product = new Product(productName, storeName, description, quantity, price);
+
+                                    for (int i = 0; i < sellers.size(); i++) {
+                                        if (sellers.get(i).getUsername().equals(username)) {
+                                            if (sellers.get(i).getStores().get(i).getName().equals(storeName)) {
+                                                sellers.get(i).saveToFileProduct(product);
+                                            }
+                                        } else {
+                                            System.out.println("No store found. Making a new one.");
+                                            ArrayList<Product> productsInStore = new ArrayList<>();
+                                            productsInStore.add(product);
+                                            Store store = new Store(productsInStore, storeName);
+                                            sellers.get(i).stores.add(store);
+                                        }
+                                    }
+                                } else if(choice == 3){
+                                    flag = false;
+                                } else {
+                                    System.out.println("Invalid choice. Try again");
+                                }
+                            } while (flag);
+                            break;
+
+                        case 6:
+                            //Dashboard
+                            for(int i = 0; i < sellers.size(); i++) {
+                                System.out.println("Store:");
+                                System.out.println(sellers.get(i).getStores().get(i));
+                                System.out.println("Products\tPrice");
+                                for(int j = 0; j < sellers.get(i).getStores().get(i).getProducts().size(); j++) {
+                                    System.out.println(sellers.get(i).getStores().get(i).getProducts().get(j) + "\t"
+                                            + sellers.get(i).getStores().get(i).getProducts().get(j).getSales());
+                                }
+                            }
+                            break;
+                            //Raghav
                         default:
                             System.out.println("Please enter the correct number!");
                             checkIndexUser = false;
