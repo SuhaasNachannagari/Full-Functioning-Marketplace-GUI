@@ -20,7 +20,7 @@ public class main {
         // this read the file and set the "sellers" variable
         //sellers = readDataSeller();
         sellers = readDataSeller();
-        
+
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Filler");//Fill in the welcome message.
@@ -276,7 +276,7 @@ public class main {
                                 }
                             }
                             break;
-                            //Raghav
+                        //Raghav
                         default:
                             System.out.println("Please enter the correct number!");
                             checkIndexUser = false;
@@ -307,7 +307,7 @@ public class main {
                     System.out.println("1 - Sort, 2 - View, 3 - Search, 4 - Shopping Carts, 5 - Purchased Items, 6 - Dashboard ");
                     int option = scanner.nextInt();
                     scanner.nextLine();
-                    
+
                     switch (option) {
                         // Thomas, Suhaas, and Rohan
                         default:
@@ -361,6 +361,34 @@ public class main {
             result = new ArrayList<>();
             for (; ; ) {
                 result.add((Seller) ois.readObject());
+            }
+        } catch (EOFException eof) {
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        return result;
+    }
+
+    public static void writeDataCustomer() {
+        ArrayList<Customer> customerData = getCustomers();
+        try(FileOutputStream fos = new FileOutputStream("CustomerInfo.bin");
+            ObjectOutputStream oos = new ObjectOutputStream(fos);) {
+            for (int i = 0; i < customerData.size(); i++) {
+                oos.writeObject(customerData.get(i));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static ArrayList<Customer> readDataCustomer() {
+        ArrayList<Customer> result = null;
+        try (FileInputStream fis = new FileInputStream("CustomerInfo.bin");
+             ObjectInputStream ois = new ObjectInputStream(fis);) {
+            result = new ArrayList<>();
+            for (; ; ) {
+                result.add((Customer) ois.readObject());
             }
         } catch (EOFException eof) {
         } catch (IOException | ClassNotFoundException e) {
