@@ -1,4 +1,3 @@
-import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -40,21 +39,40 @@ public class main {
             System.out.println("Welcome to the marketplace.");//Fill in the welcome message.
             boolean correctInput = true;
             // Tri: I bring this out so that I can use this variable later;
-            int custOrSell;
+            int custOrSell = 0;
             //
 
             do {
-                System.out.println("Are you a customer or a seller?" +
-                        "(1 - Seller, 2 - Customer, 3 - Exit)");
-                custOrSell = scanner.nextInt();
-                scanner.nextLine();
+                boolean checkFormat1;
+                do {
+                    checkFormat1 = true;
+                    try {
+                        System.out.println("Are you a customer or a seller?" +
+                                "(1 - Seller, 2 - Customer, 3 - Exit)");
+                        custOrSell = scanner.nextInt();
+                        scanner.nextLine();
+                    } catch (NumberFormatException e) {
+                        checkFormat1 = false;
+                        System.out.println("Enter the correct format!");
+                    }
+                } while (!checkFormat1);
                 if (custOrSell == 1) { //Seller
                     SellerLogin sellerLogin = new SellerLogin();
                     boolean correctInput1 = true;
                     do {
-                        System.out.println("Does the account already exist? (1 - Exists, 2 - New Account)");
-                        int input = scanner.nextInt();
-                        scanner.nextLine();
+                        int input = 0;
+                        boolean checkFormat;
+                        do {
+                            checkFormat = true;
+                            try {
+                                System.out.println("Does the account already exist? (1 - Exists, 2 - New Account)");
+                                input = scanner.nextInt();
+                                scanner.nextLine();
+                            } catch (NumberFormatException e) {
+                                System.out.println("Enter the correct format!");
+                                checkFormat = false;
+                            }
+                        } while (!checkFormat);
                         if (input == 1) {
                             boolean usernameExists;
                             boolean passwordIsCorrect;
@@ -129,9 +147,19 @@ public class main {
                     CustomerLogin customerLogin = new CustomerLogin();
                     boolean correctInput1 = true;
                     do {
-                        System.out.println("Does the account already exist? (1 - Exists, 2 - New Account)");
-                        int input = scanner.nextInt();
-                        scanner.nextLine();
+                        int input = 0;
+                        boolean checkFormat2;
+                        do {
+                            checkFormat2 = true;
+                            try {
+                                System.out.println("Does the account already exist? (1 - Exists, 2 - New Account)");
+                                input = scanner.nextInt();
+                                scanner.nextLine();
+                            } catch (NumberFormatException e) {
+                                System.out.println("Please enter the correct format!");
+                                checkFormat2 = false;
+                            }
+                        } while (!checkFormat2);
                         if (input == 1) {
                             boolean usernameExists;
                             boolean passwordIsCorrect;
@@ -217,7 +245,7 @@ public class main {
                     lastIndex = scanner.nextInt();
                     scanner.nextLine();
                 } catch (NumberFormatException e) {
-                    System.out.println("Please enter the correct formar!");
+                    System.out.println("Please enter the correct format!");
                     lastFormat = false;
                 }
             } while (!lastFormat);
@@ -245,10 +273,19 @@ public class main {
             do {
                 checkIndexUser = true;
                 System.out.println("What do you want to do?");
-                System.out.println("1 - Delete, 2 - Edit, 3 - Create, 4 - View, 5 - Import/Export, 6 - Dashboard ");
-                int option = scanner.nextInt();
-                scanner.nextLine();
-
+                boolean checkFormat;
+                int option = 0;
+                do {
+                    checkFormat = true;
+                    try {
+                        System.out.println("1 - Delete, 2 - Edit, 3 - Create, 4 - View, 5 - Import/Export, 6 - Dashboard ");
+                        option = scanner.nextInt();
+                        scanner.nextLine();
+                    } catch (NumberFormatException e) {
+                        checkFormat = false;
+                        System.out.println("Please enter the correct format!");
+                    }
+                } while (!checkFormat);
                 switch (option) {
                     // Tri
                     case 1:
@@ -274,13 +311,20 @@ public class main {
                         break;
                     case 5:
                         //import export files
-                        int choice;
+                        int choice = 0;
                         boolean flag = true;
                         do {
-                            System.out.println("Do you want to import or export files (1 - Import, 2 - Export, " +
-                                    "3 - exit");
-                            choice = scanner.nextInt();
-
+                            boolean checkFormat1;
+                            do {
+                                checkFormat1 = true;
+                                try {
+                                    System.out.println("Do you want to import or export files (1 - Import, 2 - Export, " +
+                                            "3 - exit");
+                                    choice = scanner.nextInt();
+                                } catch (NumberFormatException e) {
+                                    checkFormat1 = false;
+                                }
+                            } while (!checkFormat1);
                             if (choice == 1) {
                                 for (int i = 0; i < sellers.size(); i++) {
                                     if (sellers.get(i).getUserName().equals(username)) {
@@ -336,7 +380,7 @@ public class main {
 
             do {
                 checkIndexDoAgain = false;
-                System.out.println("Do you want to exit the program? ( 1 - Yes, 2 - No");
+                System.out.println("Do you want to continue your implementation? ( 1 - Yes, 2 - No");
                 checkDoAgain = scanner.nextInt();
                 scanner.nextLine();
 
@@ -543,7 +587,8 @@ public class main {
                         } while (searchAgain == 1);
                         break;
                     case 4:
-                        System.out.println("What do you want to do? ");
+                        // add code for purchase history, code below does not run properly
+                        /*System.out.println("What do you want to do? ");
                         System.out.println("1 - Add to cart, 2 - Remove from cart, 3 - Check out, 4 - View cart");
                         int choice = scanner.nextInt();
                         scanner.nextLine();
@@ -555,26 +600,30 @@ public class main {
                             case 2:
                                 Customer.deleteShoppingCart();
                                 break;
-                             case 3:
+                            case 3:
                                 CheckOut.checkOutAndExportToCSV();
                                 //Export to CSV and clear shoppingCart
                                 ShoppingCartExporter.exportToCSV(shoppingCart, "shopping_cart.csv");
                                 //Read and display the CSV file
                                 CSVReader.readCSV("shopping_cart.csv");
                                 break;
-                            case 4: 
+                            case 4:
                                 System.out.println(Customer.getShoppingCar());
                             default:
-                                    System.out.println("Invalid choice. Please enter a number between 1 and 4.");
+                                System.out.println("Invalid choice. Please enter a number between 1 and 4.");
                         }
+                        */
                         break;
                     case 5:
+                        /* add code for purchase history, code below does not run properly
                         System.out.println(Customer.getPurchasedHistory());
+                        */
                         break;
                     //Rohan
-                    //case 6:
-                    //  CustomerDashboard dashboard = new CustomerDashboard();
-                    //dashboard.printDashboard();
+                    case 6:
+                        CustomerDashboard dashboard = new CustomerDashboard();
+                        dashboard.printDashboard();
+                        break;
                     default:
                         System.out.println("Please enter the correct number!");
                         checkIndexUser = false;
