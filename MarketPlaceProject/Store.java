@@ -16,6 +16,7 @@ public class Store implements Serializable {
 
     String name;
     ArrayList<Product> products;
+    double sales;
     public Store(ArrayList<Product> products, String name) {
         this.products = products;
         this.name = name;
@@ -36,6 +37,10 @@ public class Store implements Serializable {
 
     public void setProducts(ArrayList<Product> products) {
         this.products = products;
+    }
+
+    public double getSales() {
+        return sales;
     }
 
     public void addProduct(Product product) {
