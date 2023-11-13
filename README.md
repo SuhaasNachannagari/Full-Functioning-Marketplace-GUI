@@ -3,7 +3,7 @@ To run and Compile our project, you must run the main method of the program, whi
 ![image](https://github.com/SuhaasNachannagari/Project4CSGOld/assets/143854535/2f61bb32-a6c5-44c7-ad02-e91005411eac)
 After the customer/seller signs into their account they are prompted with all the different actions they can perform.
 
-Raghav - Submitted report on Brightspace
+Raghav - Submitted report on Brightspace  
 Tri - Submitted the code on Vocareum
 
 Classes:
