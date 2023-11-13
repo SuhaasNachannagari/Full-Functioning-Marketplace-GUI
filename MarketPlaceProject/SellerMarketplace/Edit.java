@@ -1,6 +1,12 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Project 4 - Edit
+ * <p>
+ * This class will be used to edit products.
+ */
+
 public class Edit extends main {
     private Seller seller;
     private int sellerIndex;
