@@ -12,7 +12,7 @@ public class View extends main {
 
     ArrayList<Product> listedProducts;
 
-    public void createList() {
+    public void listProducts() {
         for (Seller seller : listedSellers) {
             ArrayList<Store> stores = seller.getStores();
             for (Store store : stores) {
@@ -22,8 +22,6 @@ public class View extends main {
                 }
             }
         }
-    }
-    public void listProducts() {
         System.out.println("Here are your available items: ");
         int i = 1;
         for (Product product : listedProducts) {
@@ -42,7 +40,7 @@ public class View extends main {
         }
         Product product = listedProducts.get(num - 1);
         System.out.printf("Name: %s\n" + "  Store Name: %s\n" + "  Price: %.2f\n" +
-                        "  Quantity Available: %d\n" + "Description: %s\n",
+                        "  Quantity Available: %d\n" + "  Description: %s\n",
                 product.getName(),
                 product.getStoreName(),
                 product.getPrice(),
@@ -56,6 +54,7 @@ public class View extends main {
             System.out.println("Reviews: ");
             for (String review : reviews) {
                 System.out.println(j + ") \"" + review + "\"");
+                j++;
             }
         }
         return true;
@@ -67,7 +66,7 @@ public class View extends main {
         for (Customer customer : listedCustomers) {
             if (customer.getCustomerUserName().equals(username)) {
                 ArrayList<Product> updatedShoppingCart = customer.getShoppingCar();
-                if (quantity > productFromSeller.getLimit() ){
+                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())){
                     System.out.println("You are attempting to add more than the limit of "
                             + productFromSeller.getLimit() + " units set by the seller");
                 } else if (quantity > productFromSeller.getQuantAvailable()) {
@@ -88,15 +87,15 @@ public class View extends main {
     }
     public void purchaseItem(String username, int quantity, int num) {
         Product productFromSeller = listedProducts.get(num - 1);
-        for (Customer customer : listedCustomers) {
+        for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
                 ArrayList<Product> updatedPurchaseHistory = customer.getPurchaseHistory();
-                if (quantity > productFromSeller.getLimit() ){
-                    System.out.println("You are attempting to add more than the limit of "
+                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())){
+                    System.out.println("You are attempting to buy more than the limit of "
                             + productFromSeller.getLimit() + " units set by the seller");
                 } else if (quantity > productFromSeller.getQuantAvailable()) {
                     System.out.println("There is only " + productFromSeller.getQuantAvailable()
-                            + " units left, you are attempting to add above that limit");
+                            + " units left, you are attempting to buy above that limit");
                 } else {
                     Product productToBuy = new Product(productFromSeller.getName(),
                             productFromSeller.getStoreName(),
@@ -106,11 +105,25 @@ public class View extends main {
                     updatedPurchaseHistory.add(productToBuy);
                     customer.setPurchaseHistory(updatedPurchaseHistory);
                     productFromSeller.setQuantAvailable(productFromSeller.getQuantAvailable()-quantity);
+                    Store storeToUpdate = null;
+                    for (Seller seller : sellers) {
+                        ArrayList<Store> stores = seller.getStores();
+                        for (Store store : stores) {
+                            ArrayList<Product> products = store.getProducts();
+                            for (Product product : products) {
+                                if (product.getName().equals(productToBuy.getName())) {
+                                    storeToUpdate = store;
+                                    storeToUpdate.editProduct(product.getName(), 4, (""+ (productFromSeller.getQuantAvailable()-quantity)));
+                                    store = storeToUpdate;
+                                }
+                            }
+                        }
+                        seller.setStores(stores);
+                    }
                     if (productFromSeller.getQuantAvailable()-quantity == 0) {
-                        System.out.println("You have bought ");
+                        System.out.println("You have bought the entire stock");
                     }
                 }
-
             }
         }
     }
