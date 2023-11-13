@@ -1,3 +1,10 @@
+/**
+ * Project 4 - User
+ *
+ * This class represents all users
+ */
+
+
 public class User {
     private String username;
     private String password;
