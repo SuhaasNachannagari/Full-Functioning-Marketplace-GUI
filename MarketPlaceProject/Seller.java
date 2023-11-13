@@ -1,6 +1,12 @@
 import java.io.*;
 import java.util.ArrayList;
 
+/**
+ * Project 4 - Seller
+ *
+ * This class represents a single seller.
+ */
+
 public class Seller implements Serializable {
     private String userName;
     ArrayList<Store> stores = new ArrayList();
