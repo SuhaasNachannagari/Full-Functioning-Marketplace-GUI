@@ -1,5 +1,11 @@
 import java.util.*;
 
+/**
+ * Project 4 - Product
+ * <p>
+ * This class represents a product.
+ */
+
 public class Product implements Serializable { // most basic class, everything is built off of this
     private String name;
     private String storeName;
