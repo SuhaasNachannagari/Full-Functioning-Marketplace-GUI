@@ -2,7 +2,9 @@ import java.util.*;
 import java.lang.*;
 /**
  * A Class that extends main in order to display and enact the code that runs whenever 
- * the customer chooses to "search" in the main method 
+ * the customer chooses to "search" in the main method. Includes methods that sort the products,
+ * display the products, and allow the user to write a review, buy the product, or add it to their 
+ * shopping cart
  *
  * <p>Purdue University -- CS18000 -- Fall 2023</p>
  *
