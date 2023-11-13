@@ -6,27 +6,27 @@ After the customer/seller signs into their account they are prompted with all th
 Raghav - Submitted report on Brightspace  
 Tri - Submitted the code on Vocareum
 
-Classes:
-  Login -
-    CustomerLogin - 
-    SellerLogin - 
-    User - 
-  Seller -
-  Product -
-  Store - 
-  buyShoppingCart - 
-  CSVReader - 
-  Dashboard(Seller) - 
-  CustomerSwitchCase - 
-  Customer 
-  SellerMarketplace - 
-    Create - 
-    Dashboard - 
-    Delete - 
-    Edit - 
-  CustomerMarketplace - 
-    CustomerDashboard -
-    Search - 
-    Sort -  
-    View - 
+Classes:  
+  Login -  
+    CustomerLogin -  
+    SellerLogin -  
+    User -  
+  Seller -  
+  Product - 
+  Store -  
+  buyShoppingCart -  
+  CSVReader -  
+  Dashboard(Seller) -  
+  CustomerSwitchCase -  
+  Customer -  
+  SellerMarketplace -  
+    Create -  
+    Dashboard -  
+    Delete -   
+    Edit -  
+  CustomerMarketplace -   
+    CustomerDashboard - A Class that extends main in order to display and enact the code that runs whenever the customer chooses to view a dashboard. It allows the customer     to view all the stores and prints out the number of sales for each of them. It also displays the products the customer has bought and the stores they have bought it         from.  
+    Search -   
+    Sort -   
+    View -  
 
