@@ -3,7 +3,14 @@ import java.awt.image.AreaAveragingScaleFilter;
 import java.util.*;
 import java.lang.*;
 import java.io.*;
-
+/**
+ * A class that extends main in order to display and enact the code that runs whenever
+ * the customer chooses to "sort" in the main method
+ *
+ * <p>Purdue University -- CS18000 -- Fall 2023</p>
+ *
+ * @version November 13, 2023
+ */
 
 public class Sort extends main {
     private ArrayList<Seller> sortedSellers = getSellers();
@@ -104,6 +111,7 @@ public class Sort extends main {
         }
         return true;
     }
+
     public boolean quantityShowProduct(int num) {
         Scanner scanner = new Scanner(System.in);
         if (num < 1 || num > quantityListedProducts.size()) {
@@ -136,7 +144,7 @@ public class Sort extends main {
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
                 ArrayList<Product> updatedShoppingCart = customer.getShoppingCar();
-                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())){
+                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
                     System.out.println("You are attempting to add more than the limit of "
                             + productFromSeller.getLimit()
                             + " units set by the seller");
@@ -161,7 +169,7 @@ public class Sort extends main {
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
                 ArrayList<Product> updatedPurchaseHistory = customer.getPurchaseHistory();
-                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())){
+                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
                     System.out.println("You are attempting to buy more than the limit of "
                             + productFromSeller.getLimit() + " units set by the seller");
                 } else if (quantity > productFromSeller.getQuantAvailable()) {
@@ -175,7 +183,7 @@ public class Sort extends main {
                             productFromSeller.getPrice());
                     updatedPurchaseHistory.add(productToBuy);
                     customer.setPurchaseHistory(updatedPurchaseHistory);
-                    productFromSeller.setQuantAvailable(productFromSeller.getQuantAvailable()-quantity);
+                    productFromSeller.setQuantAvailable(productFromSeller.getQuantAvailable() - quantity);
                     Store storeToUpdate = null;
                     for (Seller seller : sellers) {
                         ArrayList<Store> stores = seller.getStores();
@@ -185,14 +193,14 @@ public class Sort extends main {
                                 if (product.getName().equals(productToBuy.getName())) {
                                     storeToUpdate = store;
                                     storeToUpdate.editProduct(product.getName(), 4,
-                                            (""+ (productFromSeller.getQuantAvailable()-quantity)));
+                                            ("" + (productFromSeller.getQuantAvailable() - quantity)));
                                     store = storeToUpdate;
                                 }
                             }
                         }
                         seller.setStores(stores);
                     }
-                    if (productFromSeller.getQuantAvailable()-quantity == 0) {
+                    if (productFromSeller.getQuantAvailable() - quantity == 0) {
                         System.out.println("You have bought the entire stock");
                     }
                 }
@@ -200,12 +208,13 @@ public class Sort extends main {
             }
         }
     }
+
     public void priceAddToShoppingCart(String username, int quantity, int num) {
         Product productFromSeller = priceListedProducts.get(num - 1);
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
                 ArrayList<Product> updatedShoppingCart = customer.getShoppingCar();
-                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())){
+                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
                     System.out.println("You are attempting to add more than the limit of "
                             + productFromSeller.getLimit()
                             + " units set by the seller");
@@ -230,7 +239,7 @@ public class Sort extends main {
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
                 ArrayList<Product> updatedPurchaseHistory = customer.getPurchaseHistory();
-                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())){
+                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
                     System.out.println("You are attempting to buy more than the limit of "
                             + productFromSeller.getLimit() + " units set by the seller");
                 } else if (quantity > productFromSeller.getQuantAvailable()) {
@@ -244,7 +253,7 @@ public class Sort extends main {
                             productFromSeller.getPrice());
                     updatedPurchaseHistory.add(productToBuy);
                     customer.setPurchaseHistory(updatedPurchaseHistory);
-                    productFromSeller.setQuantAvailable(productFromSeller.getQuantAvailable()-quantity);
+                    productFromSeller.setQuantAvailable(productFromSeller.getQuantAvailable() - quantity);
                     Store storeToUpdate = null;
                     for (Seller seller : sellers) {
                         ArrayList<Store> stores = seller.getStores();
@@ -254,14 +263,14 @@ public class Sort extends main {
                                 if (product.getName().equals(productToBuy.getName())) {
                                     storeToUpdate = store;
                                     storeToUpdate.editProduct(product.getName(), 4,
-                                            (""+ (productFromSeller.getQuantAvailable()-quantity)));
+                                            ("" + (productFromSeller.getQuantAvailable() - quantity)));
                                     store = storeToUpdate;
                                 }
                             }
                         }
                         seller.setStores(stores);
                     }
-                    if (productFromSeller.getQuantAvailable()-quantity == 0) {
+                    if (productFromSeller.getQuantAvailable() - quantity == 0) {
                         System.out.println("You have bought the entire stock");
                     }
                 }
@@ -269,14 +278,13 @@ public class Sort extends main {
             }
         }
     }
+
     public void addReview(String review, int num) {
         Product productToReview = quantityListedProducts.get(num - 1);
         ArrayList<String> updatedReviews = productToReview.getReviews();
         updatedReviews.add(review);
         productToReview.setReviews(updatedReviews);
     }
-
-
 
 
 }
