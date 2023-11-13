@@ -57,9 +57,9 @@ Classes:
   
     CustomerDashboard - A Class that extends main in order to display and enact the code that runs whenever the customer chooses to view a dashboard. It allows the customer       to view all the stores and prints out the number of sales for each of them. It also displays the products the customer has bought and the stores they have bought it         from. 
     
-    Search -  
+    Search -  A Class that extends main in order to display and enact the code that runs whenever the customer chooses to "search" in the main method. Includes methods that search the market using the customer's input, display the products, and allow the user to write a review, buy the product, or add it to their shopping cart.
     
-    Sort -   
+    Sort -   A Class that extends main in order to display and enact the code that runs whenever the customer chooses to "search" in the main method. Includes methods that sort the products by quantity or price, display the products, and allow the user to write a review, buy the product, or add it to their shopping cart
     
-    View -  
+    View -  A class that extends main in order to display and enact the code that runs whenever the customer chooses to "sort" in the main method. Includes methods that display the products and allow the user to write a review, buy the product, or add it to their shopping cart
 
