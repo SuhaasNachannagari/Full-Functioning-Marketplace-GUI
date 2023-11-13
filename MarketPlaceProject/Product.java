@@ -14,10 +14,7 @@ public class Product { // most basic class, everything is built off of this
     private int quantAvailable;
     private double price;
     private ArrayList<String> reviews;
-
     private int limit;
-
-    private int sales;
 
     public Product(String name, String storeName, String description, int quantAvailable, double price) {
         this.name = name;
