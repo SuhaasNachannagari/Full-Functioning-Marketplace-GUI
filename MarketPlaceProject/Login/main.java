@@ -207,27 +207,27 @@ public class main {
                 }
             } while (!correctInput);
 
-            //body
-        boolean lastFormat;
-        int lastIndex = 0;
-        do {
-            lastFormat = true;
-            try {
-                System.out.println("1. Log out  2. End program");
-                lastIndex = scanner.nextInt();
-                scanner.nextLine();
-            } catch (NumberFormatException e) {
-                System.out.println("Please enter the correct formar!");
-                lastFormat = false;
-            }
-        } while (!lastFormat);
+                //body
+            boolean lastFormat;
+            int lastIndex = 0;
+            do {
+                lastFormat = true;
+                try {
+                    System.out.println("1. Log out  2. End program");
+                    lastIndex = scanner.nextInt();
+                    scanner.nextLine();
+                } catch (NumberFormatException e) {
+                    System.out.println("Please enter the correct formar!");
+                    lastFormat = false;
+                }
+            } while (!lastFormat);
 
-        if  (lastIndex == 1) {
-            lastCheck = true;
-        }
-        if ( lastIndex == 2) {
-            lastCheck = false;
-        }
+            if  (lastIndex == 1) {
+                lastCheck = true;
+            }
+            if ( lastIndex == 2) {
+                lastCheck = false;
+            }
 
         } while (lastCheck);
         // added but haven't updated
@@ -336,7 +336,7 @@ public class main {
 
             do {
                 checkIndexDoAgain = false;
-                System.out.println("Do you want to use the program again? ( 1 - Yes, 2 - No");
+                System.out.println("Do you want to exit the program? ( 1 - Yes, 2 - No");
                 checkDoAgain = scanner.nextInt();
                 scanner.nextLine();
 
@@ -543,28 +543,10 @@ public class main {
                         } while (searchAgain == 1);
                         break;
                     case 4:
-                        System.out.println("What do you want to do? ");
-                        System.out.println("1 - Add to cart, 2 - Remove from cart, 3 - Check out");
-                        int choice = scanner.nextInt();
-                        scanner.nextLine();
-                        switch(choice) {
-                            case 1:
-                                Customer.addShoppingCart();
-                                break;
-                            case 2:
-                                Customer.deleteShoppingCart();
-                                break;
-                            case 3:
-                                CheckOut.checkOutAndExportToCSV();
-                                ShoppingCartExporter.exportToCSV(shoppingCart, "shopping_cart.csv");
-                                CSVReader.readCSV("shopping_cart.csv");
-                                break;
-                            default:
-                                System.out.println("Invalid choice. Please enter a number between 1 and 5.");
-                        }
+                        // add code for purchase history
                         break;
                     case 5:
-                        System.out.println(Customer.getPurchaseHistory());
+                        // add code for shopping cart
                         break;
                     //Rohan
                     //case 6:
