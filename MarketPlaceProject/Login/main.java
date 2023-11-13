@@ -244,7 +244,7 @@ public class main {
                                     Product product = new Product(productName, storeName, description, quantity, price);
 
                                     for (int i = 0; i < sellers.size(); i++) {
-                                        if (sellers.get(i).getUsername().equals(username)) {
+                                        if (sellers.get(i).getUserName().equals(username)) {
                                             if (sellers.get(i).getStores().get(i).getName().equals(storeName)) {
                                                 sellers.get(i).saveToFileProduct(product);
                                             }
@@ -253,7 +253,7 @@ public class main {
                                             ArrayList<Product> productsInStore = new ArrayList<>();
                                             productsInStore.add(product);
                                             Store store = new Store(productsInStore, storeName);
-                                            sellers.get(i).stores.add(store);
+                                            sellers.get(i).getStores().add(store);
                                         }
                                     }
                                 } else if(choice == 3){
