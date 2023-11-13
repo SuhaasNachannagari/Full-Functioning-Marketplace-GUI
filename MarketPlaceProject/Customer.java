@@ -1,6 +1,12 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Project 4 - Customer
+ *
+ * This class represents a customer.
+ */
+
 public class Customer {
     String customerUserName;
     ArrayList<Product> shoppingCart;
