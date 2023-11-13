@@ -212,7 +212,7 @@ public class main {
                         case 4:
                             //view
                             for (int i = 0; i < sellers.size(); i++) {
-                                if (sellers.get(i).getUsername().equals(username)) {
+                                if (sellers.get(i).getUserName().equals(username)) {
                                     sellers.get(i).view();
                                 }
                             }
@@ -228,7 +228,7 @@ public class main {
 
                                 if (choice == 1) {
                                     for (int i = 0; i < sellers.size(); i++) {
-                                        if (sellers.get(i).getUsername().equals(username)) {
+                                        if (sellers.get(i).getUserName().equals(username)) {
                                             sellers.get(i).loadFromFileProduct();
                                         }
                                     }
