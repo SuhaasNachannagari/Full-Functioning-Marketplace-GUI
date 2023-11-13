@@ -1,6 +1,10 @@
 import java.util.ArrayList;
 import java.util.Scanner;
-
+/**
+ * Project 4 - Dashboard for Seller
+ * <p>
+ * This class will be used to display dashboard.
+ */
 public class Dashboard extends main {
     private Seller seller;
     private ArrayList<Customer> customers = getCustomers();
