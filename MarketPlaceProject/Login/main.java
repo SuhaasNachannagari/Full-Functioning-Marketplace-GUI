@@ -176,6 +176,7 @@ public class main {
                         System.out.println("Please enter your password.");
                         String password = scanner.nextLine();
                         customerLogin.createUser(username, password);
+                        customers.add(new Customer(null, username));
                         /*
                         Rest of the code for a new account.
                          */
