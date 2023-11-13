@@ -1,5 +1,11 @@
 import java.util.ArrayList;
 
+/**
+ * Project 4 - Store
+ * <p>
+ * This class represents a single store.
+ */
+
 // Tri_Vo
 // Field: Name of the store and an ArrayList of Products in that store
 // Method: get, set field value; Add product to store; Edit a product in store; Delete a product in store
