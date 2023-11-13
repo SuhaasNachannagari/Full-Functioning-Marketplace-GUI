@@ -1,12 +1,12 @@
+import java.io.*;
 import java.util.ArrayList;
 
-public class Seller {
-    public String userName;
-    public ArrayList<Store> stores;
+public class Seller extends User {
 
-    public Seller(ArrayList<Store> stores, String userName) {
+    ArrayList<Store> stores = new ArrayList();
+    public Seller(String username, String password, ArrayList<Store> stores) {
+        super(username, password);
         this.stores = stores;
-        this.userName = userName;
     }
 
     public ArrayList<Store> getStores() {
@@ -21,15 +21,39 @@ public class Seller {
         this.stores.add(store);
     }
 
-    public void listProducts() {
-        System.out.println("The available products for the store are:");
-        for(int i = 0; i < this.stores.size(); i++) {
-            System.out.println("Store: " + this.stores.get(i));
-            System.out.println("Products of store:\t\tPrice");
-            for(int j = 0; j < this.stores.get(i).product.size(); j++) {
-                System.out.print(this.stores.get(i).product.get(i) + "\t\t");
-                System.out.println(this.stores.get(i).product.get(i).getPrice());
+    public void view() {
+        System.out.println("List of stores:");
+        for(int i = 0; i < stores.size(); i++) {
+            System.out.println(stores.get(i));
+            System.out.println("Products\tQuantity available");
+            for(int j = 0; j < stores.get(i).getProducts().size(); j++) {
+                stores.get(i).listProducts();
             }
+            System.out.println("Revenue of store: " + stores.get(i).getSales());
         }
+    }
+
+    public void saveToFileProduct(Product product) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("SellerProductDetails.txt"))) {
+            String toFile = product.getName() + "," + product.getStoreName() + "," + product.getDescription() + "," +
+                    product.getQuantAvailable() + "," + product.getPrice();
+            writer.write(toFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ArrayList<String> loadFromFileProduct() {
+        ArrayList<String> productData = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("SellerProductDetails.txt")) ){
+            String line;
+            while ((line = reader.readLine()) != null) {
+                productData.add(line);
+            }
+            return productData;
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        //System.out.println("User data loaded from " + "filler.txt");
     }
 }
