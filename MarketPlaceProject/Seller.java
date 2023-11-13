@@ -1,20 +1,18 @@
 import java.io.*;
 import java.util.ArrayList;
 
-public class Seller extends User implements Serializable {
+public class Seller implements Serializable {
     private String userName;
     ArrayList<Store> stores = new ArrayList();
-    public Seller(String username, String password, ArrayList<Store> stores) {
-        super(username, password);
-        this.stores = stores;
-    }
+    
     //tri: used to create new Seller in main class
     public Seller(ArrayList<Store> stores, String username) {
         this.stores = stores;
         this.username = username;
     }
     //
-
+    public String getUserName() { return this.userName; }
+    
     public ArrayList<Store> getStores() {
         return this.stores;
     }
