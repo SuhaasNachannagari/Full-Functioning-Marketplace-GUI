@@ -318,6 +318,11 @@ public class main {
 
                     switch (option) {
                         // Thomas, Suhaas, and Rohan
+
+                        //Rohan
+                        case 6:
+                            CustomerDashboard dashboard = new CustomerDashboard();
+                            dashboard.printDashboard();
                         default:
                             System.out.println("Please enter the correct number!");
                             checkIndexUser = false;
