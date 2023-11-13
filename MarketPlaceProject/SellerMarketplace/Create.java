@@ -1,6 +1,13 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Project 4 - Create
+ *
+ * This class will be used to create products
+ */
+
+
 public class Create extends main {
     private Seller seller;
     private int sellerIndex;
