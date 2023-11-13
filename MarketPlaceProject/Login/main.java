@@ -9,14 +9,14 @@ import java.util.Scanner;
  */
 
 public class main {
-    public static ArrayList<Seller> sellers;
+    public static ArrayList<Seller> sellers = new ArrayList<>();
 
     // added static, but not updated
     public static ArrayList<Seller> getSellers() {
         return sellers;
     }
 
-    public static ArrayList<Customer> customers;
+    public static ArrayList<Customer> customers = new ArrayList<>();
 
     // added static for getCust, but not updated;
     public static ArrayList<Customer> getCustomers() {
@@ -34,33 +34,61 @@ public class main {
     public static void main(String[] args) {
         // this read the file and set the "sellers" variable
         //sellers = readDataSeller();
-        if (!readDataSeller().isEmpty()) { sellers = readDataSeller(); }
-        if (!readDataCustomer().isEmpty()) { customers = readDataCustomer(); }
-
-
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Welcome to the marketplace.");//Fill in the welcome message.
-        boolean correctInput = true;
-        // Tri: I bring this out so that I can use this variable later;
-        int custOrSell;
-        //
-        
+        boolean lastCheck = false;
         do {
-            System.out.println("Are you a customer or a seller?" +
-                    "(1 - Seller, 2 - Customer, 3 - Exit)");
-            custOrSell = scanner.nextInt();
-            scanner.nextLine();
-            if (custOrSell == 1) { //Seller
-                SellerLogin sellerLogin = new SellerLogin();
-                boolean correctInput1 = true;
-                do {
-                    System.out.println("Does the account already exist? (1 - Exists, 2 - New Account)");
-                    int input = scanner.nextInt();
-                    scanner.nextLine();
-                    if (input == 1) {
-                        boolean usernameExists;
-                        boolean passwordIsCorrect;
-                        do {
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Welcome to the marketplace.");//Fill in the welcome message.
+            boolean correctInput = true;
+            // Tri: I bring this out so that I can use this variable later;
+            int custOrSell;
+            //
+
+            do {
+                System.out.println("Are you a customer or a seller?" +
+                        "(1 - Seller, 2 - Customer, 3 - Exit)");
+                custOrSell = scanner.nextInt();
+                scanner.nextLine();
+                if (custOrSell == 1) { //Seller
+                    SellerLogin sellerLogin = new SellerLogin();
+                    boolean correctInput1 = true;
+                    do {
+                        System.out.println("Does the account already exist? (1 - Exists, 2 - New Account)");
+                        int input = scanner.nextInt();
+                        scanner.nextLine();
+                        if (input == 1) {
+                            boolean usernameExists;
+                            boolean passwordIsCorrect;
+                            do {
+                                do {
+                                    System.out.println("Please enter your username(enter 'back' to go back): ");
+                                    username = scanner.nextLine();
+                                    if (username.equals("back")) {
+                                        correctInput1 = false;
+                                        break;
+                                    }
+                                    usernameExists = sellerLogin.checkExistingUserName(username);
+                                    if (!usernameExists) {
+                                        System.out.println("Please input a valid username.");
+                                    }
+                                } while (!usernameExists);
+                                if (username.equals("back")) {
+                                    break;
+                                }
+                                System.out.println("Please enter your password.");
+                                String password = scanner.nextLine();
+                                passwordIsCorrect = sellerLogin.loginUser(username, password);
+                            } while (!passwordIsCorrect);
+                            if (username.equals("back")) {
+                                break;
+                            }
+                        /*
+                        Continue The code here for an existing seller.
+                         */
+                            runSeller();
+
+
+                        } else if (input == 2) {
+                            boolean usernameExists;
                             do {
                                 System.out.println("Please enter your username(enter 'back' to go back): ");
                                 username = scanner.nextLine();
@@ -69,75 +97,75 @@ public class main {
                                     break;
                                 }
                                 usernameExists = sellerLogin.checkExistingUserName(username);
-                                if (!usernameExists) {
-                                    System.out.println("Please input a valid username.");
+                                if (usernameExists) {
+                                    System.out.println("This username already exists.");
                                 }
-                            } while (!usernameExists);
+                            } while (usernameExists);
+                            // Add new seller
                             if (username.equals("back")) {
                                 break;
                             }
                             System.out.println("Please enter your password.");
                             String password = scanner.nextLine();
-                            passwordIsCorrect = sellerLogin.loginUser(username, password);
-                        } while (!passwordIsCorrect);
-                        if (username.equals("back")) {
-                            break;
-                        }
-                        /*
-                        Continue The code here for an existing seller.
-                         */
-                        runSeller();
 
-
-                    } else if (input == 2) {
-                        boolean usernameExists;
-                        do {
-                            System.out.println("Please enter your username(enter 'back' to go back): ");
-                            username = scanner.nextLine();
-                            if (username.equals("back")) {
-                                correctInput1 = false;
-                                break;
-                            }
-                            usernameExists = sellerLogin.checkExistingUserName(username);
-                            if (usernameExists) {
-                                System.out.println("This username already exists.");
-                            }
-                        } while (usernameExists);
-                        // Add new seller
-                        if (username.equals("back")) {
-                            break;
-                        }
-                        System.out.println("Please enter your password.");
-                        String password = scanner.nextLine();
-
-                        sellerLogin.createUser(username, password);
-                        ArrayList<Store> storesList = new ArrayList<>();
-                        ArrayList<Product> productsList = new ArrayList<>();
-                        storesList.add(new Store(productsList,""));
-                        productsList.add(new Product("", "", "",0, 0.0));
-                        sellers.add(new Seller(storesList, username));
+                            sellerLogin.createUser(username, password);
+                            ArrayList<Store> storesList = new ArrayList<>();
+                            ArrayList<Product> productsList = new ArrayList<>();
+                            storesList.add(new Store(productsList, ""));
+                            productsList.add(new Product("", "", "", 0, 0.0));
+                            sellers.add(new Seller(storesList, username));
                         /*
                         Rest of the code for a new account.
                          */
-                        runSeller();
+                            runSeller();
 
 
-                    } else {
-                        System.out.println("Incorrect input, please try again.");
-                        correctInput1 = false;
-                    }
-                } while (!correctInput1);
-            } else if (custOrSell == 2) {
-                CustomerLogin customerLogin = new CustomerLogin();
-                boolean correctInput1 = true;
-                do {
-                    System.out.println("Does the account already exist? (1 - Exists, 2 - New Account)");
-                    int input = scanner.nextInt();
-                    scanner.nextLine();
-                    if (input == 1) {
-                        boolean usernameExists;
-                        boolean passwordIsCorrect;
-                        do {
+                        } else {
+                            System.out.println("Incorrect input, please try again.");
+                            correctInput1 = false;
+                        }
+                    } while (!correctInput1);
+                } else if (custOrSell == 2) {
+                    CustomerLogin customerLogin = new CustomerLogin();
+                    boolean correctInput1 = true;
+                    do {
+                        System.out.println("Does the account already exist? (1 - Exists, 2 - New Account)");
+                        int input = scanner.nextInt();
+                        scanner.nextLine();
+                        if (input == 1) {
+                            boolean usernameExists;
+                            boolean passwordIsCorrect;
+                            do {
+                                do {
+                                    System.out.println("Please enter your username(enter 'back' to go back): ");
+                                    username = scanner.nextLine();
+                                    if (username.equals("back")) {
+                                        correctInput1 = false;
+                                        break;
+                                    }
+                                    usernameExists = customerLogin.checkExistingUserName(username);
+                                    if (!usernameExists) {
+                                        System.out.println("Please input a valid username.");
+                                    }
+                                } while (!usernameExists);
+                                if (username.equals("back")) {
+                                    break;
+                                }
+                                System.out.println("Please enter your password.");
+                                String password = scanner.nextLine();
+                                passwordIsCorrect = customerLogin.loginUser(username, password);
+                            } while (!passwordIsCorrect);
+                            if (username.equals("back")) {
+                                break;
+                            }
+                        /*
+                        Continue The code here for an existing customer.
+                         */
+                            runCustomer();
+
+
+                        } else if (input == 2) {
+                            boolean usernameExists;
                             do {
                                 System.out.println("Please enter your username(enter 'back' to go back): ");
                                 username = scanner.nextLine();
@@ -146,136 +174,71 @@ public class main {
                                     break;
                                 }
                                 usernameExists = customerLogin.checkExistingUserName(username);
-                                if (!usernameExists) {
-                                    System.out.println("Please input a valid username.");
+                                if (usernameExists) {
+                                    System.out.println("This username already exists.");
                                 }
-                            } while (!usernameExists);
+                            } while (usernameExists);
                             if (username.equals("back")) {
                                 break;
                             }
                             System.out.println("Please enter your password.");
                             String password = scanner.nextLine();
-                            passwordIsCorrect = customerLogin.loginUser(username, password);
-                        } while (!passwordIsCorrect);
-                        if (username.equals("back")) {
-                            break;
-                        }
-                        /*
-                        Continue The code here for an existing customer.
-                         */
-                        runCustomer();
+                            customerLogin.createUser(username, password);
 
-
-
-                    } else if (input == 2) {
-                        boolean usernameExists;
-                        do {
-                            System.out.println("Please enter your username(enter 'back' to go back): ");
-                            username = scanner.nextLine();
-                            if (username.equals("back")) {
-                                correctInput1 = false;
-                                break;
-                            }
-                            usernameExists = customerLogin.checkExistingUserName(username);
-                            if (usernameExists) {
-                                System.out.println("This username already exists.");
-                            }
-                        } while (usernameExists);
-                        if (username.equals("back")) {
-                            break;
-                        }
-                        System.out.println("Please enter your password.");
-                        String password = scanner.nextLine();
-                        customerLogin.createUser(username, password);
-
-                        ArrayList<Product> shoppingCart = new ArrayList<>();
-                        shoppingCart.add(new Product("","", "",0,0.0));
-                        customers.add(new Customer(null, username));
+                            ArrayList<Product> shoppingCart = new ArrayList<>();
+                            shoppingCart.add(new Product("", "", "", 0, 0.0));
+                            customers.add(new Customer(null, username));
                         /*
                         Rest of the code for a new account.
                          */
-                        runCustomer();
+                            runCustomer();
 
 
-                    } else {
-                        System.out.println("Incorrect input, please try again.");
-                        correctInput1 = false;
-                    }
-                } while (!correctInput1);
-            } else if (custOrSell == 3) {
-                break;
-            } else {
-                System.out.println("Incorrect input, please try again.");
-                correctInput = false;
+                        } else {
+                            System.out.println("Incorrect input, please try again.");
+                            correctInput1 = false;
+                        }
+                    } while (!correctInput1);
+                } else if (custOrSell == 3) {
+                    break;
+                } else {
+                    System.out.println("Incorrect input, please try again.");
+                    correctInput = false;
+                }
+            } while (!correctInput);
+
+            //body
+        boolean lastFormat;
+        int lastIndex = 0;
+        do {
+            lastFormat = true;
+            try {
+                System.out.println("1. Log out  2. End program");
+                lastIndex = scanner.nextInt();
+                scanner.nextLine();
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter the correct formar!");
+                lastFormat = false;
             }
-        } while (!correctInput);
+        } while (!lastFormat);
 
-        //body
+        if  (lastIndex == 1) {
+            lastCheck = true;
+        }
+        if ( lastIndex == 2) {
+            lastCheck = false;
+        }
 
-
+        } while (lastCheck);
         // added but haven't updated
-        writeDateSeller();
-        writeDataCustomer();
     }
 
     // write information of each Seller in the Sellers ArrayList to a file called SellerInfo.bi using Object Output Stream
     // purpose: store sellers' data (which also include Products and Stores data
-    public static void writeDateSeller() {
-        ArrayList<Seller> sellerData = getSellers();
-        try (FileOutputStream fos = new FileOutputStream("SellerInfo.bin");
-             ObjectOutput oos = new ObjectOutputStream(fos);) {
-            for (int i = 0; i < sellerData.size(); i++) {
-                oos.writeObject(sellerData.get(i));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
 
     // read the file (SellerInfo.bi) that contains Sellers' data, this method will return an ArrayList<Seller>
-    public static ArrayList<Seller> readDataSeller() {
-        ArrayList<Seller> result = null;
-        try (FileInputStream fis = new FileInputStream("SellerInfo.bin");
-             ObjectInputStream ois = new ObjectInputStream(fis);) {
-            result = new ArrayList<>();
-            for (; ; ) {
-                result.add((Seller) ois.readObject());
-            }
-        } catch (EOFException eof) {
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
 
-        return result;
-    }
-
-    public static void writeDataCustomer() {
-        ArrayList<Customer> customerData = getCustomers();
-        try (FileOutputStream fos = new FileOutputStream("CustomerInfo.bin");
-             ObjectOutputStream oos = new ObjectOutputStream(fos);) {
-            for (int i = 0; i < customerData.size(); i++) {
-                oos.writeObject(customerData.get(i));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    public static ArrayList<Customer> readDataCustomer() {
-        ArrayList<Customer> result = null;
-        try (FileInputStream fis = new FileInputStream("CustomerInfo.bin");
-             ObjectInputStream ois = new ObjectInputStream(fis);) {
-            result = new ArrayList<>();
-            for (; ; ) {
-                result.add((Customer) ois.readObject());
-            }
-        } catch (EOFException eof) {
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
-        return result;
-    }
     public static void runSeller() {
         Scanner scanner = new Scanner(System.in);
         do {
