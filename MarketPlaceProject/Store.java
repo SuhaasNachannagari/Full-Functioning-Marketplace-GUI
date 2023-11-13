@@ -88,17 +88,8 @@ public class Store implements Serializable {
 
     // delete product: name - name of product want to be deleted
     // the method returns a boolean value to check if the method runs into any error, then we could tell user to do again or not.
-    public boolean deleteProduct(String name) {
-        boolean checkItemExist = false;
-        for (int i = 0; i < products.size(); i++) {
-            if ((products.get(i).getName()).equals(name)) {
-                checkItemExist = true;
-                products.remove(i);
-                break;
-            }
-        }
-        if (!checkItemExist) { System.out.println("Please enter the correct name");}
-        return checkItemExist;
+    public void deleteProduct(int i) {
+        products.remove(i);
     }
 
 }
