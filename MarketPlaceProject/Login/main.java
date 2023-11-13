@@ -17,7 +17,7 @@ public class main {
         return customers;
     }
 
-    public static void setCustomers(ArrayList<Customer> customers) {
+    public void setCustomers(ArrayList<Customer> customers) {
         this.customers = customers;
     }
 
