@@ -1,13 +1,6 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
-/**
- * Project 4 - Create
- *
- * This class will be used to create products
- */
-
-
 public class Create extends main {
     private Seller seller;
     private int sellerIndex;
@@ -30,15 +23,18 @@ public class Create extends main {
         boolean checkFormat;
         ArrayList<Store> stores = seller.getStores();
         do {
+            System.out.print("1. Create new store");
             for (int i = 0; i < stores.size(); i++) {
                 Store store = stores.get(i);
-                int j = i + 1;
-                System.out.print( j + ". " + store.getName() + "\t\t");
+                if (!store.getName().equals("")) {
+                    int j = i + 2;
+                    System.out.print(j + ". " + store.getName() + "\t\t");
+                }
             }
             do {
                 checkFormat = true;
                 try {
-                    System.out.println("\nEnter the index of the store you want to edit: ");
+                    System.out.println("\nEnter the index you want to edit: ");
                     index = scan.nextInt();
                     scan.nextLine();
                 } catch (NumberFormatException e) {
@@ -55,46 +51,54 @@ public class Create extends main {
         Scanner scan = new Scanner(System.in);
         Store store = seller.getStores().get(storeIndex);
 
-        boolean checkFormat;
-        Product product = null;
-        do {
-            checkFormat = false;
-            try {
-                boolean checkProductExist;
-                do {
-                    checkProductExist = false;
-                    System.out.println("Enter the information of the product: ");
-                    System.out.println("Name: ");
-                    String name = scan.nextLine();
-                    boolean checkExistName = false;
-                    for (int i = 0; i < store.getProducts().size(); i++) {
-                        if (name.equals(store.getProducts().get(i).getName())) {
-                            checkExistName = true;
-                            break;
+        if (indexTemp == seller.getStores().size()) {
+            System.out.println("Enter the name:");
+            String name = scan.nextLine();
+            sellers.get(sellerIndex).getStores().get(storeIndex).addProduct(new
+                    Product("", name,"", 0, 0.0));
+            System.out.println("Store created!");
+        } else {
+            boolean checkFormat;
+            Product product = null;
+            do {
+                checkFormat = false;
+                try {
+                    boolean checkProductExist;
+                    do {
+                        checkProductExist = false;
+                        System.out.println("Enter the information of the product: ");
+                        System.out.println("Name: ");
+                        String name = scan.nextLine();
+                        boolean checkExistName = false;
+                        for (int i = 0; i < store.getProducts().size(); i++) {
+                            if (name.equals(store.getProducts().get(i).getName())) {
+                                checkExistName = true;
+                                break;
+                            }
                         }
-                    }
-                    if (!checkExistName) {
-                        String storeName = store.getName();
-                        System.out.println("Description: ");
-                        String desc = scan.nextLine();
-                        System.out.println("Quantity Available: ");
-                        int quantAvail = scan.nextInt();
-                        scan.nextLine();
-                        System.out.println("Price ");
-                        double price = scan.nextDouble();
-                        scan.nextLine();
-                        product = new Product(name, storeName, desc, quantAvail, price);
-                    } else {
-                        System.out.println("This product has already existed, please add another product");
-                        checkProductExist = true;
-                    }
-                } while (checkProductExist);
-            } catch (NumberFormatException e) {
-                System.out.println("Please enter the right format!");
-                checkFormat = true;
-            }
-        } while (checkFormat);
-        // add the newly created product to the picked store
-        sellers.get(sellerIndex).getStores().get(storeIndex).addProduct(product);
+                        if (!checkExistName) {
+                            String storeName = store.getName();
+                            System.out.println("Description: ");
+                            String desc = scan.nextLine();
+                            System.out.println("Quantity Available: ");
+                            int quantAvail = scan.nextInt();
+                            scan.nextLine();
+                            System.out.println("Price ");
+                            double price = scan.nextDouble();
+                            scan.nextLine();
+                            product = new Product(name, storeName, desc, quantAvail, price);
+                        } else {
+                            System.out.println("This product has already existed, please add another product");
+                            checkProductExist = true;
+                        }
+                    } while (checkProductExist);
+                } catch (NumberFormatException e) {
+                    System.out.println("Please enter the right format!");
+                    checkFormat = true;
+                }
+            } while (checkFormat);
+            // add the newly created product to the picked store
+            sellers.get(sellerIndex).getStores().get(storeIndex).addProduct(product);
+        }
     }
 }
