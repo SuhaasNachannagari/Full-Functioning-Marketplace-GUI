@@ -1,14 +1,16 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Create extends Marketplace {
-    private ArrayList<Seller> sellers = getSeller();
+public class Create extends main {
     private Seller seller;
+    private int sellerIndex;
+    private int storeIndex;
     public void setSeller(String userName) {
         for (int i = 0; i < sellers.size(); i++) {
             Seller sellerTemp = sellers.get(i);
             if (sellerTemp.getUserName().equals(userName)) {
                 this.seller = sellers.get(i);
+                sellerIndex = i;
             }
             break;
         }
@@ -16,7 +18,9 @@ public class Create extends Marketplace {
     }
     public void showStore() {
         Scanner scan = new Scanner(System.in);
+
         int index = -1;
+        boolean checkFormat;
         ArrayList<Store> stores = seller.getStores();
         do {
             for (int i = 0; i < stores.size(); i++) {
@@ -24,17 +28,25 @@ public class Create extends Marketplace {
                 int j = i + 1;
                 System.out.print( j + ". " + store.getName() + "\t\t");
             }
-            System.out.println("Enter the index of the store you want to edit: ");
-            index = scan.nextInt();
-            scan.nextLine();
+            do {
+                checkFormat = true;
+                try {
+                    System.out.println("\nEnter the index of the store you want to edit: ");
+                    index = scan.nextInt();
+                    scan.nextLine();
+                } catch (NumberFormatException e) {
+                    checkFormat = false;
+                    System.out.println("Please enter the right format!");
+                }
+            } while (!checkFormat);
         } while (index > stores.size() || index <= 0); // correct index is from 1 to store.size()
         createProduct(index);
     }
 
     public void createProduct(int indexTemp) {
-        int index = indexTemp - 1;
+        storeIndex = indexTemp - 1;
         Scanner scan = new Scanner(System.in);
-        Store store = seller.getStores().get(index);
+        Store store = seller.getStores().get(storeIndex);
 
         boolean checkFormat;
         Product product = null;
@@ -76,16 +88,6 @@ public class Create extends Marketplace {
             }
         } while (checkFormat);
         // add the newly created product to the picked store
-        seller.getStores().get(index).addProduct(product);
+        sellers.get(sellerIndex).getStores().get(storeIndex).addProduct(product);
     }
-
-    // public static void main(String[] args) {
-    // Create create = new Create();
-    // Scanner scan = new Scanner(System.in);
-    // System.out.println("Enter your name");
-    // String name = scan.nextLine();
-    // create.setSeller(name);
-    // int index = create.showStore();
-    // create.createProduct(index);
-    //}
 }
