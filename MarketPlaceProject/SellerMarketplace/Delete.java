@@ -1,6 +1,12 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Project 4 - Delete
+ * <p>
+ * This class will be used to delete products.
+ */
+
 public class Delete extends main {
     private Seller seller;
     private int sellerIndex;
