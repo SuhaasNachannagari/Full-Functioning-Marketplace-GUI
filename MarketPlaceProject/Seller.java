@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.ArrayList;
 
-public class Seller extends User implements Serialization {
+public class Seller extends User implements Serializable {
 
     ArrayList<Store> stores = new ArrayList();
     public Seller(String username, String password, ArrayList<Store> stores) {
