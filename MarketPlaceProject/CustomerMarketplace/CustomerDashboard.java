@@ -9,12 +9,12 @@ public class CustomerDashboard extends main {
     private ArrayList<Customer> sortedCustomers = getCustomers();
     public void printDashboard() {
         for (int i = 0; i < sortedCustomers.size(); i++) {
-            for (int j = 0; i < sortedCustomers.get(i).getpurchaseHistory.size();
+            for (int j = 0; i < sortedCustomers.get(i).getpurchaseHistory().size();
                  j++) {
                 String storeName =
-                        sortedCustomers.get(i).purhaseHistory.get(j).getStoreName;
+                        sortedCustomers.get(i).getPurchaseHistory().get(j).getStoreName();
                 int productBought =
-                        sortedCustomers.get(i).purchaseHistory.get(j).getQuantAvailable;
+                        sortedCustomers.get(i).getPurchaseHistory().get(j).getQuantAvailable();
                 if (!storeNames2.contains(storeName)) {
                     storeNames2.add(storeName);
                     numberOfPurchases.add(productBought);
