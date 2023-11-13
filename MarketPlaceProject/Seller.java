@@ -54,13 +54,19 @@ public class Seller implements Serializable {
         }
     }
 
-    public void loadFromFileProduct(String file) {
+    public ArrayList<String> loadFromFileProduct(String fileName) {
         ArrayList<String> productData = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName)) ){
             String line;
             while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+                productData.add(line);
             }
+            if(productData == null || productData.isEmpty()) {
+                System.out.println("No data in file.");
+            } else {
+                System.out.println("File imported success");
+            }
+            return productData;
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
