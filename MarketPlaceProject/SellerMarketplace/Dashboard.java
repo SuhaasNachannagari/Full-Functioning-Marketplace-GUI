@@ -102,7 +102,7 @@ public class Dashboard extends main {
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a correct format!");
             }
-            if (option !=  1 || option != 2) {
+            if (option !=  1 && option != 2) {
                 System.out.println("Please enter a valid number!");
                 checkFormat = false;
             }
@@ -162,7 +162,7 @@ public class Dashboard extends main {
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a correct format!");
             }
-            if (option !=  1 || option != 2) {
+            if (option !=  1 && option != 2) {
                 System.out.println("Please enter a valid number!");
                 checkFormat = false;
             }
