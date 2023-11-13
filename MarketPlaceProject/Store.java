@@ -42,6 +42,14 @@ public class Store implements Serializable {
         products.add(product);
     }
 
+    public void listProducts() {
+        System.out.println("The available products for the store are:");
+
+        for(int i = 0; i < this.products.size(); i++) {
+            System.out.println(this.products.get(i) + "\t" + this.products.get(i).getPrice());
+        }
+    }
+
     // edit Product: name - name of Product, input - category wants to be edited, val - value to be changed to
     // the method returns a boolean value to check if the method runs into any error, then we could tell user to do again or not.
     public boolean editProduct(String name, int input, String val) {
