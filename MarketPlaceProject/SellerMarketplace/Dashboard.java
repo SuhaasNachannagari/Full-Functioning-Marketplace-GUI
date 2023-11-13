@@ -31,7 +31,7 @@ public class Dashboard extends main {
                 if (indexSelection == 2) {
                     getListProducts();
                 }
-                if (indexSelection != 1 || indexSelection != 2) {
+                if (indexSelection != 1 && indexSelection != 2) {
                     checkFormat = false;
                     System.out.println("Please choose a correct number!");
                 }
