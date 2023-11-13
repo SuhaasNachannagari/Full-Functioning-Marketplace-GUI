@@ -1,0 +1,656 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+/**
+ * Project 4 - Main
+ *
+ * This class represents the marketplace.
+ */
+
+public class main {
+    public static ArrayList<Seller> sellers = new ArrayList<>();
+
+    // added static, but not updated
+    public static ArrayList<Seller> getSellers() {
+        return sellers;
+    }
+
+    public static ArrayList<Customer> customers = new ArrayList<>();
+
+    // added static for getCust, but not updated;
+    public static ArrayList<Customer> getCustomers() {
+        return customers;
+    }
+
+    public void setCustomers(ArrayList<Customer> customers) {
+        this.customers = customers;
+    }
+    static boolean checkIndexUser;
+    static boolean checkIndexDoAgain;
+    static int checkDoAgain;
+    static String username = null;
+
+    public static void main(String[] args) {
+        // this read the file and set the "sellers" variable
+        //sellers = readDataSeller();
+        boolean lastCheck = false;
+        do {
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Welcome to the marketplace.");//Fill in the welcome message.
+            boolean correctInput = true;
+            // Tri: I bring this out so that I can use this variable later;
+            int custOrSell = 0;
+            //
+
+            do {
+                boolean checkFormat1;
+                do {
+                    checkFormat1 = true;
+                    try {
+                        System.out.println("Are you a customer or a seller?" +
+                                "(1 - Seller, 2 - Customer, 3 - Exit)");
+                        custOrSell = scanner.nextInt();
+                        scanner.nextLine();
+                    } catch (NumberFormatException e) {
+                        checkFormat1 = false;
+                        System.out.println("Enter the correct format!");
+                    }
+                } while (!checkFormat1);
+                if (custOrSell == 1) { //Seller
+                    SellerLogin sellerLogin = new SellerLogin();
+                    boolean correctInput1 = true;
+                    do {
+                        int input = 0;
+                        boolean checkFormat;
+                        do {
+                            checkFormat = true;
+                            try {
+                                System.out.println("Does the account already exist? (1 - Exists, 2 - New Account)");
+                                input = scanner.nextInt();
+                                scanner.nextLine();
+                            } catch (NumberFormatException e) {
+                                System.out.println("Enter the correct format!");
+                                checkFormat = false;
+                            }
+                        } while (!checkFormat);
+                        if (input == 1) {
+                            boolean usernameExists;
+                            boolean passwordIsCorrect;
+                            do {
+                                do {
+                                    System.out.println("Please enter your username(enter 'back' to go back): ");
+                                    username = scanner.nextLine();
+                                    if (username.equals("back")) {
+                                        correctInput1 = false;
+                                        break;
+                                    }
+                                    usernameExists = sellerLogin.checkExistingUserName(username);
+                                    if (!usernameExists) {
+                                        System.out.println("Please input a valid username.");
+                                    }
+                                } while (!usernameExists);
+                                if (username.equals("back")) {
+                                    break;
+                                }
+                                System.out.println("Please enter your password.");
+                                String password = scanner.nextLine();
+                                passwordIsCorrect = sellerLogin.loginUser(username, password);
+                            } while (!passwordIsCorrect);
+                            if (username.equals("back")) {
+                                break;
+                            }
+                        /*
+                        Continue The code here for an existing seller.
+                         */
+                            runSeller();
+
+
+                        } else if (input == 2) {
+                            boolean usernameExists;
+                            do {
+                                System.out.println("Please enter your username(enter 'back' to go back): ");
+                                username = scanner.nextLine();
+                                if (username.equals("back")) {
+                                    correctInput1 = false;
+                                    break;
+                                }
+                                usernameExists = sellerLogin.checkExistingUserName(username);
+                                if (usernameExists) {
+                                    System.out.println("This username already exists.");
+                                }
+                            } while (usernameExists);
+                            // Add new seller
+                            if (username.equals("back")) {
+                                break;
+                            }
+                            System.out.println("Please enter your password.");
+                            String password = scanner.nextLine();
+
+                            sellerLogin.createUser(username, password);
+                            ArrayList<Store> storesList = new ArrayList<>();
+                            ArrayList<Product> productsList = new ArrayList<>();
+                            storesList.add(new Store(productsList, ""));
+                            productsList.add(new Product("", "", "", 0, 0.0));
+                            sellers.add(new Seller(storesList, username));
+                        /*
+                        Rest of the code for a new account.
+                         */
+                            runSeller();
+
+
+                        } else {
+                            System.out.println("Incorrect input, please try again.");
+                            correctInput1 = false;
+                        }
+                    } while (!correctInput1);
+                } else if (custOrSell == 2) {
+                    CustomerLogin customerLogin = new CustomerLogin();
+                    boolean correctInput1 = true;
+                    do {
+                        int input = 0;
+                        boolean checkFormat2;
+                        do {
+                            checkFormat2 = true;
+                            try {
+                                System.out.println("Does the account already exist? (1 - Exists, 2 - New Account)");
+                                input = scanner.nextInt();
+                                scanner.nextLine();
+                            } catch (NumberFormatException e) {
+                                System.out.println("Please enter the correct format!");
+                                checkFormat2 = false;
+                            }
+                        } while (!checkFormat2);
+                        if (input == 1) {
+                            boolean usernameExists;
+                            boolean passwordIsCorrect;
+                            do {
+                                do {
+                                    System.out.println("Please enter your username(enter 'back' to go back): ");
+                                    username = scanner.nextLine();
+                                    if (username.equals("back")) {
+                                        correctInput1 = false;
+                                        break;
+                                    }
+                                    usernameExists = customerLogin.checkExistingUserName(username);
+                                    if (!usernameExists) {
+                                        System.out.println("Please input a valid username.");
+                                    }
+                                } while (!usernameExists);
+                                if (username.equals("back")) {
+                                    break;
+                                }
+                                System.out.println("Please enter your password.");
+                                String password = scanner.nextLine();
+                                passwordIsCorrect = customerLogin.loginUser(username, password);
+                            } while (!passwordIsCorrect);
+                            if (username.equals("back")) {
+                                break;
+                            }
+                        /*
+                        Continue The code here for an existing customer.
+                         */
+                            runCustomer();
+
+
+                        } else if (input == 2) {
+                            boolean usernameExists;
+                            do {
+                                System.out.println("Please enter your username(enter 'back' to go back): ");
+                                username = scanner.nextLine();
+                                if (username.equals("back")) {
+                                    correctInput1 = false;
+                                    break;
+                                }
+                                usernameExists = customerLogin.checkExistingUserName(username);
+                                if (usernameExists) {
+                                    System.out.println("This username already exists.");
+                                }
+                            } while (usernameExists);
+                            if (username.equals("back")) {
+                                break;
+                            }
+                            System.out.println("Please enter your password.");
+                            String password = scanner.nextLine();
+                            customerLogin.createUser(username, password);
+
+                            ArrayList<Product> shoppingCart = new ArrayList<>();
+                            shoppingCart.add(new Product("", "", "", 0, 0.0));
+                            customers.add(new Customer(null, username));
+                        /*
+                        Rest of the code for a new account.
+                         */
+                            runCustomer();
+
+
+                        } else {
+                            System.out.println("Incorrect input, please try again.");
+                            correctInput1 = false;
+                        }
+                    } while (!correctInput1);
+                } else if (custOrSell == 3) {
+                    break;
+                } else {
+                    System.out.println("Incorrect input, please try again.");
+                    correctInput = false;
+                }
+            } while (!correctInput);
+
+                //body
+            boolean lastFormat;
+            int lastIndex = 0;
+            do {
+                lastFormat = true;
+                try {
+                    System.out.println("1. Log out  2. End program");
+                    lastIndex = scanner.nextInt();
+                    scanner.nextLine();
+                } catch (NumberFormatException e) {
+                    System.out.println("Please enter the correct format!");
+                    lastFormat = false;
+                }
+            } while (!lastFormat);
+
+            if  (lastIndex == 1) {
+                lastCheck = true;
+            }
+            if ( lastIndex == 2) {
+                lastCheck = false;
+            }
+
+        } while (lastCheck);
+        // added but haven't updated
+    }
+
+    // write information of each Seller in the Sellers ArrayList to a file called SellerInfo.bi using Object Output Stream
+    // purpose: store sellers' data (which also include Products and Stores data
+
+
+    // read the file (SellerInfo.bi) that contains Sellers' data, this method will return an ArrayList<Seller>
+
+    public static void runSeller() {
+        Scanner scanner = new Scanner(System.in);
+        do {
+            do {
+                checkIndexUser = true;
+                System.out.println("What do you want to do?");
+                boolean checkFormat;
+                int option = 0;
+                do {
+                    checkFormat = true;
+                    try {
+                        System.out.println("1 - Delete, 2 - Edit, 3 - Create, 4 - View, 5 - Import/Export, 6 - Dashboard ");
+                        option = scanner.nextInt();
+                        scanner.nextLine();
+                    } catch (NumberFormatException e) {
+                        checkFormat = false;
+                        System.out.println("Please enter the correct format!");
+                    }
+                } while (!checkFormat);
+                switch (option) {
+                    // Tri
+                    case 1:
+                        Delete delete = new Delete();
+                        delete.setSeller(username);
+                        break;
+                    case 2:
+                        Edit edit = new Edit();
+                        edit.setSeller(username);
+                        break;
+                    case 3:
+                        Create create = new Create();
+                        create.setSeller(username);
+                        break;
+                    //Raghav
+                    case 4:
+                        //view
+                        for (int i = 0; i < sellers.size(); i++) {
+                            if (sellers.get(i).getUserName().equals(username)) {
+                                sellers.get(i).view();
+                            }
+                        }
+                        break;
+                    case 5:
+                        //import export files
+                        int choice = 0;
+                        boolean flag = true;
+                        do {
+                            boolean checkFormat1;
+                            do {
+                                checkFormat1 = true;
+                                try {
+                                    System.out.println("Do you want to import or export files (1 - Import, 2 - Export, " +
+                                            "3 - exit");
+                                    choice = scanner.nextInt();
+                                } catch (NumberFormatException e) {
+                                    checkFormat1 = false;
+                                }
+                            } while (!checkFormat1);
+                            if (choice == 1) {
+                                for (int i = 0; i < sellers.size(); i++) {
+                                    if (sellers.get(i).getUserName().equals(username)) {
+                                        System.out.println("Enter file name:");
+                                        String fileName = scanner.nextLine();
+                                        sellers.get(i).loadFromFileProduct(fileName);
+                                        break;
+                                    }
+                                }
+                            } else if (choice == 2) {
+                                System.out.println("Enter product details you want to add to export file:");
+                                String productName = scanner.nextLine();
+                                String storeName = scanner.nextLine();
+                                String description = scanner.nextLine();
+                                int quantity = scanner.nextInt();
+                                double price = scanner.nextDouble();
+
+                                Product product = new Product(productName, storeName, description, quantity, price);
+
+                                for (int i = 0; i < sellers.size(); i++) {
+                                    if (sellers.get(i).getUserName().equals(username)) {
+                                        if (sellers.get(i).getStores().get(i).getName().equals(storeName)) {
+                                            sellers.get(i).saveToFileProduct(product);
+                                        }
+                                    } else {
+                                        System.out.println("No store found. Making a new one.");
+                                        ArrayList<Product> productsInStore = new ArrayList<>();
+                                        productsInStore.add(product);
+                                        Store store = new Store(productsInStore, storeName);
+                                        sellers.get(i).getStores().add(store);
+                                    }
+                                }
+                            } else if (choice == 3) {
+                                flag = false;
+                            } else {
+                                System.out.println("Invalid choice. Try again");
+                            }
+                        } while (flag);
+                        break;
+
+                    case 6:
+                        //Dashboard
+                        Dashboard dashboard = new Dashboard();
+                        dashboard.setSeller(username);
+                        break;
+                    //Raghav
+                    default:
+                        System.out.println("Please enter the correct number!");
+                        checkIndexUser = false;
+                        break;
+                }
+            } while (!checkIndexUser);
+
+            do {
+                checkIndexDoAgain = false;
+                System.out.println("Do you want to continue your implementation? ( 1 - Yes, 2 - No");
+                checkDoAgain = scanner.nextInt();
+                scanner.nextLine();
+
+                if (checkDoAgain != 2 && checkDoAgain != 1) {
+                    checkIndexDoAgain = true;
+                    System.out.println("Please enter the correct number");
+                }
+            } while (checkIndexDoAgain);
+
+        } while (checkDoAgain == 1);
+    }
+
+    public static void runCustomer() {
+        do {
+            Scanner scanner = new Scanner(System.in);
+            do {
+                checkIndexUser = true;
+                System.out.println("What do you want to do?");
+                System.out.println("1 - Sort, 2 - View, 3 - Search, 4 - Shopping Carts, 5 - Purchased Items, 6 - Dashboard ");
+                int option = scanner.nextInt();
+                scanner.nextLine();
+
+                switch (option) {
+                    // Thomas, Suhaas, and Rohan
+                    case 1:
+                        Sort sorter = new Sort();
+                        boolean checkSortBy = true;
+                        do {
+                            System.out.println("What do you want to do?");
+                            System.out.println("1 - Sort by prices, 2 - Sort by quantity");
+                            int sortBy = scanner.nextInt();
+                            if (sortBy == 1) {
+                                sorter.sortByPrice();
+                                System.out.println("Which product number would you like to look at?");
+                                int priceNum = scanner.nextInt();
+                                boolean validPriceNum = true;
+                                do {
+                                    validPriceNum = sorter.priceShowProduct(priceNum);
+                                    if (!validPriceNum) {
+                                        System.out.println("Enter a valid input please:");
+                                        priceNum = scanner.nextInt();
+                                    }
+                                } while (!validPriceNum);
+                                System.out.println("Would you like to: 1 - Purchase the Product, 2 - Add the Product to your cart, 3 - Leave a review.");
+                                boolean validActionProduct = true;
+                                int actionProduct = 0;
+                                do {
+                                    System.out.println("Would you like to: 1 - Purchase the Product, 2 - Add the Product to your cart, 3 - Leave a review. ");
+                                    actionProduct = scanner.nextInt();
+                                    switch (actionProduct) {
+                                        case 1:
+                                            System.out.println("How much of the product would you like to buy?");
+                                            int quantityPurchased = scanner.nextInt();
+                                            sorter.quantityPurchaseItems(username, quantityPurchased, priceNum);
+                                            break;
+                                        case 2:
+                                            System.out.println("How much of the product would you like to add to cart??");
+                                            int quantityToShoppingCart = scanner.nextInt(); scanner.nextLine();
+                                            sorter.quantityAddToShoppingCart(username, quantityToShoppingCart, priceNum);
+                                            break;
+                                        case 3:
+                                            System.out.println("Type your review below: ");
+                                            String review = scanner.nextLine();
+                                            sorter.addReview(review, priceNum);
+                                            break;
+                                        default:
+                                            System.out.println("Enter a valid input");
+                                            validActionProduct = false;
+                                    }
+                                } while (!validActionProduct);
+                            } else if (sortBy == 2) {
+                                sorter.sortByQuantity();
+                                System.out.println("Which product number would you like to look at?");
+                                int quantityNum = scanner.nextInt();
+                                boolean validQuantityNum = true;
+                                do {
+                                    validQuantityNum = sorter.quantityShowProduct(quantityNum);
+                                    if (!validQuantityNum) {
+                                        System.out.println("Enter a valid input please:");
+                                        int priceNum = scanner.nextInt();
+                                    }
+                                } while (!validQuantityNum);
+                                boolean validActionProduct = true;
+                                int actionProduct = 0;
+                                do {
+                                    System.out.println("Would you like to: 1 - Purchase the Product, 2 - Add the Product to your cart, 3 - Leave a review. ");
+                                    actionProduct = scanner.nextInt();
+                                    switch (actionProduct) {
+                                        case 1:
+                                            System.out.println("How much of the product would you like to buy?");
+                                            int quantityPurchased = scanner.nextInt();
+                                            sorter.quantityPurchaseItems(username, quantityPurchased, quantityNum);
+                                            break;
+                                        case 2:
+                                            System.out.println("How much of the product would you like to add to cart??");
+                                            int quantityToShoppingCart = scanner.nextInt(); scanner.nextLine();
+                                            sorter.quantityAddToShoppingCart(username, quantityToShoppingCart, quantityNum);
+                                            break;
+                                        case 3:
+                                            System.out.println("Type your review below: ");
+                                            String review = scanner.nextLine();
+                                            sorter.addReview(review, quantityNum);
+                                            break;
+                                        default:
+                                            System.out.println("Enter a valid input");
+                                            validActionProduct = false;
+                                    }
+                                } while (!validActionProduct);
+                            } else {
+                                System.out.println("Please enter the correct number");
+                                checkSortBy = false;
+                            }
+                        } while (!checkSortBy);
+                        break;
+                    case 2:
+                        View viewer = new View();
+                        viewer.listProducts();
+                        System.out.println("Which product number would you like to look at?");
+                        int itemNum = scanner.nextInt();
+                        boolean validItemNum = true;
+                        do {
+                            validItemNum = viewer.showProduct(itemNum);
+                            if (!validItemNum) {
+                                System.out.println("Enter a valid input please:");
+                                itemNum = scanner.nextInt();
+                            }
+                        } while (!validItemNum);
+                        System.out.println("Would you like to: 1 - Purchase the Product, 2 - Add the Product to your cart, 3 - Leave a review.");
+                        boolean validActionProduct = true;
+                        int actionProduct = 0;
+                        do {
+                            System.out.println("Would you like to: 1 - Purchase the Product, 2 - Add the Product to your cart, 3 - Leave a review. ");
+                            actionProduct = scanner.nextInt();
+                            switch (actionProduct) {
+                                case 1:
+                                    System.out.println("How much of the product would you like to buy?");
+                                    int quantityPurchased = scanner.nextInt();
+                                    viewer.purchaseItem(username, quantityPurchased, itemNum);
+                                    break;
+                                case 2:
+                                    System.out.println("How much of the product would you like to add to cart??");
+                                    int quantityToShoppingCart = scanner.nextInt(); scanner.nextLine();
+                                    viewer.addToShoppingCart(username, quantityToShoppingCart, itemNum);
+                                    break;
+                                case 3:
+                                    System.out.println("Type your review below: ");
+                                    String review = scanner.nextLine();
+                                    viewer.addReview(review, itemNum);
+                                    break;
+                                default:
+                                    System.out.println("Enter a valid input");
+                                    validActionProduct = false;
+                            }
+                        } while (!validActionProduct);
+                        break;
+                    case 3:
+                        Search searcher = new Search();
+                        int searchAgain = 1;
+                        do {
+                            System.out.println("What would you like to search?");
+                            String search = scanner.nextLine();
+                            boolean isMatch = searcher.searchProducts(search);
+                            if (isMatch) {
+                                System.out.println("Which product number would you like to look at?");
+                                int searchNum = scanner.nextInt();
+                                boolean validSearchNum = true;
+                                do {
+                                    validSearchNum = searcher.showProduct(searchNum);
+                                    if (!validSearchNum) {
+                                        System.out.println("Enter a valid input please:");
+                                        searchNum = scanner.nextInt();
+                                    }
+                                } while (!validSearchNum);
+                                System.out.println("Would you like to: 1 - Purchase the Product, 2 - Add the Product to your cart, 3 - Leave a review.");
+                                boolean validSearchProduct = true;
+                                int searchProduct = 0;
+                                do {
+                                    System.out.println("Would you like to: 1 - Purchase the Product, 2 - Add the Product to your cart, 3 - Leave a review. ");
+                                    searchProduct = scanner.nextInt();
+                                    switch (searchProduct) {
+                                        case 1:
+                                            System.out.println("How much of the product would you like to buy?");
+                                            int quantityPurchased = scanner.nextInt();
+                                            searcher.purchaseItem(username, quantityPurchased, searchNum);
+                                            break;
+                                        case 2:
+                                            System.out.println("How much of the product would you like to add to cart??");
+                                            int quantityToShoppingCart = scanner.nextInt(); scanner.nextLine();
+                                            searcher.addToShoppingCart(username, quantityToShoppingCart, searchNum);
+                                            break;
+                                        case 3:
+                                            System.out.println("Type your review below: ");
+                                            String review = scanner.nextLine();
+                                            searcher.addReview(review, searchNum);
+                                            break;
+                                        default:
+                                            System.out.println("Enter a valid input");
+                                            validSearchProduct = false;
+                                    }
+                                } while (!validSearchProduct);
+                            }
+                            System.out.println("Would you like to search again? 1 - Yes, 2 - No");
+                            searchAgain = scanner.nextInt();
+                        } while (searchAgain == 1);
+                        break;
+                    case 4:
+                        // add code for purchase history, code below does not run properly
+                        /*System.out.println("What do you want to do? ");
+                        System.out.println("1 - Add to cart, 2 - Remove from cart, 3 - Check out, 4 - View cart");
+                        int choice = scanner.nextInt();
+                        scanner.nextLine();
+
+                        switch(choice) {
+                            case 1:
+                                Customer.addShoppingCart();
+                                break;
+                            case 2:
+                                Customer.deleteShoppingCart();
+                                break;
+                            case 3:
+                                CheckOut.checkOutAndExportToCSV();
+                                //Export to CSV and clear shoppingCart
+                                ShoppingCartExporter.exportToCSV(shoppingCart, "shopping_cart.csv");
+                                //Read and display the CSV file
+                                CSVReader.readCSV("shopping_cart.csv");
+                                break;
+                            case 4:
+                                System.out.println(Customer.getShoppingCar());
+                            default:
+                                System.out.println("Invalid choice. Please enter a number between 1 and 4.");
+                        }
+                        */
+                        break;
+                    case 5:
+                        /* add code for purchase history, code below does not run properly
+                        System.out.println(Customer.getPurchasedHistory());
+                        */
+                        break;
+                    //Rohan
+                    case 6:
+                        CustomerDashboard dashboard = new CustomerDashboard();
+                            Customer customer = null;
+                            for (int i = 0; i < customers.size(); i++) {
+                                if (customers.get(i).getCustomerUserName().equals(username)) {
+                                    customer = customers.get(i);
+                                }
+                            }
+                            dashboard.printDashboard(customer);
+                    default:
+                        System.out.println("Please enter the correct number!");
+                        checkIndexUser = false;
+                }
+            } while (!checkIndexUser);
+
+            do {
+                checkIndexDoAgain = false;
+                System.out.println("Do you want to use the program again? ( 1 - Yes, 2 - No)");
+                checkDoAgain = scanner.nextInt();
+                scanner.nextLine();
+
+                if (checkDoAgain != 2 && checkDoAgain != 1) {
+                    checkIndexDoAgain = true;
+                    System.out.println("Please enter the correct number");
+                }
+            } while (checkIndexDoAgain);
+
+        } while (checkDoAgain == 1);
+
+        if (checkDoAgain == 2) {
+            System.out.println("Have a good day");
+        }
+    }
+}

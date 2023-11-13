@@ -1,0 +1,24 @@
+/**
+ * Project 4 - User
+ *
+ * This class helps implement the login features of the code by allowing easy storage of username and passwords.
+ */
+
+
+public class User {
+    private String username;
+    private String password;
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+}
