@@ -14,7 +14,7 @@ public class Seller implements Serializable {
     //tri: used to create new Seller in main class
     public Seller(ArrayList<Store> stores, String username) {
         this.stores = stores;
-        this.username = username;
+        this.userName = username;
     }
     //
     public String getUserName() { return this.userName; }
