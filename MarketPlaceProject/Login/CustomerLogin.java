@@ -2,8 +2,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 /*
-Login for sellers:
-Once the user says they are a seller,
+Login for customers:
+Once the user says they are a customer,
 ask them whether they have an existing account or not.
 If: The account exists, check if the username exists and return an error if it doesn't.
 Ask for the password and if its correct go into the rest of the code.
