@@ -280,15 +280,8 @@ public class main {
 
                         case 6:
                             //Dashboard
-                            for (int i = 0; i < sellers.size(); i++) {
-                                System.out.println("Store:");
-                                System.out.println(sellers.get(i).getStores().get(i));
-                                System.out.println("Products\tPrice");
-                                for (int j = 0; j < sellers.get(i).getStores().get(i).getProducts().size(); j++) {
-                                    System.out.println(sellers.get(i).getStores().get(i).getProducts().get(j) + "\t"
-                                            + sellers.get(i).getStores().get(i).getProducts().get(j).getSales());
-                                }
-                            }
+                            Dashboard dashboard = new Dashboard();
+                            dashboard.setSeller(username);
                             break;
                         //Raghav
                         default:
