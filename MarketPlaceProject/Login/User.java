@@ -1,7 +1,7 @@
 /**
  * Project 4 - User
  *
- * This class represents all users
+ * This class helps implement the login features of the code by allowing easy storage of username and passwords.
  */
 
 
