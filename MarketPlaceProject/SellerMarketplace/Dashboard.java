@@ -61,25 +61,25 @@ public class Dashboard extends main {
                 System.out.println(String.format("%d Store: %s, Customer: %s, purchased items: %d",
                             index, storeNameSeller, main.customers.get(i).getCustomerUserName(), itemNumber));
                 // sortedCustomerInfo contains of storeName and customerName " Store: store1, Customer: tri "
-                String result = String.format("Store: %s, Customer: %s ", storeNameSeller, customers.get(j).getCustomerUserName());
+                String result = String.format("Store: %s, Customer: %s ",
+                        storeNameSeller, customers.get(j).getCustomerUserName());
                 sortedCustomerInfo.add(result);
                 sortedPurchasedNumber.add(itemNumber);
             }
         }
         sortCustomers(sortedCustomerInfo, sortedPurchasedNumber);
     }
-    //??? don't know how
     public void getListProducts() {
         int index = 0;
         ArrayList<String> productsInfo = new ArrayList<>();
-        ArrayList<Double> productsSales = new ArrayList<>();
+        ArrayList<Integer> productsSales = new ArrayList<>();
         for (int i = 0; i < seller.getStores().size(); i++) {
             String storeNameSeller = seller.getStores().get(i).getName(); //looks at every store that a seller owns
             ArrayList<Product> productsList = seller.getStores().get(i).getProducts();
             for (int j = 0; j < productsList.size(); j++) {
                 index++;
-                double totalSale = productsList.get(j).getPrice()*productsList.get(j).getQuantAvailable();
-                System.out.println(String.format("%d Store: %s, Product: %s, Sales: %.2f", index, storeNameSeller,
+                int totalSale = productsList.get(j).getQuantAvailable();
+                System.out.println(String.format("%d Store: %s, Product: %s, Sales: %d", index, storeNameSeller,
                                 productsList.get(j).getName(), totalSale));
                 productsInfo.add(String.format("Store: %s, Product: %s", storeNameSeller,
                         productsList.get(j).getName()));
@@ -149,7 +149,7 @@ public class Dashboard extends main {
             }
         }
     }
-    public void sortProduct(ArrayList<String> names, ArrayList<Double> totalSales) {
+    public void sortProduct(ArrayList<String> names, ArrayList<Integer> totalSales) {
         Scanner scan = new Scanner(System.in);
         boolean checkFormat;
         int option = 0;
@@ -173,7 +173,7 @@ public class Dashboard extends main {
                 for (int j = 0; j < i; j++) {
                     if (totalSales.get(i) >
                             totalSales.get(j)) {
-                        double largerNumber = totalSales.get(i);
+                        int largerNumber = totalSales.get(i);
                         totalSales.set(i, totalSales.get(j));
                         totalSales.set(j, largerNumber);
                         String largeName = names.get(i);
@@ -192,7 +192,7 @@ public class Dashboard extends main {
                 for (int j = 0; j < i; j++) {
                     if (totalSales.get(i) <
                             totalSales.get(j)) {
-                        double smallerNumber = totalSales.get(i);
+                        int smallerNumber = totalSales.get(i);
                         totalSales.set(i, totalSales.get(j));
                         totalSales.set(j, smallerNumber);
                         String smallerName = names.get(i);
