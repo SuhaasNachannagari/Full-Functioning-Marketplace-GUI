@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.io.Serializable;
 
 /**
  * Project 4 - Store
@@ -13,12 +12,13 @@ import java.io.Serializable;
 //
 // Note: for Add, Edit, and Delete, they will return a boolean value (see method's explanation for more info)
 
-public class Store implements Serializable {
+public class Store {
 
     String name;
-    ArrayList<Product> products;
     double sales;
-    public Store(ArrayList<Product> products, String name) {
+    ArrayList<Product> products;
+
+    public Store( ArrayList<Product> products, String name) {
         this.products = products;
         this.name = name;
     }
@@ -26,7 +26,6 @@ public class Store implements Serializable {
     public String getName() {
         return name;
     }
-
 
     public void setName(String name) {
         this.name = name;
@@ -39,15 +38,15 @@ public class Store implements Serializable {
     public void setProducts(ArrayList<Product> products) {
         this.products = products;
     }
-
     public double getSales() {
         return sales;
     }
-
+    public void setSales(double sales) {
+        this.sales = sales;
+    }
     public void addProduct(Product product) {
         products.add(product);
     }
-
     public void listProducts() {
         System.out.println("The available products for the store are:");
 
