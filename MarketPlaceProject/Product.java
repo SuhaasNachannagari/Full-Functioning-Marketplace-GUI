@@ -1,6 +1,6 @@
 import java.util.*;
 /**
- * A product class that contains all the information for a product that will be used multiple 
+ * A product class that contains all the information for a product that will be used multiple
  * times throughout the marketplace.
  *
  * <p>Purdue University -- CS18000 -- Fall 2023</p>
@@ -81,4 +81,3 @@ public class Product { // most basic class, everything is built off of this
     public void setLimit(int limit) {
         this.limit = limit;
     }
-}
