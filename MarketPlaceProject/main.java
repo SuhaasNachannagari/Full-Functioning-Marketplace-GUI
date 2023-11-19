@@ -1,3 +1,4 @@
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -11,10 +12,7 @@ public class main {
     public static ArrayList<Seller> sellers = new ArrayList<>();
 
     // added static, but not updated
-    public static ArrayList<Seller> getSellers() {
-        return sellers;
-    }
-
+    public static ArrayList<Seller> getSellers() { return sellers; }
     public static ArrayList<Customer> customers = new ArrayList<>();
 
     // added static for getCust, but not updated;
@@ -33,80 +31,50 @@ public class main {
     public static void main(String[] args) {
         // this read the file and set the "sellers" variable
         //sellers = readDataSeller();
-        boolean lastCheck = false;
+        //readDataCustomer();
+        sellers = readDataSeller();
+        customers = readDataCustomer();
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Welcome to the marketplace.");
+        boolean correctInput = true;
+        int custOrSell = 0;
+
         do {
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("Welcome to the marketplace.");//Fill in the welcome message.
-            boolean correctInput = true;
-            // Tri: I bring this out so that I can use this variable later;
-            int custOrSell = 0;
-            //
-
+            boolean checkFormat1;
             do {
-                boolean checkFormat1;
+                checkFormat1 = true;
+                try {
+                    System.out.println("Are you a customer or a seller?" +
+                            "(1 - Seller, 2 - Customer, 3 - Exit)");
+                    custOrSell = scanner.nextInt();
+                    scanner.nextLine();
+                } catch (NumberFormatException e) {
+                    checkFormat1 = false;
+                    System.out.println("Enter the correct format!");
+                }
+            } while (!checkFormat1);
+            if (custOrSell == 1) { //Seller
+                SellerLogin sellerLogin = new SellerLogin();
+                boolean correctInput1 = true;
                 do {
-                    checkFormat1 = true;
-                    try {
-                        System.out.println("Are you a customer or a seller?" +
-                                "(1 - Seller, 2 - Customer, 3 - Exit)");
-                        custOrSell = scanner.nextInt();
-                        scanner.nextLine();
-                    } catch (NumberFormatException e) {
-                        checkFormat1 = false;
-                        System.out.println("Enter the correct format!");
-                    }
-                } while (!checkFormat1);
-                if (custOrSell == 1) { //Seller
-                    SellerLogin sellerLogin = new SellerLogin();
-                    boolean correctInput1 = true;
+                    int input = 0;
+                    boolean checkFormat;
                     do {
-                        int input = 0;
-                        boolean checkFormat;
+                        checkFormat = true;
+                        try {
+                            System.out.println("Does the account already exist? (1 - Exists, 2 - New Account)");
+                            input = scanner.nextInt();
+                            scanner.nextLine();
+                        } catch (NumberFormatException e) {
+                            System.out.println("Enter the correct format!");
+                            checkFormat = false;
+                        }
+                    } while (!checkFormat);
+                    if (input == 1) {
+                        boolean usernameExists;
+                        boolean passwordIsCorrect;
                         do {
-                            checkFormat = true;
-                            try {
-                                System.out.println("Does the account already exist? (1 - Exists, 2 - New Account)");
-                                input = scanner.nextInt();
-                                scanner.nextLine();
-                            } catch (NumberFormatException e) {
-                                System.out.println("Enter the correct format!");
-                                checkFormat = false;
-                            }
-                        } while (!checkFormat);
-                        if (input == 1) {
-                            boolean usernameExists;
-                            boolean passwordIsCorrect;
-                            do {
-                                do {
-                                    System.out.println("Please enter your username(enter 'back' to go back): ");
-                                    username = scanner.nextLine();
-                                    if (username.equals("back")) {
-                                        correctInput1 = false;
-                                        break;
-                                    }
-                                    usernameExists = sellerLogin.checkExistingUserName(username);
-                                    if (!usernameExists) {
-                                        System.out.println("Please input a valid username.");
-                                    }
-                                } while (!usernameExists);
-                                if (username.equals("back")) {
-                                    break;
-                                }
-                                System.out.println("Please enter your password.");
-                                String password = scanner.nextLine();
-                                passwordIsCorrect = sellerLogin.loginUser(username, password);
-                            } while (!passwordIsCorrect);
-                            if (username.equals("back")) {
-                                break;
-                            }
-                        /*
-                        Continue The code here for an existing seller.
-                         */
-                            runSeller();
-
-
-                        } else if (input == 2) {
-                            boolean usernameExists;
                             do {
                                 System.out.println("Please enter your username(enter 'back' to go back): ");
                                 username = scanner.nextLine();
@@ -115,85 +83,85 @@ public class main {
                                     break;
                                 }
                                 usernameExists = sellerLogin.checkExistingUserName(username);
-                                if (usernameExists) {
-                                    System.out.println("This username already exists.");
+                                if (!usernameExists) {
+                                    System.out.println("Please input a valid username.");
                                 }
-                            } while (usernameExists);
-                            // Add new seller
+                            } while (!usernameExists);
                             if (username.equals("back")) {
                                 break;
                             }
                             System.out.println("Please enter your password.");
                             String password = scanner.nextLine();
-
-                            sellerLogin.createUser(username, password);
-                            ArrayList<Store> storesList = new ArrayList<>();
-                            ArrayList<Product> productsList = new ArrayList<>();
-                            storesList.add(new Store(productsList, ""));
-                            productsList.add(new Product("", "", "", 0, 0.0));
-                            sellers.add(new Seller(storesList, username));
-                        /*
-                        Rest of the code for a new account.
-                         */
-                            runSeller();
-
-
-                        } else {
-                            System.out.println("Incorrect input, please try again.");
-                            correctInput1 = false;
+                            passwordIsCorrect = sellerLogin.loginUser(username, password);
+                        } while (!passwordIsCorrect);
+                        if (username.equals("back")) {
+                            break;
                         }
-                    } while (!correctInput1);
-                } else if (custOrSell == 2) {
-                    CustomerLogin customerLogin = new CustomerLogin();
-                    boolean correctInput1 = true;
-                    do {
-                        int input = 0;
-                        boolean checkFormat2;
+                    /*
+                    Continue The code here for an existing seller.
+                     */
+                        runSeller();
+
+
+                    } else if (input == 2) {
+                        boolean usernameExists;
                         do {
-                            checkFormat2 = true;
-                            try {
-                                System.out.println("Does the account already exist? (1 - Exists, 2 - New Account)");
-                                input = scanner.nextInt();
-                                scanner.nextLine();
-                            } catch (NumberFormatException e) {
-                                System.out.println("Please enter the correct format!");
-                                checkFormat2 = false;
-                            }
-                        } while (!checkFormat2);
-                        if (input == 1) {
-                            boolean usernameExists;
-                            boolean passwordIsCorrect;
-                            do {
-                                do {
-                                    System.out.println("Please enter your username(enter 'back' to go back): ");
-                                    username = scanner.nextLine();
-                                    if (username.equals("back")) {
-                                        correctInput1 = false;
-                                        break;
-                                    }
-                                    usernameExists = customerLogin.checkExistingUserName(username);
-                                    if (!usernameExists) {
-                                        System.out.println("Please input a valid username.");
-                                    }
-                                } while (!usernameExists);
-                                if (username.equals("back")) {
-                                    break;
-                                }
-                                System.out.println("Please enter your password.");
-                                String password = scanner.nextLine();
-                                passwordIsCorrect = customerLogin.loginUser(username, password);
-                            } while (!passwordIsCorrect);
+                            System.out.println("Please enter your username(enter 'back' to go back): ");
+                            username = scanner.nextLine();
                             if (username.equals("back")) {
+                                correctInput1 = false;
                                 break;
                             }
-                        /*
-                        Continue The code here for an existing customer.
-                         */
-                            runCustomer();
+                            usernameExists = sellerLogin.checkExistingUserName(username);
+                            if (usernameExists) {
+                                System.out.println("This username already exists.");
+                            }
+                        } while (usernameExists);
+                        // Add new seller
+                        if (username.equals("back")) {
+                            break;
+                        }
+                        System.out.println("Please enter your password.");
+                        String password = scanner.nextLine();
+
+                        sellerLogin.createUser(username, password);
+                        ArrayList<Store> storesList = new ArrayList<>();
+                        ArrayList<Product> productsList = new ArrayList<>();
+                        storesList.add(new Store(productsList, ""));
+                        productsList.add(new Product("", "", "", 0, 0.0));
+                        sellers.add(new Seller(storesList, username));
+                    /*
+                    Rest of the code for a new account.
+                     */
+                        runSeller();
 
 
-                        } else if (input == 2) {
-                            boolean usernameExists;
+                    } else {
+                        System.out.println("Incorrect input, please try again.");
+                        correctInput1 = false;
+                    }
+                } while (!correctInput1);
+            } else if (custOrSell == 2) {
+                CustomerLogin customerLogin = new CustomerLogin();
+                boolean correctInput1 = true;
+                do {
+                    int input = 0;
+                    boolean checkFormat2;
+                    do {
+                        checkFormat2 = true;
+                        try {
+                            System.out.println("Does the account already exist? (1 - Exists, 2 - New Account)");
+                            input = scanner.nextInt();
+                            scanner.nextLine();
+                        } catch (NumberFormatException e) {
+                            System.out.println("Please enter the correct format!");
+                            checkFormat2 = false;
+                        }
+                    } while (!checkFormat2);
+                    if (input == 1) {
+                        boolean usernameExists;
+                        boolean passwordIsCorrect;
+                        do {
                             do {
                                 System.out.println("Please enter your username(enter 'back' to go back): ");
                                 username = scanner.nextLine();
@@ -202,70 +170,69 @@ public class main {
                                     break;
                                 }
                                 usernameExists = customerLogin.checkExistingUserName(username);
-                                if (usernameExists) {
-                                    System.out.println("This username already exists.");
+                                if (!usernameExists) {
+                                    System.out.println("Please input a valid username.");
                                 }
-                            } while (usernameExists);
+                            } while (!usernameExists);
                             if (username.equals("back")) {
                                 break;
                             }
                             System.out.println("Please enter your password.");
                             String password = scanner.nextLine();
-                            customerLogin.createUser(username, password);
-
-                            ArrayList<Product> shoppingCart = new ArrayList<>();
-                            shoppingCart.add(new Product("", "", "", 0, 0.0));
-                            customers.add(new Customer(null, username));
-                        /*
-                        Rest of the code for a new account.
-                         */
-                            runCustomer();
-
-
-                        } else {
-                            System.out.println("Incorrect input, please try again.");
-                            correctInput1 = false;
+                            passwordIsCorrect = customerLogin.loginUser(username, password);
+                        } while (!passwordIsCorrect);
+                        if (username.equals("back")) {
+                            break;
                         }
-                    } while (!correctInput1);
-                } else if (custOrSell == 3) {
-                    break;
-                } else {
-                    System.out.println("Incorrect input, please try again.");
-                    correctInput = false;
-                }
-            } while (!correctInput);
+                    /*
+                    Continue The code here for an existing customer.
+                     */
+                        runCustomer();
 
-                //body
-            boolean lastFormat;
-            int lastIndex = 0;
-            do {
-                lastFormat = true;
-                try {
-                    System.out.println("1. Log out  2. End program");
-                    lastIndex = scanner.nextInt();
-                    scanner.nextLine();
-                } catch (NumberFormatException e) {
-                    System.out.println("Please enter the correct format!");
-                    lastFormat = false;
-                }
-            } while (!lastFormat);
+                    } else if (input == 2) {
+                        boolean usernameExists;
+                        do {
+                            System.out.println("Please enter your username(enter 'back' to go back): ");
+                            username = scanner.nextLine();
+                            if (username.equals("back")) {
+                                correctInput1 = false;
+                                break;
+                            }
+                            usernameExists = customerLogin.checkExistingUserName(username);
+                            if (usernameExists) {
+                                System.out.println("This username already exists.");
+                            }
+                        } while (usernameExists);
+                        if (username.equals("back")) {
+                            break;
+                        }
+                        System.out.println("Please enter your password.");
+                        String password = scanner.nextLine();
+                        customerLogin.createUser(username, password);
 
-            if  (lastIndex == 1) {
-                lastCheck = true;
+                        ArrayList<Product> shoppingCart = new ArrayList<>();
+                        shoppingCart.add(new Product("", "", "", 0, 0.0));
+                        customers.add(new Customer(null, username));
+                    /*
+                    Rest of the code for a new account.
+                     */
+                        runCustomer();
+
+
+                    } else {
+                        System.out.println("Incorrect input, please try again.");
+                        correctInput1 = false;
+                    }
+                } while (!correctInput1);
+            } else if (custOrSell == 3) {
+                break;
+            } else {
+                System.out.println("Incorrect input, please try again.");
+                correctInput = false;
             }
-            if ( lastIndex == 2) {
-                lastCheck = false;
-            }
+        } while (!correctInput);
 
-        } while (lastCheck);
-        // added but haven't updated
     }
-
-    // write information of each Seller in the Sellers ArrayList to a file called SellerInfo.bi using Object Output Stream
-    // purpose: store sellers' data (which also include Products and Stores data
-
-
-    // read the file (SellerInfo.bi) that contains Sellers' data, this method will return an ArrayList<Seller>
 
     public static void runSeller() {
         Scanner scanner = new Scanner(System.in);
@@ -622,13 +589,13 @@ public class main {
                     //Rohan
                     case 6:
                         CustomerDashboard dashboard = new CustomerDashboard();
-                            Customer customer = null;
-                            for (int i = 0; i < customers.size(); i++) {
-                                if (customers.get(i).getCustomerUserName().equals(username)) {
-                                    customer = customers.get(i);
-                                }
+                        Customer customer = null;
+                        for (int i = 0; i < customers.size(); i++) {
+                            if (customers.get(i).getCustomerUserName().equals(username)) {
+                                customer = customers.get(i);
                             }
-                            dashboard.printDashboard(customer);
+                        }
+                        dashboard.printDashboard(customer);
                     default:
                         System.out.println("Please enter the correct number!");
                         checkIndexUser = false;
@@ -652,5 +619,364 @@ public class main {
         if (checkDoAgain == 2) {
             System.out.println("Have a good day");
         }
+
+        writeDataSeller();
+        writeDataCustomer();
     }
+
+    public static void writeDataSeller() {
+        ArrayList<Seller> sellerData = sellers ;
+        String sellerName;
+        String storeName;
+        String storeSale;
+        String productName;
+        String productDescription;
+        String productQuant;
+        String productPrice;
+        String productLimit;
+        try {
+            PrintWriter pw = new PrintWriter( new FileOutputStream("SellerInfo.txt"));
+            for (int i = 0; i < sellerData.size(); i++) {
+                sellerName = sellerData.get(i).getUserName();
+                ArrayList<Store> stores = sellerData.get(i).getStores();
+                for (int j = 0; j < stores.size(); j++) {
+                    storeName = stores.get(j).getName();
+                    storeSale = String.valueOf(stores.get(j).getSales());
+                    ArrayList<Product> products = stores.get(j).getProducts();
+                    for (int k = 0; k < products.size(); k++) {
+                        productName = products.get(k).getName();
+                        productDescription = products.get(k).getDescription();
+                        productQuant = String.valueOf(products.get(k).getQuantAvailable());
+                        productPrice = String.valueOf(products.get(k).getPrice());
+                        productLimit = String.valueOf(products.get(k).getLimit());
+                        ArrayList<String> reviews = products.get(k).getReviews();
+                        // tri,tri's store,sales,milk,taro flavour,10,5.4,5,review1,review2
+                        String ans = String.format("%s/-%s/-%s/-%s/-%s/-%s/-%s/-%s/-",
+                                sellerName, storeName, storeSale, productName, productDescription,
+                                productQuant, productPrice, productLimit);
+                        pw.write(ans);
+                        for (int l = 0; l < reviews.size(); l++ ) {
+                            pw.write(reviews.get(l) + "/-");
+                        }
+                        pw.write("\n");
+                    }
+                }
+            }
+            pw.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static ArrayList<Seller> readDataSeller() {
+        ArrayList<String> tempList = new ArrayList<>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("SellerInfo.txt"));
+            String line = br.readLine();
+            while (line != null){
+                tempList.add(line);
+                line = br.readLine();
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        String nameTemp = "";
+        ArrayList<Seller> sellersTemp = new ArrayList<>();
+        Seller seller;
+        int indexSeller = -1;
+        Store store;
+        String storeName = "";
+        double storeSales;
+        int indexStore = -1;
+        Product product;
+        ArrayList<String> reviewsTemp;
+
+        // tri,tri's store,sales,milk,taro flavour,10,5.4,5,review1,review2
+        for (int i = 0; i < tempList.size(); i++) {
+            String[] arr = (tempList.get(i)).split("/-");
+            // Seller
+            if (nameTemp.equals(arr[0])) {  // check if is still the same Seller
+                if (storeName.equals(arr[1])) {  // check if is still in the same Store
+                    // Product
+                    reviewsTemp = new ArrayList<>();
+                    for (int j = 8; j < arr.length; j++) { // create an ArrayList of reviews
+                        reviewsTemp.add(arr[j]);
+                    }
+                    int intQuantAvail = Integer.parseInt(arr[5]);
+                    double doublePrice = Double.parseDouble(arr[6]);
+                    int intLimit = Integer.parseInt(arr[7]);
+                    product = new Product(arr[3],arr[1],arr[4],intQuantAvail, doublePrice);
+                    product.setReviews(reviewsTemp);
+                    product.setLimit(intLimit);
+                    Seller test = sellersTemp.get(indexSeller);
+
+                } else {
+                    // from new Store
+                    indexStore++;
+                    storeName = arr[1];
+                    storeSales = Double.parseDouble(arr[2]); // from new store
+                    store = new Store(null,storeName);
+                    store.setSales(storeSales); // set Sales of store
+                    sellersTemp.get(indexSeller).createStore(store); // add new Store to seller's stores
+                    // Product
+                    reviewsTemp = new ArrayList<>();
+                    for (int j = 8; j < arr.length; j++) { // create an ArrayList of reviews
+                        reviewsTemp.add(arr[j]);
+                    }
+                    int intQuantAvail = Integer.parseInt(arr[5]);
+                    double doublePrice = Double.parseDouble(arr[6]);
+                    int intLimit = Integer.parseInt(arr[7]);
+                    product = new Product(arr[3],arr[1],arr[4],intQuantAvail, doublePrice);
+                    product.setReviews(reviewsTemp);
+                    product.setLimit(intLimit);
+                    // intialize an ArrayList<Product>
+                    sellersTemp.get(indexSeller).getStores().get(indexStore).setProducts(new ArrayList<>());
+                    sellersTemp.get(indexSeller).getStores().get(indexStore).addProduct(product); // add Product
+
+                }
+            } else {
+                // from new Seller
+                indexSeller++;
+                indexStore = -1;
+                nameTemp = arr[0];
+                seller = new Seller(null, nameTemp);
+                sellersTemp.add(seller); // add new Seller to List of Sellers
+                if (storeName.equals(arr[1])) {  // check if is still in the same Store
+                    // Product
+                    reviewsTemp = new ArrayList<>();
+                    for (int j = 8; j < tempList.size(); j++) { // create an ArrayList of reviews
+                        reviewsTemp.add(arr[j]);
+                    }
+                    int intQuantAvail = Integer.parseInt(arr[5]);
+                    double doublePrice = Double.parseDouble(arr[6]);
+                    int intLimit = Integer.parseInt(arr[7]);
+                    product = new Product(arr[3],arr[1],arr[4],intQuantAvail, doublePrice);
+                    product.setReviews(reviewsTemp);
+                    product.setLimit(intLimit);
+                    sellersTemp.get(indexSeller).getStores().get(indexStore).addProduct(product); // add new product
+                } else {
+                    // Store
+                    indexStore++;
+                    storeName = arr[1];
+                    storeSales = Double.parseDouble(arr[2]); // from new store
+                    store = new Store(null,storeName);
+                    store.setSales(storeSales); // set Sales of store
+                    sellersTemp.get(indexSeller).setStores(new ArrayList<>()); // initialize an ArrayList<Store>
+                    sellersTemp.get(indexSeller).createStore(store); // add new Store to seller's stores
+                    // Product
+                    reviewsTemp = new ArrayList<>();
+                    for (int j = 8; j < arr.length; j++) { // create an ArrayList of reviews
+                        reviewsTemp.add(arr[j]);
+                    }
+                    int intQuantAvail = Integer.parseInt(arr[5]);
+                    double doublePrice = Double.parseDouble(arr[6]);
+                    int intLimit = Integer.parseInt(arr[7]);
+                    product = new Product(arr[3],arr[1],arr[4],intQuantAvail, doublePrice);
+                    product.setReviews(reviewsTemp);
+                    product.setLimit(intLimit);
+                    // initialize an ArrayList<Product>
+                    sellersTemp.get(indexSeller).getStores().get(indexStore).setProducts(new ArrayList<>());
+                    sellersTemp.get(indexSeller).getStores().get(indexStore).addProduct(product); // add new Product
+                }
+            }
+        }
+        return sellersTemp;
+    }
+    public static void writeDataCustomer(){
+        ArrayList<Customer> customersData = customers;
+        try {
+            String custName;
+            String productName;
+            String storeName;
+            String productDescription;
+            String productQuant;
+            String productPrice;
+            String productLimit;
+            PrintWriter pw = new PrintWriter(new FileOutputStream("SellerInfo.txt"));
+            for (int i = 0; i < customersData.size(); i++) {
+                Customer custTemp = customersData.get(i);
+                custName = custTemp.getCustomerUserName();
+                pw.write(custName + "\n");
+                ArrayList<Product> prodShop = custTemp.getShoppingCar();
+                for (int k = 0; k < prodShop.size(); k++) {
+                    productName = prodShop.get(k).getName();
+                    storeName = prodShop.get(k).getStoreName();
+                    productDescription = prodShop.get(k).getDescription();
+                    productQuant = String.valueOf(prodShop.get(k).getQuantAvailable());
+                    productPrice = String.valueOf(prodShop.get(k).getPrice());
+                    productLimit = String.valueOf(prodShop.get(k).getLimit());
+                    ArrayList<String> reviews = prodShop.get(k).getReviews();
+                    // tri,tri's store,sales,milk,taro flavour,10,5.4,5,review1,review2
+                    String ans = String.format("%s/-%s/-%s/-%s/-%s/-%s/-%s/-",
+                            custName, storeName, productName, productDescription,
+                            productQuant, productPrice, productLimit);
+                    pw.write(ans);
+                    for (int l = 0; l < reviews.size(); l++ ) {
+                        pw.write(reviews.get(l) + "/-");
+                    }
+                    pw.write("\n");
+                }
+                pw.write("change/-value\n");
+                ArrayList<Product> prodHistory = custTemp.getPurchaseHistory();
+                for (int k = 0; k < prodHistory.size(); k++) {
+                    productName = prodHistory.get(k).getName();
+                    storeName = prodHistory.get(k).getStoreName();
+                    productDescription = prodHistory.get(k).getDescription();
+                    productQuant = String.valueOf(prodHistory.get(k).getQuantAvailable());
+                    productPrice = String.valueOf(prodHistory.get(k).getPrice());
+                    productLimit = String.valueOf(prodHistory.get(k).getLimit());
+                    ArrayList<String> reviews = prodHistory.get(k).getReviews();
+                    // tri,tri's store,sales,milk,taro flavour,10,5.4,5,review1,review2
+                    String ans = String.format("%s/-%s/-%s/-%s/-%s/-%s/-%s/-",
+                            custName, storeName, productName, productDescription,
+                            productQuant, productPrice, productLimit);
+                    pw.write(ans);
+                    for (int l = 0; l < reviews.size(); l++ ) {
+                        pw.write(reviews.get(l) + "/-");
+                    }
+                    pw.write("\n");
+                }
+            }
+            pw.close();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    // instead of using "/-" to seperate word, use another symbol that has a lower chance of being used by user
+
+    public static ArrayList<Customer> readDataCustomer() {
+        ArrayList<String> tempList = new ArrayList<>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("CustomerInfo.txt"));
+            String line = br.readLine();
+            while (line != null){
+                tempList.add(line);
+                line = br.readLine();
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        int index = 0;
+        int indCust = 0;
+        String custName = "";
+        ArrayList<Customer> customerTemp = new ArrayList<>();
+        while (index < tempList.size()) {
+            // milk,tri's store,taro flavor,10,5.5,7,review1,review2
+            String[] arr = tempList.get(index).split("/-");
+            Customer cust = null;
+            if (arr.length == 1) {
+                custName = tempList.get(index);
+                index++;
+                cust = new Customer(new ArrayList<>(), custName);
+                cust.setPurchaseHistory(new ArrayList<>());
+                customerTemp.add(cust);
+            } else {
+                ArrayList<Product> listShop = new ArrayList<>();
+                while (arr.length != 2 && index < tempList.size() ) {
+                    Product prodShop;
+                    ArrayList<String> reviewsTemp = new ArrayList<>();
+                    for (int j = 6; j < arr.length; j++) { // create an ArrayList of reviews
+                        reviewsTemp.add(arr[j]);
+                    }
+                    int intQuantAvail = Integer.parseInt(arr[3]);
+                    double doublePrice = Double.parseDouble(arr[4]);
+                    int intLimit = Integer.parseInt(arr[5]);
+                    prodShop = new Product(arr[1], arr[2], arr[3], intQuantAvail, doublePrice);
+                    prodShop.setReviews(reviewsTemp);
+                    prodShop.setLimit(intLimit);
+                    listShop.add(prodShop);
+                    // continue on the next line
+                    index++;
+                    try {
+                        arr = tempList.get(index).split("/-");
+                    } catch (IndexOutOfBoundsException e) {
+
+                    }
+                }
+
+                if (index < tempList.size()) {
+                    index++;
+                    arr = tempList.get(index).split("/-");
+                }
+
+                ArrayList<Product> listHist = new ArrayList<>();
+                while (arr.length != 1 && index < tempList.size()) {
+                    Product prodHistory;
+                    ArrayList<String> reviewsTemp = new ArrayList<>();
+                    for (int j = 8; j < tempList.size(); j++) { // create an ArrayList of reviews
+                        reviewsTemp.add(arr[j]);
+                    }
+                    int intQuantAvail = Integer.parseInt(arr[3]);
+                    double doublePrice = Double.parseDouble(arr[4]);
+                    int intLimit = Integer.parseInt(arr[5]);
+                    prodHistory = new Product(arr[1], arr[2], arr[3], intQuantAvail, doublePrice);
+                    prodHistory.setReviews(reviewsTemp);
+                    prodHistory.setLimit(intLimit);
+                    listHist.add(prodHistory);
+                    index++;
+                    arr = tempList.get(index).split("/-");
+                }
+                try {
+                    cust.setShoppingCar(listShop);
+                    cust.setPurchaseHistory(listHist);
+                    customerTemp.add(cust);
+                } catch (NullPointerException e ) {
+                }
+            }
+        }
+        return customerTemp;
+    }
+
+
+    /*
+    public static ArrayList<Seller> read1DataSeller() {
+        ArrayList<Seller> result = null;
+        try (FileInputStream fis = new FileInputStream("SellerInfo.txt");
+             ObjectInputStream ois = new ObjectInputStream(fis);) {
+            result = new ArrayList<>();
+            for (; ; ) {
+                result.add((Seller) ois.readObject());
+            }
+        } catch (EOFException eof) {
+        } catch (FileNotFoundException e) {
+            System.out.println("filenotfound");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    public static void writeDataCustomer() {
+        ArrayList<Customer> customerData = getCustomers();
+        try (FileOutputStream fos = new FileOutputStream("CustomerInfo.bin");
+             ObjectOutputStream oos = new ObjectOutputStream(fos);) {
+            for (int i = 0; i < customerData.size(); i++) {
+                oos.writeObject(customerData.get(i));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static ArrayList<Customer> readDataCustomer() {
+        ArrayList<Customer> result = null;
+        try (FileInputStream fis = new FileInputStream("CustomerInfo.bin");
+             ObjectInputStream ois = new ObjectInputStream(fis);) {
+            result = new ArrayList<>();
+            for (; ; ) {
+                result.add((Customer) ois.readObject());
+            }
+        } catch (EOFException eof) {
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+    */
 }
