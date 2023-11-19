@@ -1,6 +1,5 @@
 import java.io.*;
 import java.util.ArrayList;
-import java.io.Serializable;
 
 /**
  * Project 4 - Seller
@@ -8,10 +7,10 @@ import java.io.Serializable;
  * This class represents a single seller.
  */
 
-public class Seller implements Serializable {
+public class Seller {
     private String userName;
     ArrayList<Store> stores = new ArrayList();
-    
+
     //tri: used to create new Seller in main class
     public Seller(ArrayList<Store> stores, String username) {
         this.stores = stores;
@@ -19,7 +18,9 @@ public class Seller implements Serializable {
     }
     //
     public String getUserName() { return this.userName; }
-    
+    public void setUserName(String name) {
+        this.userName = name;
+    }
     public ArrayList<Store> getStores() {
         return this.stores;
     }
