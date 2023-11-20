@@ -654,7 +654,6 @@ public class main {
                         productLimit = String.valueOf(products.get(k).getLimit());
                         ArrayList<String> reviews = products.get(k).getReviews();
                         // tri,tri's store,sales,milk,taro flavour,10,5.4,5,review1,review2
-                        System.out.println("checkPrintWriteFormat");
                         String ans = String.format("%s/-%s/-%s/-%s/-%s/-%s/-%s/-%s/-",
                                 sellerName, storeName, storeSale, productName, productDescription,
                                 productQuant, productPrice, productLimit);
@@ -774,7 +773,6 @@ public class main {
                     for (int j = 8; j < arr.length; j++) { // create an ArrayList of reviews
                         reviewsTemp.add(arr[j]);
                     }
-                    System.out.println("check123 " + arr[5]);
                     int intQuantAvail = Integer.parseInt(arr[5]);
                     double doublePrice = Double.parseDouble(arr[6]);
                     int intLimit = Integer.parseInt(arr[7]);
