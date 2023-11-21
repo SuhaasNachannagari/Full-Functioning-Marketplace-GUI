@@ -12,6 +12,7 @@ public class Edit extends main {
     private int sellerIndex;
     private int storeIndex;
     private int indexProduct;
+    private String listStore = "";
     public void setSeller(String userName) {
         for (int i = 0; i < sellers.size(); i++) {
             Seller sellerTemp = sellers.get(i);
@@ -33,8 +34,9 @@ public class Edit extends main {
             for (int i = 0; i < stores.size(); i++) {
                 Store store = stores.get(i);
                 int j = i + 1;
-                System.out.print( j + "." + store.getName() + "\t");
+                listStore += (j + "." + store.getName() + "\t\t");
             }
+            System.out.print(listStore);
             do {
                 try {
                     checkFormat = true;
@@ -68,7 +70,7 @@ public class Edit extends main {
             do {
                 checkFormat1 = true;
                 try {
-                    System.out.println("Enter the index of the store you want to edit: ");
+                    System.out.println("Enter the index of the product you want to edit: ");
                     indexProductTemp = scan.nextInt();
                     scan.nextLine();
                 } catch (NumberFormatException e) {
@@ -90,14 +92,32 @@ public class Edit extends main {
                 System.out.println("1. Name     2. Store Name      3. Description       4. Quantity Available       5. Price");
                 int indexChange = scan.nextInt();
                 scan.nextLine();
-                System.out.println("Enter the value you want to change: ");
-                String valueChange = scan.nextLine();
-                checkOption = sellers.get(sellerIndex).getStores().get(storeIndex).editProduct(name, indexChange, valueChange);
+
+                //change storename;
+                if (indexChange == 2) {
+                    System.out.println("Which store you want to move to?");
+                    System.out.println(listStore);
+                    int newStoreIndex = scan.nextInt(); scan.nextLine();
+
+                    String storeName = sellers.get(sellerIndex).getStores().get(newStoreIndex - 1).getName();
+                    Product oldProduct = sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(indexProduct);
+                    Product newProduct = new Product(oldProduct.getName(),storeName, oldProduct.getDescription(),
+                                        oldProduct.getQuantAvailable(),oldProduct.getPrice());
+                    newProduct.setLimit(oldProduct.getLimit());
+                    newProduct.setReviews(oldProduct.getReviews());
+                    sellers.get(sellerIndex).getStores().get(newStoreIndex-1).addProduct(newProduct);
+                    sellers.get(sellerIndex).getStores().get(storeIndex).deleteProduct(indexProduct);
+                } else {
+                    System.out.println("Enter the value you want to change: ");
+                    String valueChange = scan.nextLine();
+                    checkOption = sellers.get(sellerIndex).getStores().get(storeIndex).editProduct(name, indexChange, valueChange);
+                }
             } catch (NumberFormatException e) {
                 System.out.println("Please enter the right format!");
                 checkFormat2 = false;
             }
         } while (!checkFormat2 || !checkOption);
+        System.out.println("Product edited");
     }
 
 }
