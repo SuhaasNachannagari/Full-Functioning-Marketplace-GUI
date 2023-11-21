@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 /**
  * Project 4 - Create
@@ -43,7 +44,7 @@ public class Create extends main {
                     System.out.println("\nEnter the index you want to edit: ");
                     index = scan.nextInt();
                     scan.nextLine();
-                } catch (NumberFormatException e) {
+                } catch (InputMismatchException e) {
                     checkFormat = false;
                     System.out.println("Please enter the right format!");
                 }
@@ -111,7 +112,7 @@ public class Create extends main {
                 }
             } while (checkFormat);
             // add the newly created product to the designated store
-            if (sellers.get(sellerIndex).getStores().get(storeIndex).getName().equals("N/A")) {
+            if (sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).getName().equals("N/A")) {
                 // if the store hasn't contained any product yet
                 sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setName(product.getName());
                 sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setStoreName(product.getStoreName());
