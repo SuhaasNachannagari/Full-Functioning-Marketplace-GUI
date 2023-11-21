@@ -644,8 +644,14 @@ public class main {
                 ArrayList<Store> stores = sellerData.get(i).getStores();
                 for (int j = 0; j < stores.size(); j++) {
                     storeName = stores.get(j).getName();
+                    System.out.println(storeName);
                     storeSale = String.valueOf(stores.get(j).getSales());
                     ArrayList<Product> products = stores.get(j).getProducts();
+                    if (products.size() == 0) {
+                        pw.write(String.format("%s/-%s/-%s/-%s/-%s/-%s/-%s/-%s/-",
+                                sellerName, storeName, storeSale, "N/A", "N/A", "0", "0.0", "0" ));
+                        pw.write("\n");
+                    }
                     for (int k = 0; k < products.size(); k++) {
                         productName = products.get(k).getName();
                         productDescription = products.get(k).getDescription();
@@ -812,8 +818,8 @@ public class main {
                     productLimit = String.valueOf(prodShop.get(k).getLimit());
                     ArrayList<String> reviews = prodShop.get(k).getReviews();
                     // tri,tri's store,sales,milk,taro flavour,10,5.4,5,review1,review2
-                    String ans = String.format("%s/-%s/-%s/-%s/-%s/-%s/-%s/-",
-                            custName, storeName, productName, productDescription,
+                    String ans = String.format("%s/-%s/-%s/-%s/-%s/-%s/-",
+                            productName, storeName, productDescription,
                             productQuant, productPrice, productLimit);
                     pw.write(ans);
                     for (int l = 0; l < reviews.size(); l++ ) {
@@ -821,7 +827,9 @@ public class main {
                     }
                     pw.write("\n");
                 }
-                pw.write("change/-value\n");
+                if (prodShop.size() != 0) {
+                    pw.write("change/-value\n");
+                }
                 ArrayList<Product> prodHistory = custTemp.getPurchaseHistory();
                 for (int k = 0; k < prodHistory.size(); k++) {
                     productName = prodHistory.get(k).getName();
@@ -832,8 +840,8 @@ public class main {
                     productLimit = String.valueOf(prodHistory.get(k).getLimit());
                     ArrayList<String> reviews = prodHistory.get(k).getReviews();
                     // tri,tri's store,sales,milk,taro flavour,10,5.4,5,review1,review2
-                    String ans = String.format("%s/-%s/-%s/-%s/-%s/-%s/-%s/-",
-                            custName, storeName, productName, productDescription,
+                    String ans = String.format("%s/-%s/-%s/-%s/-%s/-%s/-",
+                            productName, storeName, productDescription,
                             productQuant, productPrice, productLimit);
                     pw.write(ans);
                     for (int l = 0; l < reviews.size(); l++ ) {
@@ -847,8 +855,6 @@ public class main {
             throw new RuntimeException(e);
         }
     }
-    // instead of using "/-" to seperate word, use another symbol that has a lower chance of being used by user
-
     public static ArrayList<Customer> readDataCustomer() {
         ArrayList<String> tempList = new ArrayList<>();
         try {
@@ -865,22 +871,25 @@ public class main {
         }
 
         int index = 0;
-        int indCust = 0;
         String custName = "";
+        int indexCust = 0;
+        Customer cust ;
         ArrayList<Customer> customerTemp = new ArrayList<>();
         while (index < tempList.size()) {
             // milk,tri's store,taro flavor,10,5.5,7,review1,review2
             String[] arr = tempList.get(index).split("/-");
-            Customer cust = null;
             if (arr.length == 1) {
+                if (!custName.equals(tempList.get(index)) && !custName.equals("")) {
+                    indexCust++;
+                }
                 custName = tempList.get(index);
-                index++;
                 cust = new Customer(new ArrayList<>(), custName);
                 cust.setPurchaseHistory(new ArrayList<>());
                 customerTemp.add(cust);
+                index++;
             } else {
                 ArrayList<Product> listShop = new ArrayList<>();
-                while (arr.length != 2 && index < tempList.size() ) {
+                while (arr.length != 1 && arr.length != 2 && index < tempList.size() ) {
                     Product prodShop;
                     ArrayList<String> reviewsTemp = new ArrayList<>();
                     for (int j = 6; j < arr.length; j++) { // create an ArrayList of reviews
@@ -889,7 +898,7 @@ public class main {
                     int intQuantAvail = Integer.parseInt(arr[3]);
                     double doublePrice = Double.parseDouble(arr[4]);
                     int intLimit = Integer.parseInt(arr[5]);
-                    prodShop = new Product(arr[1], arr[2], arr[3], intQuantAvail, doublePrice);
+                    prodShop = new Product(arr[0], arr[1], arr[2], intQuantAvail, doublePrice);
                     prodShop.setReviews(reviewsTemp);
                     prodShop.setLimit(intLimit);
                     listShop.add(prodShop);
@@ -902,38 +911,39 @@ public class main {
                     }
                 }
 
-                if (index < tempList.size()) {
+                if (arr.length != 1 && arr.length == 2) {
                     index++;
-                    arr = tempList.get(index).split("/-");
+                    try {
+                        arr = tempList.get(index).split("/-");
+                    } catch (IndexOutOfBoundsException e) {
+                    }
                 }
 
                 ArrayList<Product> listHist = new ArrayList<>();
                 while (arr.length != 1 && index < tempList.size()) {
                     Product prodHistory;
                     ArrayList<String> reviewsTemp = new ArrayList<>();
-                    for (int j = 8; j < tempList.size(); j++) { // create an ArrayList of reviews
+                    for (int j = 6; j < arr.length; j++) { // create an ArrayList of reviews
                         reviewsTemp.add(arr[j]);
                     }
                     int intQuantAvail = Integer.parseInt(arr[3]);
                     double doublePrice = Double.parseDouble(arr[4]);
                     int intLimit = Integer.parseInt(arr[5]);
-                    prodHistory = new Product(arr[1], arr[2], arr[3], intQuantAvail, doublePrice);
+                    prodHistory = new Product(arr[0], arr[1], arr[2], intQuantAvail, doublePrice);
                     prodHistory.setReviews(reviewsTemp);
                     prodHistory.setLimit(intLimit);
                     listHist.add(prodHistory);
                     index++;
                     arr = tempList.get(index).split("/-");
                 }
-                try {
-                    cust.setShoppingCar(listShop);
-                    cust.setPurchaseHistory(listHist);
-                    customerTemp.add(cust);
-                } catch (NullPointerException e ) {
-                }
+                customerTemp.get(indexCust).setShoppingCar(listShop);
+                customerTemp.get(indexCust).setPurchaseHistory(listHist);
+                customerTemp.get(indexCust).setCustomerUserName(custName);
             }
         }
         return customerTemp;
     }
+
 
 
     /*
