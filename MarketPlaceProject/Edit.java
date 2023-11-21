@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
@@ -50,7 +51,12 @@ public class Edit extends main {
             } while (!checkFormat);
         } while (index > stores.size() || index <= 0); // correct index is from 1 to store.size()
 
-        showAndEditProduct(index);
+        // check if the store has any products
+        if (seller.getStores().get(index-1).getProducts().get(0).getName().equals("N/A")) {
+             System.out.println("This store doesn't have any products! You should create a new product for it");
+        } else {
+            showAndEditProduct(index);
+        }
     }
     public void showAndEditProduct(int indexTemp) {
         storeIndex = indexTemp - 1;
@@ -73,7 +79,7 @@ public class Edit extends main {
                     System.out.println("Enter the index of the product you want to edit: ");
                     indexProductTemp = scan.nextInt();
                     scan.nextLine();
-                } catch (NumberFormatException e) {
+                } catch (InputMismatchException e) {
                     checkFormat1 = false;
                     System.out.println("Please enter the right format!");
                 }
@@ -112,7 +118,7 @@ public class Edit extends main {
                     String valueChange = scan.nextLine();
                     checkOption = sellers.get(sellerIndex).getStores().get(storeIndex).editProduct(name, indexChange, valueChange);
                 }
-            } catch (NumberFormatException e) {
+            } catch (InputMismatchException e) {
                 System.out.println("Please enter the right format!");
                 checkFormat2 = false;
             }
