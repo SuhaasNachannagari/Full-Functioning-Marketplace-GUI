@@ -27,14 +27,16 @@ public class Create extends main {
         boolean checkFormat;
         ArrayList<Store> stores = seller.getStores();
         do {
-            System.out.print("1. Create new store");
+            int j = 0;
             for (int i = 0; i < stores.size(); i++) {
                 Store store = stores.get(i);
                 if (!store.getName().equals("")) {
-                    int j = i + 2;
+                    j = i + 1;
                     System.out.print(j + ". " + store.getName() + "\t\t");
                 }
             }
+            j++;
+            System.out.print( j + ". Create new store");
             do {
                 checkFormat = true;
                 try {
@@ -46,22 +48,25 @@ public class Create extends main {
                     System.out.println("Please enter the right format!");
                 }
             } while (!checkFormat);
-        } while (index > stores.size() || index <= 0); // correct index is from 1 to store.size()
+        } while (index > stores.size() + 1 || index <= 0); // correct index is from 1 to store.size()
         createProduct(index);
     }
 
     public void createProduct(int indexTemp) {
         storeIndex = indexTemp - 1;
         Scanner scan = new Scanner(System.in);
-        Store store = seller.getStores().get(storeIndex);
 
-        if (indexTemp == seller.getStores().size()) {
-            System.out.println("Enter the name:");
+        if (storeIndex == seller.getStores().size()) {
+            System.out.println("Enter the name of the new store:");
             String name = scan.nextLine();
-            sellers.get(sellerIndex).getStores().get(storeIndex).addProduct(new
-                    Product("", name,"", 0, 0.0));
+            //sellers.get(sellerIndex).getStores().get(storeIndex).addProduct(new
+            //        Product("", name,"", 0, 0.0));
+            //Product dummyProd = new Product("", name,"", 0, 0.0);
+            sellers.get(sellerIndex).getStores().add( new Store(new ArrayList<>(),name));
+            sellers.get(sellerIndex).getStores().get(storeIndex).setSales(0);
             System.out.println("Store created!");
         } else {
+            Store store = seller.getStores().get(storeIndex);
             boolean checkFormat;
             Product product = null;
             do {
@@ -87,10 +92,14 @@ public class Create extends main {
                             System.out.println("Quantity Available: ");
                             int quantAvail = scan.nextInt();
                             scan.nextLine();
-                            System.out.println("Price ");
+                            System.out.println("Price: ");
                             double price = scan.nextDouble();
                             scan.nextLine();
+                            System.out.println("Limit: ");
+                            int limit = scan.nextInt(); scan.nextLine();
                             product = new Product(name, storeName, desc, quantAvail, price);
+                            product.setReviews(new ArrayList<>());
+                            product.setLimit(limit);
                         } else {
                             System.out.println("This product has already existed, please add another product");
                             checkProductExist = true;
@@ -101,8 +110,21 @@ public class Create extends main {
                     checkFormat = true;
                 }
             } while (checkFormat);
-            // add the newly created product to the picked store
-            sellers.get(sellerIndex).getStores().get(storeIndex).addProduct(product);
+            // add the newly created product to the designated store
+            if (sellers.get(sellerIndex).getStores().get(storeIndex).getName().equals("N/A")) {
+                // if the store hasn't contained any product yet
+                sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setName(product.getName());
+                sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setStoreName(product.getStoreName());
+                sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setDescription(product.getDescription());
+                sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setPrice(product.getPrice());
+                sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setQuantAvailable(product.getQuantAvailable());
+                sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setLimit(product.getLimit());
+                sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setReviews(product.getReviews());
+            } else {
+                // if the store already has at least 1 product existed.
+                sellers.get(sellerIndex).getStores().get(storeIndex).addProduct(product);
+            }
+            System.out.println("Product created!");
         }
     }
 }
