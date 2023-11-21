@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * Project 4 - Store
@@ -54,12 +55,12 @@ public class Store {
             System.out.println(this.products.get(i) + "\t" + this.products.get(i).getPrice());
         }
     }
-
     // edit Product: name - name of Product, input - category wants to be edited, val - value to be changed to
     // the method returns a boolean value to check if the method runs into any error, then we could tell user to do again or not.
     public boolean editProduct(String name, int input, String val) {
 
         boolean checkItemExist = false;
+        System.out.println("check41");
         for (Product item: products) {
             if (item.getName().equals(name)) {
                 checkItemExist = true;
@@ -67,17 +68,18 @@ public class Store {
                     case (1):
                         item.setName(val);
                         break;
-                    case (2):
-                        item.setStoreName(val);
-                        break;
+                    // case(2) is in the Edit class, last method
                     case (3):
+                        System.out.println("check42");
                         item.setDescription(val);
                         break;
                     case (4):
+                        System.out.println("check43");
                         int quantAvailable = Integer.parseInt(val);
                         item.setQuantAvailable(quantAvailable);
                         break;
                     case (5):
+                        System.out.println("check44");
                         double price = Double.parseDouble(val);
                         item.setPrice(price);
                         break;
