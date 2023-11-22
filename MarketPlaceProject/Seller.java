@@ -1,92 +1,77 @@
+import java.io.*;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.io.Serializable;
 
 /**
- * Project 4 - Customer
+ * Project 4 - Seller
  *
- * This class represents a customer.
+ * This class represents a single seller.
  */
 
-public class Customer {
-    String customerUserName;
-    ArrayList<Product> shoppingCart;
-    ArrayList<Product> purchaseHistory;
+public class Seller {
+    private String userName;
+    ArrayList<Store> stores = new ArrayList();
 
-    public Customer(ArrayList<Product> shoppingCart, String customerUserName) {
-        this.customerUserName = customerUserName;
-        this.shoppingCart = shoppingCart;
+    //tri: used to create new Seller in main class
+    public Seller(ArrayList<Store> stores, String username) {
+        this.stores = stores;
+        this.userName = username;
+    }
+    //
+    public String getUserName() { return this.userName; }
+    public void setUserName(String name) {
+        this.userName = name;
+    }
+    public ArrayList<Store> getStores() {
+        return this.stores;
     }
 
-    public String getCustomerUserName() {
-        return customerUserName;
+    public void setStores(ArrayList<Store> stores) {
+        this.stores = stores;
     }
 
-    public void setCustomerUserName(String customerUserName) {
-        this.customerUserName = customerUserName;
+    public void createStore(Store store) {
+        this.stores.add(store);
     }
 
-    public ArrayList<Product> getShoppingCar() {
-        return shoppingCart;
-    }
-
-    public void setShoppingCar(ArrayList<Product> shoppingCar) {
-        this.shoppingCart = shoppingCar;
-    }
-
-    public ArrayList<Product> getPurchaseHistory() {
-        return purchaseHistory;
-    }
-
-    public void setPurchaseHistory(ArrayList<Product> purchaseHistory) {
-        this.purchaseHistory = purchaseHistory;
-    }
-
-    public void addShoppingCart(Product product) {
-
-        Scanner scan = new Scanner (System.in);
-        boolean keepShopping = true;
-
-        while (keepShopping) {
-            keepShopping = false;
-            System.out.println("Enter the product you want to buy:");
-            String input = scan.nextLine();
-            for (Product items : shoppingCart) {
-                if (items.getName().equalsIgnoreCase(input)) {
-                    shoppingCart.add(items);
-                } else {
-                    System.out.println("The product you enter does not exist please try again");
-                }
+    public void view() {
+        System.out.println("List of stores:");
+        for(int i = 0; i < stores.size(); i++) {
+            System.out.println(stores.get(i));
+            System.out.println("Products\tQuantity available");
+            for(int j = 0; j < stores.get(i).getProducts().size(); j++) {
+                stores.get(i).listProducts();
             }
-            System.out.println("Do you want to keep shopping?");
-            String answer = scan.nextLine();
-            if (answer.equalsIgnoreCase("yes")) {
-                keepShopping = true;
-            }
+            System.out.println("Revenue of store: " + stores.get(i).getSales());
         }
     }
 
-    public void deleteShoppingCar(Product product) {
-
-        Scanner scan = new Scanner (System.in);
-        boolean keepRemoving = true;
-
-        while (keepRemoving) {
-            keepRemoving = false;
-            System.out.println("Enter the product you want to remove:");
-            String input = scan.nextLine();
-
-            for (Product items : shoppingCart) {
-                if (items.getName().equalsIgnoreCase(input)) {
-                    shoppingCart.remove((items));
-                } else {
-                    System.out.println("The product you enter does not exist please try again");
-                }
-                System.out.println("Do you want to keep removing?");
-                String answer = scan.nextLine();
-                if (answer.equalsIgnoreCase("yes")) {
-                    keepRemoving = true;
-                }
-            }
+    public void saveToFileProduct(Product product) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("SellerProductDetails.txt"))) {
+            String toFile = product.getName() + "," + product.getStoreName() + "," + product.getDescription() + "," +
+                    product.getQuantAvailable() + "," + product.getPrice();
+            writer.write(toFile);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    public ArrayList<String> loadFromFileProduct(String fileName) {
+        ArrayList<String> productData = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName)) ){
+            String line;
+            while ((line = reader.readLine()) != null) {
+                productData.add(line);
+            }
+            if(productData == null || productData.isEmpty()) {
+                System.out.println("No data in file.");
+            } else {
+                System.out.println("File imported success");
+            }
+            return productData;
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        //System.out.println("User data loaded from " + "filler.txt");
     }
 }
