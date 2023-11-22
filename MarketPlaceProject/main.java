@@ -35,6 +35,8 @@ public class main {
         sellers = readDataSeller();
         customers = readDataCustomer();
 
+        System.out.println(sellers.size() + " checkSellerSize0");
+
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to the marketplace.");
         boolean correctInput = true;
@@ -287,7 +289,7 @@ public class main {
                                 try {
                                     System.out.println("Do you want to import or export files (1 - Import, 2 - Export, " +
                                             "3 - exit");
-                                    choice = scanner.nextInt();
+                                    choice = scanner.nextInt(); scanner.nextLine();
                                 } catch (NumberFormatException e) {
                                     checkFormat1 = false;
                                 }
@@ -306,8 +308,8 @@ public class main {
                                 String productName = scanner.nextLine();
                                 String storeName = scanner.nextLine();
                                 String description = scanner.nextLine();
-                                int quantity = scanner.nextInt();
-                                double price = scanner.nextDouble();
+                                int quantity = scanner.nextInt(); scanner.nextLine();
+                                double price = scanner.nextDouble(); scanner.nextLine();
 
                                 Product product = new Product(productName, storeName, description, quantity, price);
 
@@ -376,45 +378,46 @@ public class main {
                 switch (option) {
                     // Thomas, Suhaas, and Rohan
                     case 1:
+                        System.out.println(customers.size() + " checkCustSize1");
                         Sort sorter = new Sort();
                         boolean checkSortBy = true;
                         do {
                             System.out.println("What do you want to do?");
                             System.out.println("1 - Sort by prices, 2 - Sort by quantity");
-                            int sortBy = scanner.nextInt();
+                            int sortBy = scanner.nextInt(); scanner.nextLine();
                             if (sortBy == 1) {
                                 sorter.sortByPrice();
                                 System.out.println("Which product number would you like to look at?");
-                                int priceNum = scanner.nextInt();
+                                int priceNum = scanner.nextInt(); scanner.nextLine();
                                 boolean validPriceNum = true;
                                 do {
                                     validPriceNum = sorter.priceShowProduct(priceNum);
                                     if (!validPriceNum) {
                                         System.out.println("Enter a valid input please:");
-                                        priceNum = scanner.nextInt();
+                                        priceNum = scanner.nextInt(); scanner.nextLine();
                                     }
                                 } while (!validPriceNum);
-                                System.out.println("Would you like to: 1 - Purchase the Product, 2 - Add the Product to your cart, 3 - Leave a review.");
+
                                 boolean validActionProduct = true;
                                 int actionProduct = 0;
                                 do {
                                     System.out.println("Would you like to: 1 - Purchase the Product, 2 - Add the Product to your cart, 3 - Leave a review. ");
-                                    actionProduct = scanner.nextInt();
+                                    actionProduct = scanner.nextInt(); scanner.nextLine();
                                     switch (actionProduct) {
                                         case 1:
                                             System.out.println("How much of the product would you like to buy?");
-                                            int quantityPurchased = scanner.nextInt();
-                                            sorter.quantityPurchaseItems(username, quantityPurchased, priceNum);
+                                            int pricePurchased = scanner.nextInt(); scanner.nextLine();
+                                            sorter.pricePurchaseItem(username, pricePurchased, priceNum);
                                             break;
                                         case 2:
                                             System.out.println("How much of the product would you like to add to cart??");
-                                            int quantityToShoppingCart = scanner.nextInt(); scanner.nextLine();
-                                            sorter.quantityAddToShoppingCart(username, quantityToShoppingCart, priceNum);
+                                            int priceToShoppingCart = scanner.nextInt(); scanner.nextLine();
+                                            sorter.priceAddToShoppingCart(username, priceToShoppingCart, priceNum);
                                             break;
                                         case 3:
                                             System.out.println("Type your review below: ");
                                             String review = scanner.nextLine();
-                                            sorter.addReview(review, priceNum);
+                                            sorter.addReviewPrice(review,priceNum);
                                             break;
                                         default:
                                             System.out.println("Enter a valid input");
@@ -424,24 +427,24 @@ public class main {
                             } else if (sortBy == 2) {
                                 sorter.sortByQuantity();
                                 System.out.println("Which product number would you like to look at?");
-                                int quantityNum = scanner.nextInt();
+                                int quantityNum = scanner.nextInt();  scanner.nextLine();
                                 boolean validQuantityNum = true;
                                 do {
                                     validQuantityNum = sorter.quantityShowProduct(quantityNum);
                                     if (!validQuantityNum) {
                                         System.out.println("Enter a valid input please:");
-                                        int priceNum = scanner.nextInt();
+                                        int priceNum = scanner.nextInt(); scanner.nextLine();
                                     }
                                 } while (!validQuantityNum);
                                 boolean validActionProduct = true;
                                 int actionProduct = 0;
                                 do {
                                     System.out.println("Would you like to: 1 - Purchase the Product, 2 - Add the Product to your cart, 3 - Leave a review. ");
-                                    actionProduct = scanner.nextInt();
+                                    actionProduct = scanner.nextInt(); scanner.nextLine();
                                     switch (actionProduct) {
                                         case 1:
                                             System.out.println("How much of the product would you like to buy?");
-                                            int quantityPurchased = scanner.nextInt();
+                                            int quantityPurchased = scanner.nextInt(); scanner.nextLine();
                                             sorter.quantityPurchaseItems(username, quantityPurchased, quantityNum);
                                             break;
                                         case 2:
@@ -452,7 +455,7 @@ public class main {
                                         case 3:
                                             System.out.println("Type your review below: ");
                                             String review = scanner.nextLine();
-                                            sorter.addReview(review, quantityNum);
+                                            sorter.addReviewQuantity(review, quantityNum);
                                             break;
                                         default:
                                             System.out.println("Enter a valid input");
@@ -469,25 +472,25 @@ public class main {
                         View viewer = new View();
                         viewer.listProducts();
                         System.out.println("Which product number would you like to look at?");
-                        int itemNum = scanner.nextInt();
+                        int itemNum = scanner.nextInt(); scanner.nextLine();
                         boolean validItemNum = true;
                         do {
                             validItemNum = viewer.showProduct(itemNum);
                             if (!validItemNum) {
                                 System.out.println("Enter a valid input please:");
-                                itemNum = scanner.nextInt();
+                                itemNum = scanner.nextInt(); scanner.nextLine();
                             }
                         } while (!validItemNum);
-                        System.out.println("Would you like to: 1 - Purchase the Product, 2 - Add the Product to your cart, 3 - Leave a review.");
+
                         boolean validActionProduct = true;
                         int actionProduct = 0;
                         do {
                             System.out.println("Would you like to: 1 - Purchase the Product, 2 - Add the Product to your cart, 3 - Leave a review. ");
-                            actionProduct = scanner.nextInt();
+                            actionProduct = scanner.nextInt(); scanner.nextLine();
                             switch (actionProduct) {
                                 case 1:
                                     System.out.println("How much of the product would you like to buy?");
-                                    int quantityPurchased = scanner.nextInt();
+                                    int quantityPurchased = scanner.nextInt(); scanner.nextLine();
                                     viewer.purchaseItem(username, quantityPurchased, itemNum);
                                     break;
                                 case 2:
@@ -515,25 +518,24 @@ public class main {
                             boolean isMatch = searcher.searchProducts(search);
                             if (isMatch) {
                                 System.out.println("Which product number would you like to look at?");
-                                int searchNum = scanner.nextInt();
+                                int searchNum = scanner.nextInt(); scanner.nextLine();
                                 boolean validSearchNum = true;
                                 do {
                                     validSearchNum = searcher.showProduct(searchNum);
                                     if (!validSearchNum) {
                                         System.out.println("Enter a valid input please:");
-                                        searchNum = scanner.nextInt();
+                                        searchNum = scanner.nextInt(); scanner.nextLine();
                                     }
                                 } while (!validSearchNum);
-                                System.out.println("Would you like to: 1 - Purchase the Product, 2 - Add the Product to your cart, 3 - Leave a review.");
                                 boolean validSearchProduct = true;
                                 int searchProduct = 0;
                                 do {
                                     System.out.println("Would you like to: 1 - Purchase the Product, 2 - Add the Product to your cart, 3 - Leave a review. ");
-                                    searchProduct = scanner.nextInt();
+                                    searchProduct = scanner.nextInt(); scanner.nextLine();
                                     switch (searchProduct) {
                                         case 1:
                                             System.out.println("How much of the product would you like to buy?");
-                                            int quantityPurchased = scanner.nextInt();
+                                            int quantityPurchased = scanner.nextInt(); scanner.nextLine();
                                             searcher.purchaseItem(username, quantityPurchased, searchNum);
                                             break;
                                         case 2:
@@ -553,7 +555,7 @@ public class main {
                                 } while (!validSearchProduct);
                             }
                             System.out.println("Would you like to search again? 1 - Yes, 2 - No");
-                            searchAgain = scanner.nextInt();
+                            searchAgain = scanner.nextInt(); scanner.nextLine();
                         } while (searchAgain == 1);
                         break;
                     case 4:
@@ -644,7 +646,6 @@ public class main {
                 ArrayList<Store> stores = sellerData.get(i).getStores();
                 for (int j = 0; j < stores.size(); j++) {
                     storeName = stores.get(j).getName();
-                    System.out.println(storeName);
                     storeSale = String.valueOf(stores.get(j).getSales());
                     ArrayList<Product> products = stores.get(j).getProducts();
                     if (products.size() == 0) {
@@ -652,13 +653,17 @@ public class main {
                                 sellerName, storeName, storeSale, "N/A", "N/A", "0", "0.0", "0" ));
                         pw.write("\n");
                     }
+
                     for (int k = 0; k < products.size(); k++) {
                         productName = products.get(k).getName();
                         productDescription = products.get(k).getDescription();
                         productQuant = String.valueOf(products.get(k).getQuantAvailable());
                         productPrice = String.valueOf(products.get(k).getPrice());
                         productLimit = String.valueOf(products.get(k).getLimit());
-                        ArrayList<String> reviews = products.get(k).getReviews();
+                        ArrayList<String> reviews = new ArrayList<>();
+                        for (int o = 0; o < products.get(k).getReviews().size(); o++ ) {
+                            reviews.add(products.get(k).getReviews().get(o));
+                        }
                         // tri,tri's store,sales,milk,taro flavour,10,5.4,5,review1,review2
                         String ans = String.format("%s/-%s/-%s/-%s/-%s/-%s/-%s/-%s/-",
                                 sellerName, storeName, storeSale, productName, productDescription,
@@ -816,7 +821,10 @@ public class main {
                     productQuant = String.valueOf(prodShop.get(k).getQuantAvailable());
                     productPrice = String.valueOf(prodShop.get(k).getPrice());
                     productLimit = String.valueOf(prodShop.get(k).getLimit());
-                    ArrayList<String> reviews = prodShop.get(k).getReviews();
+                    ArrayList<String> reviews = new ArrayList<>();
+                    for (int o = 0; o < prodShop.get(k).getReviews().size(); o++ ) {
+                        reviews.add(prodShop.get(k).getReviews().get(o));
+                    }
                     // tri,tri's store,sales,milk,taro flavour,10,5.4,5,review1,review2
                     String ans = String.format("%s/-%s/-%s/-%s/-%s/-%s/-",
                             productName, storeName, productDescription,
@@ -838,7 +846,10 @@ public class main {
                     productQuant = String.valueOf(prodHistory.get(k).getQuantAvailable());
                     productPrice = String.valueOf(prodHistory.get(k).getPrice());
                     productLimit = String.valueOf(prodHistory.get(k).getLimit());
-                    ArrayList<String> reviews = prodHistory.get(k).getReviews();
+                    ArrayList<String> reviews = new ArrayList<>();
+                    for (int o = 0; o < prodHistory.get(k).getReviews().size(); o++ ) {
+                        reviews.add(prodHistory.get(k).getReviews().get(o));
+                    }
                     // tri,tri's store,sales,milk,taro flavour,10,5.4,5,review1,review2
                     String ans = String.format("%s/-%s/-%s/-%s/-%s/-%s/-",
                             productName, storeName, productDescription,
