@@ -19,7 +19,7 @@ public class View extends main {
 
     private ArrayList<Customer> listedCustomers = getCustomers();
 
-    ArrayList<Product> listedProducts;
+    ArrayList<Product> listedProducts = new ArrayList<>();
 
     public void listProducts() {
         for (Seller seller : listedSellers) {
@@ -67,11 +67,18 @@ public class View extends main {
             if (customer.getCustomerUserName().equals(username)) {
                 ArrayList<Product> updatedShoppingCart = customer.getShoppingCar();
                 if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
-                    System.out.println("You are attempting to add more than the limit of " + productFromSeller.getLimit() + " units set by the seller");
+                    System.out.println("You are attempting to add more than the limit of "
+                            + productFromSeller.getLimit() + " units set by the seller");
                 } else if (quantity > productFromSeller.getQuantAvailable()) {
-                    System.out.println("There is only " + productFromSeller.getQuantAvailable() + " units left, you are attempting to add above that limit");
+                    System.out.println("There is only " + productFromSeller.getQuantAvailable()
+                            + " units left, you are attempting to add above that limit");
                 } else {
-                    Product productToAdd = new Product(productFromSeller.getName(), productFromSeller.getStoreName(), productFromSeller.getDescription(), quantity, productFromSeller.getPrice());
+                    Product productToAdd = new Product(productFromSeller.getName(),
+                            productFromSeller.getStoreName(), productFromSeller.getDescription(),
+                            quantity, productFromSeller.getPrice());
+                    productToAdd.setLimit(productFromSeller.getLimit());
+                    productToAdd.setReviews(productFromSeller.getReviews());
+
                     updatedShoppingCart.add(productToAdd);
                     customer.setShoppingCar(updatedShoppingCart);
                 }
@@ -86,11 +93,17 @@ public class View extends main {
             if (customer.getCustomerUserName().equals(username)) {
                 ArrayList<Product> updatedPurchaseHistory = customer.getPurchaseHistory();
                 if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
-                    System.out.println("You are attempting to buy more than the limit of " + productFromSeller.getLimit() + " units set by the seller");
+                    System.out.println("You are attempting to buy more than the limit of "
+                            + productFromSeller.getLimit() + " units set by the seller");
                 } else if (quantity > productFromSeller.getQuantAvailable()) {
-                    System.out.println("There is only " + productFromSeller.getQuantAvailable() + " units left, you are attempting to buy above that limit");
+                    System.out.println("There is only " + productFromSeller.getQuantAvailable()
+                            + " units left, you are attempting to buy above that limit");
                 } else {
-                    Product productToBuy = new Product(productFromSeller.getName(), productFromSeller.getStoreName(), productFromSeller.getDescription(), quantity, productFromSeller.getPrice());
+                    Product productToBuy = new Product(productFromSeller.getName(), productFromSeller.getStoreName(),
+                            productFromSeller.getDescription(), quantity, productFromSeller.getPrice());
+                    productToBuy.setLimit(productFromSeller.getLimit());
+                    productToBuy.setReviews(productFromSeller.getReviews());
+
                     updatedPurchaseHistory.add(productToBuy);
                     customer.setPurchaseHistory(updatedPurchaseHistory);
                     productFromSeller.setQuantAvailable(productFromSeller.getQuantAvailable() - quantity);
@@ -123,12 +136,18 @@ public class View extends main {
         updatedReviews.add(review);
         productToReview.setReviews(updatedReviews);
 
+        for (Seller seller : sellers) {
+            for (Store store : seller.getStores()) {
+                for ( Product product : store.getProducts()) {
+                    if (product.getName().equals(productToReview.getName()) &&
+                            product.getStoreName().equals(productToReview.getStoreName())) {
+                        product.setReviews(productToReview.getReviews());
+                    }
+                }
+            }
+        }
+
     }
 
 
 }
-
-
-
-
-
