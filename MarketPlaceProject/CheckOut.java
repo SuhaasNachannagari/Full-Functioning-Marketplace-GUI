@@ -33,7 +33,7 @@ public class CheckOut extends main {
                     customer.setShoppingCar(new ArrayList<>());
                 }
             }
-            System.out.println("Export succeeded!");a
+            System.out.println("Export succeeded!");
         } catch (IOException e) {
             e.printStackTrace();
         }
