@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
@@ -26,7 +27,7 @@ public class main {
     static boolean checkIndexUser;
     static boolean checkIndexDoAgain;
     static int checkDoAgain;
-    static String username = null;
+    public static String username = null;
 
     public static void main(String[] args) {
         // this read the file and set the "sellers" variable
@@ -559,37 +560,118 @@ public class main {
                         } while (searchAgain == 1);
                         break;
                     case 4:
-                        // add code for purchase history, code below does not run properly
-                        /*System.out.println("What do you want to do? ");
-                        System.out.println("1 - Add to cart, 2 - Remove from cart, 3 - Check out, 4 - View cart");
+                        System.out.println("What do you want to do? ");
+                        System.out.println("1 - Remove from cart, 2 - Check out, 3 - View cart, 4 - Add to cart");
                         int choice = scanner.nextInt();
                         scanner.nextLine();
 
-                        switch(choice) {
-                            case 1:
-                                Customer.addShoppingCart();
-                                break;
-                            case 2:
-                                Customer.deleteShoppingCart();
-                                break;
-                            case 3:
-                                CheckOut.checkOutAndExportToCSV();
-                                //Export to CSV and clear shoppingCart
-                                ShoppingCartExporter.exportToCSV(shoppingCart, "shopping_cart.csv");
-                                //Read and display the CSV file
-                                CSVReader.readCSV("shopping_cart.csv");
-                                break;
-                            case 4:
-                                System.out.println(Customer.getShoppingCar());
-                            default:
-                                System.out.println("Invalid choice. Please enter a number between 1 and 4.");
+                        for (Customer customer : customers) {
+                            if (customer.getCustomerUserName().equals(username)) {
+
+                                switch (choice) {
+                                    case 1:
+                                        customer.deleteShoppingCart();
+                                        break;
+                                    case 2:
+                                        boolean keepDoing = true;
+                                        boolean checkFormat;
+                                        int buyIndex = 0;
+
+                                        do {
+                                            if (customer.getShoppingCar().isEmpty()) {
+                                                System.out.println("Shopping Cart doesn't contain any products" +
+                                                        ", please add some!");
+                                            } else {
+
+                                                keepDoing = false;
+                                                do {
+                                                    checkFormat = true;
+                                                    try {
+                                                        System.out.println("1. Buy one item        2. Buy all");
+                                                        buyIndex = scanner.nextInt();
+                                                        scanner.nextLine();
+                                                    } catch (InputMismatchException e) {
+                                                        checkFormat = false;
+                                                        System.out.println("Please enter the correct format!");
+                                                    }
+                                                    if (buyIndex != 1 && buyIndex != 2) {
+                                                        checkFormat = false;
+                                                        System.out.println("Please enter the correct format!");
+                                                    }
+                                                } while (!checkFormat);
+
+                                                if (buyIndex == 1) {
+                                                    PurchaseCart purchase = new PurchaseCart();
+                                                    purchase.showProducts();
+                                                } else if (buyIndex == 2) {
+                                                    PurchaseCart purchase = new PurchaseCart();
+                                                    purchase.purchaseItemALL();
+                                                }
+
+                                                boolean checkFormat2;
+                                                do {
+                                                    checkFormat2 = true;
+                                                    int checkKeepDoing = 0;
+                                                    try {
+                                                        System.out.println("Do you want to continue buying? 1. Yes      2. No");
+                                                        checkKeepDoing = scanner.nextInt();
+                                                        scanner.nextLine();
+
+                                                        if (checkKeepDoing == 1) {
+                                                            keepDoing = true;
+                                                        }
+                                                    } catch (InputMismatchException e) {
+                                                        checkFormat2 = false;
+                                                        System.out.println("Please enter the correct format!");
+                                                    }
+                                                    if (checkKeepDoing != 1 && checkKeepDoing != 2) {
+                                                        checkFormat2 = false;
+                                                        System.out.println("Please enter the correct format!");
+                                                    }
+                                                } while (!checkFormat2);
+                                            }
+                                        } while (keepDoing && !customer.getShoppingCar().isEmpty());
+
+
+                                        //Export to CSV and clear shoppingCart
+                                        //ShoppingCartExporter.exportToCSV(shoppingCart, "shopping_cart.csv");
+                                        //Read and display the CSV file
+                                        //CSVReader.readCSV("shopping_cart.csv");
+                                        break;
+                                    case 3:
+                                        customer.viewShoppingCart();
+                                        break;
+                                    case 4:
+                                        View view2 = new View();
+                                        view2.listProducts();
+                                        System.out.println("Which product number would you like to look at?");
+                                        int itemNum2 = scanner.nextInt(); scanner.nextLine();
+                                        boolean validItemNum2 = true;
+                                        do {
+                                            validItemNum2 = view2.showProduct(itemNum2);
+                                            if (!validItemNum2) {
+                                                System.out.println("Enter a valid input please:");
+                                                itemNum2 = scanner.nextInt(); scanner.nextLine();
+                                            }
+                                        } while (!validItemNum2);
+
+                                        System.out.println("How much of the product would you like to add to cart??");
+                                        int quantityToShoppingCart = scanner.nextInt(); scanner.nextLine();
+                                        view2.addToShoppingCart(username, quantityToShoppingCart, itemNum2);
+                                        break;
+                                    default:
+                                        System.out.println("Invalid choice. Please enter a number between 1 and 4.");
+                                }
+                            }
                         }
-                        */
+
                         break;
                     case 5:
                         /* add code for purchase history, code below does not run properly
                         System.out.println(Customer.getPurchasedHistory());
                         */
+                        CheckOut checkOut = new CheckOut();
+                        //checkOut.exportToCSV();
                         break;
                     //Rohan
                     case 6:
