@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
@@ -10,7 +11,6 @@ import java.util.Scanner;
 public class Customer {
     String customerUserName;
     ArrayList<Product> shoppingCart;
-    
     ArrayList<Product> purchaseHistory;
 
     public Customer(ArrayList<Product> shoppingCart, String customerUserName) {
@@ -42,52 +42,78 @@ public class Customer {
         this.purchaseHistory = purchaseHistory;
     }
 
-    public void addShoppingCar(Product product) {
+    public void deleteShoppingCart() {
 
-        Scanner scan = new Scanner (System.in);
-        boolean keepShopping = true;
-
-        while (keepShopping) {
-            keepShopping = false;
-            System.out.println("Enter the product you want to buy:");
-            String input = scan.nextLine();
-            for (Product items : shoppingCart) {
-                if (items.getName().equalsIgnoreCase(input)) {
-                    shoppingCart.add(items);
-                } else {
-                    System.out.println("The product you enter does not exist please try again");
-                }
-            }
-            System.out.println("Do you want to keep shopping?");
-            String answer = scan.nextLine();
-            if (answer.equalsIgnoreCase("yes")) {
-                keepShopping = true;
-            }
-        }
-    }
-
-    public void deleteShoppingCar(Product product) {
-
-        Scanner scan = new Scanner (System.in);
+        Scanner scan = new Scanner(System.in);
         boolean keepRemoving = true;
 
         while (keepRemoving) {
             keepRemoving = false;
-            System.out.println("Enter the product you want to remove:");
-            String input = scan.nextLine();
+            int indexProductTemp = 0;
+            boolean checkFormat1;
 
-            for (Product items : shoppingCart) {
-                if (items.getName().equalsIgnoreCase(input)) {
-                    shoppingCart.remove((items));
-                } else {
-                    System.out.println("The product you enter does not exist please try again");
+            System.out.println("Here are the items in your shopping cart:");
+            int ind = 0;
+            for (Product prod : shoppingCart) {
+                ind++;
+                System.out.print(String.format("%d. Name: %s\t\t", ind, prod.getName()));
+            }
+            System.out.println();
+            do {
+                checkFormat1 = true;
+                try {
+                    System.out.println("Enter the index of the product you want to remove: ");
+                    indexProductTemp = scan.nextInt();
+                    scan.nextLine();
+                } catch (InputMismatchException e) {
+                    checkFormat1 = false;
+                    System.out.println("Please enter the right format!");
                 }
-                System.out.println("Do you want to keep removing?");
-                String answer = scan.nextLine();
-                if (answer.equalsIgnoreCase("yes")) {
-                    keepRemoving = true;
+                if (indexProductTemp <= 0 || indexProductTemp > shoppingCart.size()) {
+                    checkFormat1 = false;
+                    System.out.println("Please enter the right format!");
                 }
+            } while (!checkFormat1);
+
+            int indexProduct = indexProductTemp - 1;
+            shoppingCart.remove(indexProduct);
+            System.out.println("Item removed!");
+
+            boolean checkFormat2;
+            String ans = null;
+            do {
+                checkFormat2 =true;
+                try {
+                    System.out.println("Do you want to keep moving? 1. Yes      2. No");
+                    ans = scan.nextLine();
+                } catch (InputMismatchException e) {
+                    checkFormat2 = false;
+                    System.out.println("Please enter the right format!");
+                }
+                if (!(ans.equals("1") || ans.equals("2"))) {
+                    checkFormat2 = false;
+                    System.out.println("Please enter the right format!");
+                }
+            } while (!checkFormat2);
+
+            if (ans.equalsIgnoreCase("1")) {
+                keepRemoving = true;
             }
         }
     }
+
+    public void viewShoppingCart() {
+        for (int i = 0; i < shoppingCart.size(); i++) {
+            System.out.printf("Name: %s" + "  Store Name: %s" + "  Price: %.2f" + "  Quantity Available: %d" +
+                            "  Description: %s\n", shoppingCart.get(i).getName(), shoppingCart.get(i).getStoreName(),
+                    shoppingCart.get(i).getPrice(), shoppingCart.get(i).getQuantAvailable(),
+                    shoppingCart.get(i).getDescription());
+            System.out.print("Review: ");
+            for (int j = 0; j < shoppingCart.get(i).getReviews().size(); j++) {
+                System.out.print(shoppingCart.get(i).getReviews().get(j)+ "\t\t");
+            }
+            System.out.println();
+        }
+    }
+
 }
