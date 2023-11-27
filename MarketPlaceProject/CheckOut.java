@@ -1,43 +1,18 @@
 import java.io.*;
 import java.util.ArrayList;
 
+import static Project.Project4.Login.main.customers;
+
 /**
-*project 4 CheckOut
-*
-*this class check out the item from the user's shopping cart and clean it while delete it from the seller then export it to cvs file
-*/
+ *project 4 CheckOut
+ *
+ *this class check out the item from the user's shopping cart and clean it while delete it from the seller then export it to cvs file
+ */
 
 public class CheckOut extends main {
     private ArrayList<Product> updatedShoppingCart;
 
     public void exportToCSV(ArrayList<Product> shoppingCart, String s) throws IOException {
-        ArrayList<Product> updatedShoppingCart = null;
-        for (Customer customer : customers) {
-            if (customer.getCustomerUserName().equalsIgnoreCase(username)) {
-                updatedShoppingCart = customer.getShoppingCar();
-                customer.setShoppingCar(null);
-                Store storeToUpdate = null;
-
-                for (Product product : updatedShoppingCart) {
-                    for (Seller seller : sellers) {
-                        ArrayList<Store> stores = seller.getStores();
-                        for (Store store : stores) {
-                            ArrayList<Product> products = store.getProducts();
-                            for (Product productFromSeller : products) {
-                                if (product.getName().equals(productFromSeller.getName())) {
-                                    storeToUpdate = store;
-                                    storeToUpdate.editProduct(product.getName(), 4, (""+ (productFromSeller.getQuantAvailable()-product.getQuantAvailable())));
-                                    store = storeToUpdate;
-                                }
-                            }
-                        }
-                        seller.setStores(stores);
-                    }
-                }
-            }
-        }
-
-
 
         try (FileWriter csvWriter = new FileWriter(s)) {
             // write header
@@ -53,9 +28,14 @@ public class CheckOut extends main {
                 csvWriter.append("\n");
             }
             //clear shopping cart
-            shoppingCart.clear();
-            } catch (IOException e) {
-                e.printStackTrace();
+            for (Customer customer : customers) {
+                if (customer.getCustomerUserName().equals(username)) {
+                    customer.setShoppingCar(new ArrayList<>());
+                }
+            }
+            System.out.println("Export succeeded!");a
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
