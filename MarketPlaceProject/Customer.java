@@ -116,4 +116,17 @@ public class Customer {
         }
     }
 
+    public void viewPurchasedHistory() {
+        for (int i = 0; i < purchaseHistory.size(); i++) {
+            System.out.printf("Name: %s" + "  Store Name: %s" + "  Price: %.2f" + "  Quantity Available: %d" +
+                            "  Description: %s\n", purchaseHistory.get(i).getName(), purchaseHistory.get(i).getStoreName(),
+                    purchaseHistory.get(i).getPrice(), purchaseHistory.get(i).getQuantAvailable(),
+                    purchaseHistory.get(i).getDescription());
+            System.out.print("Review: ");
+            for (int j = 0; j < purchaseHistory.get(i).getReviews().size(); j++) {
+                System.out.print(purchaseHistory.get(i).getReviews().get(j)+ "\t\t");
+            }
+            System.out.println();
+        }
+    }
 }
