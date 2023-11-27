@@ -45,18 +45,32 @@ public class View extends main {
             return false;
         }
         Product product = listedProducts.get(num - 1);
-        System.out.printf("Name: %s\n" + "  Store Name: %s\n" + "  Price: %.2f\n" + "  Quantity Available: %d\n" + "  Description: %s\n", product.getName(), product.getStoreName(), product.getPrice(), product.getQuantAvailable(), product.getDescription());
-        System.out.println("Would you like to see the reviews? 1 - Yes,  2 - No");
-        int reviewInput = scanner.nextInt();
-        if (reviewInput == 1) {
-            ArrayList<String> reviews = product.getReviews();
-            int j = 1;
-            System.out.println("Reviews: ");
-            for (String review : reviews) {
-                System.out.println(j + ") \"" + review + "\"");
-                j++;
+        System.out.printf("Name: %s\n" + "  Store Name: %s\n" + "  Price: %.2f\n" + "  Quantity Available: %d\n" +
+                "  Description: %s\n", product.getName(), product.getStoreName(), product.getPrice(),
+                product.getQuantAvailable(), product.getDescription());
+        boolean checkFormat;
+        do {
+            checkFormat = true;
+            try {
+                System.out.println("Would you like to see the reviews? 1 - Yes,  2 - No");
+                int reviewInput = scanner.nextInt();
+                if (reviewInput == 1) {
+                    ArrayList<String> reviews = product.getReviews();
+                    int j = 1;
+                    System.out.println("Reviews: ");
+                    for (String review : reviews) {
+                        System.out.println(j + ") \"" + review + "\"");
+                        j++;
+                    }
+                } else if (reviewInput != 2) {
+                    checkFormat = false;
+                    System.out.println("Please enter the correct format!");
+                }
+            } catch (InputMismatchException e) {
+                checkFormat = false;
+                System.out.println("Please enter the correct format!");
             }
-        }
+        } while (!checkFormat);
         return true;
     }
 
@@ -81,6 +95,7 @@ public class View extends main {
 
                     updatedShoppingCart.add(productToAdd);
                     customer.setShoppingCar(updatedShoppingCart);
+                    System.out.println("Item added!");
                 }
 
             }
@@ -112,7 +127,7 @@ public class View extends main {
                         ArrayList<Store> stores = seller.getStores();
                         for (Store store : stores) {
                             ArrayList<Product> products = store.getProducts();
-                            for (Product product : products) {
+                            for (Product product : products) { //consider using storeName to compare when finding a correct produc.
                                 if (product.getName().equals(productToBuy.getName())) {
                                     storeToUpdate = store;
                                     storeToUpdate.editProduct(product.getName(), 4, ("" + (productFromSeller.getQuantAvailable() - quantity)));
@@ -125,6 +140,7 @@ public class View extends main {
                     if (productFromSeller.getQuantAvailable() - quantity == 0) {
                         System.out.println("You have bought the entire stock");
                     }
+                    System.out.println("Item purchased!");
                 }
             }
         }
@@ -146,7 +162,7 @@ public class View extends main {
                 }
             }
         }
-
+        System.out.println("Review added!");
     }
 
 
