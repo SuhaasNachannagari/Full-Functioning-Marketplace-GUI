@@ -1,3 +1,12 @@
+package Project.Project4.Login;
+
+import Project.Project4.*;
+import Project.Project4.CustomerMarketplace.*;
+import Project.Project4.SellerMarketplace.Create;
+import Project.Project4.SellerMarketplace.Dashboard;
+import Project.Project4.SellerMarketplace.Delete;
+import Project.Project4.SellerMarketplace.Edit;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
@@ -29,7 +38,7 @@ public class main {
     static int checkDoAgain;
     public static String username = null;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException { // throws IOException cuz of runCustomer()
         // this read the file and set the "sellers" variable
         //sellers = readDataSeller();
         //readDataCustomer();
@@ -366,7 +375,7 @@ public class main {
         writeDataCustomer();
     }
 
-    public static void runCustomer() {
+    public static void runCustomer() throws IOException { // throw IOException becuz of the Purchased Items;
         do {
             Scanner scanner = new Scanner(System.in);
             do {
@@ -559,7 +568,7 @@ public class main {
                             searchAgain = scanner.nextInt(); scanner.nextLine();
                         } while (searchAgain == 1);
                         break;
-                    case 4:
+                    case 4: // Shopping Cart
                         System.out.println("What do you want to do? ");
                         System.out.println("1 - Remove from cart, 2 - Check out, 3 - View cart, 4 - Add to cart");
                         int choice = scanner.nextInt();
@@ -666,12 +675,40 @@ public class main {
                         }
 
                         break;
-                    case 5:
-                        /* add code for purchase history, code below does not run properly
-                        System.out.println(Customer.getPurchasedHistory());
-                        */
-                        CheckOut checkOut = new CheckOut();
-                        //checkOut.exportToCSV();
+                    case 5: //Purchased History
+                        boolean checkFormat;
+                        int choiceFive = 0;
+                        do {
+                            checkFormat = true;
+                            try {
+                                System.out.println("1. Review Purchased History       2. Export Purchase History as csv. file ");
+                                choiceFive = scanner.nextInt(); scanner.nextLine();
+                            } catch (InputMismatchException e) {
+                                checkFormat = false;
+                                System.out.println("Please enter the correct format!");
+                            }
+                            if (!(choiceFive == 1 || choiceFive == 2)) {
+                                checkFormat = false;
+                                System.out.println("Please enter the correct format!");
+                            }
+                        } while (!checkFormat);
+
+                        if (choiceFive == 1) {
+                            for (Customer customer : customers) {
+                                if (customer.getCustomerUserName().equals(username)) {
+                                    customer.viewPurchasedHistory();
+                                }
+                            }
+                        } else {
+                            System.out.println("Enter the file path:");
+                            String filePath = scanner.nextLine();
+                            for (Customer customer : customers) {
+                                if (customer.getCustomerUserName().equals(username)) {
+                                    CheckOut checkOut = new CheckOut();
+                                    checkOut.exportToCSV(customer.getPurchaseHistory(),filePath);
+                                }
+                            }
+                        }
                         break;
                     //Rohan
                     case 6:
