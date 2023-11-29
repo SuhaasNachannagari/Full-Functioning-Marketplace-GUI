@@ -711,6 +711,7 @@ public class main {
                             }
                         }
                         dashboard.printDashboard(customer);
+                        break;
                     default:
                         System.out.println("Please enter the correct number!");
                         checkIndexUser = false;
