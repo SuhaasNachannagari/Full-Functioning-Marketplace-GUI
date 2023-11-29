@@ -11,15 +11,15 @@ import java.util.ArrayList;
  */
 
 public class CustomerDashboard extends main {
-    ArrayList<String> storeNames1;
-    ArrayList<String> storeNames2;
-    ArrayList<Integer> numberOfPurchases;
-    ArrayList<String> productNames;
+    ArrayList<String> storeNames1 = new ArrayList<>();
+    ArrayList<String> storeNames2 = new ArrayList<>();
+    ArrayList<Integer> numberOfPurchases = new ArrayList<>();
+    ArrayList<String> productNames = new ArrayList<>();
 
     private ArrayList<Customer> sortedCustomers = getCustomers();
     public void printDashboard(Customer customer) {
         for (int i = 0; i < sortedCustomers.size(); i++) {
-            for (int j = 0; i < sortedCustomers.get(i).getPurchaseHistory().size();
+            for (int j = 0; j < sortedCustomers.get(i).getPurchaseHistory().size();
                  j++) {
                 String storeName =
                         sortedCustomers.get(i).getPurchaseHistory().get(j).getStoreName();
