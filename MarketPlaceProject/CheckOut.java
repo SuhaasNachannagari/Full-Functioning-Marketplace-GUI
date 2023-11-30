@@ -1,8 +1,6 @@
 import java.io.*;
 import java.util.ArrayList;
 
-import static Project.Project4.Login.main.customers;
-
 /**
  *project 4 CheckOut
  *
