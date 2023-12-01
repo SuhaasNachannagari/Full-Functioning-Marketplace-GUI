@@ -17,6 +17,7 @@ public class Search extends main {
     private ArrayList<Customer> listedCustomers = getCustomers();
 
     ArrayList<Product> listedProducts = new ArrayList<>();
+    ArrayList<Product> matchedProducts = new ArrayList<>();
 
     public boolean searchProducts(String search) {
         ArrayList<Product> matchingProducts = new ArrayList<>();
@@ -49,15 +50,16 @@ public class Search extends main {
                 i++;
             }
         }
+        matchedProducts = matchingProducts;
         return true;
     }
 
     public boolean showProduct(int num) {
         Scanner scanner = new Scanner(System.in);
-        if (num < 1 || num > listedProducts.size()) {
+        if (num < 1 || num > matchedProducts.size()) {
             return false;
         }
-        Product product = listedProducts.get(num - 1);
+        Product product = matchedProducts.get(num - 1);
         System.out.printf("Name: %s\n" + "  Store Name: %s\n" + "  Price: %.2f\n" + "  Quantity Available: %d\n" +
                 "  Description: %s\n", product.getName(), product.getStoreName(), product.getPrice(),
                 product.getQuantAvailable(), product.getDescription());
@@ -77,7 +79,7 @@ public class Search extends main {
 
 
     public void addToShoppingCart(String username, int quantity, int num) {
-        Product productFromSeller = listedProducts.get(num - 1);
+        Product productFromSeller = matchedProducts.get(num - 1);
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
                 ArrayList<Product> updatedShoppingCart = customer.getShoppingCar();
@@ -106,7 +108,7 @@ public class Search extends main {
     }
 
     public void purchaseItem(String username, int quantity, int num) {
-        Product productFromSeller = listedProducts.get(num - 1);
+        Product productFromSeller = matchedProducts.get(num - 1);
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
                 ArrayList<Product> updatedPurchaseHistory = customer.getPurchaseHistory();
@@ -151,7 +153,7 @@ public class Search extends main {
     }
 
     public void addReview(String review, int num) {
-        Product productToReview = listedProducts.get(num - 1);
+        Product productToReview = matchedProducts.get(num - 1);
         ArrayList<String> updatedReviews = productToReview.getReviews();
         updatedReviews.add(review);
         productToReview.setReviews(updatedReviews);

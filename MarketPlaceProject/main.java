@@ -751,7 +751,7 @@ public class main {
         String productPrice;
         String productLimit;
         try {
-            PrintWriter pw = new PrintWriter( new FileOutputStream("SellerInfo.txt"));
+            PrintWriter pw = new PrintWriter( new FileOutputStream("C:\\qtri\\Purdue\\CS180\\Jetbrains\\Project4CSGOld\\MarketPlaceProject\\SellerInfo.txt"));
             for (int i = 0; i < sellerData.size(); i++) {
                 sellerName = sellerData.get(i).getUserName();
                 ArrayList<Store> stores = sellerData.get(i).getStores();
@@ -795,7 +795,7 @@ public class main {
     public static ArrayList<Seller> readDataSeller() {
         ArrayList<String> tempList = new ArrayList<>();
         try {
-            BufferedReader br = new BufferedReader(new FileReader("SellerInfo.txt"));
+            BufferedReader br = new BufferedReader(new FileReader("C:\\qtri\\Purdue\\CS180\\Jetbrains\\Project4CSGOld\\MarketPlaceProject\\SellerInfo.txt"));
             String line = br.readLine();
             while (line != null){
                 tempList.add(line);
@@ -919,7 +919,7 @@ public class main {
             String productQuant;
             String productPrice;
             String productLimit;
-            PrintWriter pw = new PrintWriter(new FileOutputStream("CustomerInfo.txt"));
+            PrintWriter pw = new PrintWriter(new FileOutputStream("C:\\qtri\\Purdue\\CS180\\Jetbrains\\Project4CSGOld\\MarketPlaceProject\\CustomerInfo.txt"));
             for (int i = 0; i < customersData.size(); i++) {
                 Customer custTemp = customersData.get(i);
                 custName = custTemp.getCustomerUserName();
@@ -980,7 +980,7 @@ public class main {
     public static ArrayList<Customer> readDataCustomer() {
         ArrayList<String> tempList = new ArrayList<>();
         try {
-            BufferedReader br = new BufferedReader(new FileReader("CustomerInfo.txt"));
+            BufferedReader br = new BufferedReader(new FileReader("C:\\qtri\\Purdue\\CS180\\Jetbrains\\Project4CSGOld\\MarketPlaceProject\\CustomerInfo.txt"));
             String line = br.readLine();
             while (line != null){
                 tempList.add(line);
