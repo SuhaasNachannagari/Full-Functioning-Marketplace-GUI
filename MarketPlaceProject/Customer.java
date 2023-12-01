@@ -108,9 +108,11 @@ public class Customer {
                             "  Description: %s\n", shoppingCart.get(i).getName(), shoppingCart.get(i).getStoreName(),
                     shoppingCart.get(i).getPrice(), shoppingCart.get(i).getQuantAvailable(),
                     shoppingCart.get(i).getDescription());
-            System.out.print("Review: ");
+            System.out.println("Review: ");
+            int ind = 1;
             for (int j = 0; j < shoppingCart.get(i).getReviews().size(); j++) {
-                System.out.println(shoppingCart.get(i).getReviews().get(j)+ "\t\t");
+                System.out.println(ind + ") \"" +shoppingCart.get(i).getReviews().get(j)+ "\"");
+                ind++;
             }
             System.out.println();
         }

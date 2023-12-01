@@ -7,15 +7,14 @@ import java.util.Scanner;
  */
 public class Dashboard extends main {
     private Seller seller;
-    private ArrayList<Customer> customers = getCustomers();
 
     public void setSeller(String userName) {
         for (int i = 0; i < sellers.size(); i++) {
             Seller sellerTemp = sellers.get(i);
             if (sellerTemp.getUserName().equals(userName)) {
                 this.seller = sellers.get(i);
+                break;
             }
-            break;
         }
         getSelection();
     }
@@ -61,14 +60,16 @@ public class Dashboard extends main {
                         itemNumber += purchasedProduct.get(k).getQuantAvailable(); // accumulate purchased number
                     }
                 }
-                index++;
-                System.out.println(String.format("%d Store: %s, Customer: %s, purchased items: %d",
-                            index, storeNameSeller, main.customers.get(i).getCustomerUserName(), itemNumber));
-                // sortedCustomerInfo contains of storeName and customerName " Store: store1, Customer: tri "
-                String result = String.format("Store: %s, Customer: %s ",
-                        storeNameSeller, customers.get(j).getCustomerUserName());
-                sortedCustomerInfo.add(result);
-                sortedPurchasedNumber.add(itemNumber);
+                if (itemNumber != 0) {
+                    index++;
+                    System.out.println(String.format("%d Store: %s, Customer: %s, purchased items: %d",
+                            index, storeNameSeller, customers.get(j).getCustomerUserName(), itemNumber));
+                    // sortedCustomerInfo contains of storeName and customerName " Store: store1, Customer: tri "
+                    String result = String.format("Store: %s, Customer: %s ",
+                            storeNameSeller, customers.get(j).getCustomerUserName());
+                    sortedCustomerInfo.add(result);
+                    sortedPurchasedNumber.add(itemNumber);
+                }
             }
         }
         sortCustomers(sortedCustomerInfo, sortedPurchasedNumber);
@@ -113,13 +114,14 @@ public class Dashboard extends main {
         } while (!checkFormat);
 
         if (option == 1) {
-            for (int i = 1; i < sortedPurchasedNumber.size(); i++) {
+            for (int i = 0; i < sortedPurchasedNumber.size(); i++) {
                 for (int j = 0; j < i; j++) {
                     if (sortedPurchasedNumber.get(i) >
                             sortedPurchasedNumber.get(j)) {
                         int largerNumber = sortedPurchasedNumber.get(i);
                         sortedPurchasedNumber.set(i, sortedPurchasedNumber.get(j));
                         sortedPurchasedNumber.set(j, largerNumber);
+
                         String largeName = sortedCustomersInfo.get(i);
                         sortedCustomersInfo.set(i, sortedCustomersInfo.get(j));
                         sortedCustomersInfo.set(j, largeName);
@@ -127,13 +129,13 @@ public class Dashboard extends main {
                 }
             }
             for (int i = 0; i < sortedPurchasedNumber.size(); i++) {
-                int index = i++;
+                int index = i + 1;
                 System.out.println(index + " " + sortedCustomersInfo.get(i) + ", purchased items: "
                             + sortedPurchasedNumber.get(i));
             }
         }
         if (option == 2) {
-            for (int i = 1; i < sortedPurchasedNumber.size(); i++) {
+            for (int i = 0; i < sortedPurchasedNumber.size(); i++) {
                 for (int j = 0; j < i; j++) {
                     if (sortedPurchasedNumber.get(i) <
                             sortedPurchasedNumber.get(j)) {
@@ -147,7 +149,7 @@ public class Dashboard extends main {
                 }
             }
             for (int i = 0; i < sortedPurchasedNumber.size(); i++) {
-                int index = i++;
+                int index = i + 1;
                 System.out.println(index + " " + sortedCustomersInfo.get(i) + ", purchased items: "
                         + sortedPurchasedNumber.get(i));
             }
@@ -173,7 +175,7 @@ public class Dashboard extends main {
         } while (!checkFormat);
 
         if (option == 1) {
-            for (int i = 1; i < totalSales.size(); i++) {
+            for (int i = 0; i < totalSales.size(); i++) {
                 for (int j = 0; j < i; j++) {
                     if (totalSales.get(i) >
                             totalSales.get(j)) {
@@ -187,12 +189,12 @@ public class Dashboard extends main {
                 }
             }
             for (int i = 0; i < totalSales.size(); i++) {
-                int index = i++;
+                int index = i + 1;
                 System.out.println(index + " " + names.get(i) + ", Sales: " + totalSales.get(i));
             }
         }
         if (option == 2) {
-            for (int i = 1; i < totalSales.size(); i++) {
+            for (int i = 0; i < totalSales.size(); i++) {
                 for (int j = 0; j < i; j++) {
                     if (totalSales.get(i) <
                             totalSales.get(j)) {
@@ -206,7 +208,7 @@ public class Dashboard extends main {
                 }
             }
             for (int i = 0; i < totalSales.size(); i++) {
-                int index = i++;
+                int index = i + 1;
                 System.out.println(index + " " + names.get(i) + ", Sales: " + totalSales.get(i));
             }
         }

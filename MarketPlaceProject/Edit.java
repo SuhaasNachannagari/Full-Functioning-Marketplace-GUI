@@ -95,7 +95,7 @@ public class Edit extends main {
             try {
                 String name = store.getProducts().get(indexProduct).getName();
                 System.out.println("What do you want to change about this product? ");
-                System.out.println("1. Name     2. Store Name      3. Description       4. Quantity Available       5. Price");
+                System.out.println("1. Name     2. Store Name      3. Description       4. Quantity Available       5. Price        6. Limit");
                 int indexChange = scan.nextInt();
                 scan.nextLine();
 

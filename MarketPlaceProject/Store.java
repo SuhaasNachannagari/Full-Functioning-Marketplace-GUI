@@ -83,6 +83,10 @@ public class Store {
                         double price = Double.parseDouble(val);
                         item.setPrice(price);
                         break;
+                    case (6):
+                        int limit = Integer.parseInt(val);
+                        item.setLimit(limit);
+                        break;
                     default:
                         System.out.println("Please enter the correct number!");
                         break;

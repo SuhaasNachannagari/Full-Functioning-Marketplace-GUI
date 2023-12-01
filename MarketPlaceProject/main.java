@@ -128,11 +128,6 @@ public class main {
                         String password = scanner.nextLine();
 
                         sellerLogin.createUser(username, password);
-                        ArrayList<Store> storesList = new ArrayList<>();
-                        ArrayList<Product> productsList = new ArrayList<>();
-                        storesList.add(new Store(productsList, ""));
-                        productsList.add(new Product("", "", "", 0, 0.0));
-                        sellers.add(new Seller(storesList, username));
                     /*
                     Rest of the code for a new account.
                      */
@@ -273,10 +268,23 @@ public class main {
                     //Raghav
                     case 4:
                         //view
-                        for (int i = 0; i < sellers.size(); i++) {
-                            if (sellers.get(i).getUserName().equals(username)) {
-                                sellers.get(i).view();
+                        boolean checkFormat4;
+                        String ans;
+                        do {
+                            checkFormat4 = true;
+                            System.out.println("1. View Sales by Stores      2. View Products in Carts ");
+                            ans = scanner.nextLine();
+                            if (!(ans.equals("1") || ans.equals("2"))) {
+                                checkFormat4 = false;
+                                System.out.println("Please enter the correct format!");
                             }
+                        } while(!checkFormat4);
+
+                        View view = new View();
+                        if ( ans.equals("1")) {
+                            view.viewStore();
+                        } else {
+                            view.viewShoppingCart();
                         }
                         break;
                     case 5:
@@ -751,7 +759,7 @@ public class main {
         String productPrice;
         String productLimit;
         try {
-            PrintWriter pw = new PrintWriter( new FileOutputStream("C:\\qtri\\Purdue\\CS180\\Jetbrains\\Project4CSGOld\\MarketPlaceProject\\SellerInfo.txt"));
+            PrintWriter pw = new PrintWriter( new FileOutputStream("SellerInfo.txt"));
             for (int i = 0; i < sellerData.size(); i++) {
                 sellerName = sellerData.get(i).getUserName();
                 ArrayList<Store> stores = sellerData.get(i).getStores();
@@ -919,7 +927,7 @@ public class main {
             String productQuant;
             String productPrice;
             String productLimit;
-            PrintWriter pw = new PrintWriter(new FileOutputStream("C:\\qtri\\Purdue\\CS180\\Jetbrains\\Project4CSGOld\\MarketPlaceProject\\CustomerInfo.txt"));
+            PrintWriter pw = new PrintWriter(new FileOutputStream("CustomerInfo.txt"));
             for (int i = 0; i < customersData.size(); i++) {
                 Customer custTemp = customersData.get(i);
                 custName = custTemp.getCustomerUserName();

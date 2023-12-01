@@ -34,8 +34,10 @@ public class View extends main {
         System.out.println("Here are your available items: ");
         int i = 1;
         for (Product product : listedProducts) {
-            System.out.printf("%d. Store: %s, Name: %s, Price: %.2f\n", i, product.getStoreName(), product.getName(), product.getPrice());
-            i++;
+            if (!product.getName().equals("N/A")) {
+                System.out.printf("%d. Store: %s, Name: %s, Price: %.2f\n", i, product.getStoreName(), product.getName(), product.getPrice());
+                i++;
+            }
         }
     }
 
@@ -165,5 +167,55 @@ public class View extends main {
         System.out.println("Review added!");
     }
 
+    public void viewStore() {
+        int indSeller = 0;
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                indSeller = i;
+            }
+        }
+
+        for (Store store: sellers.get(indSeller).getStores() ) {
+            System.out.println(store.getName() + ":");
+            double totalSale = 0;
+            for (Customer cust : customers) {
+                ArrayList<Product> purchaseTemp = cust.getPurchaseHistory();
+                for (int i = 0; i < purchaseTemp.size(); i++) {
+                    if (store.getName().equals(purchaseTemp.get(i).getStoreName())) {
+                        totalSale += purchaseTemp.get(i).getPrice();
+                        double revenue = (purchaseTemp.get(i).getPrice()*purchaseTemp.get(i).getQuantAvailable());
+                        System.out.println(String.format("Customer name: %s     Product: %s     Revenue: %.2f",
+                                cust.getCustomerUserName(), purchaseTemp.get(i).getName(), revenue));
+                    }
+                }
+            }
+            System.out.println("Total Sales: " + totalSale + "\n");
+        }
+    }
+
+    public void viewShoppingCart() {
+        int indSeller = 0;
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                indSeller = i;
+            }
+        }
+
+        for (Store store: sellers.get(indSeller).getStores()) {
+            System.out.println(store.getName() + ":");
+            for (Customer cust: customers) {
+                ArrayList<Product> cartTemp = cust.getPurchaseHistory();
+                for (Product prod : cartTemp) {
+                    if (store.getName().equals(prod.getStoreName())) {
+                        System.out.println(String.format("Customer name: %s     Product: %s     Description: %s" +
+                                "   Quantity: %d ", cust.getCustomerUserName(), prod.getName(), prod.getDescription()
+                                 , prod.getQuantAvailable()));
+                    }
+                }
+            }
+            System.out.println();
+        }
+
+    }
 
 }

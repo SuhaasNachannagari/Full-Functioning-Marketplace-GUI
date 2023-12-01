@@ -11,7 +11,7 @@ If: The account doesn't exist, ask them for a username and return an error if th
 ask them for a password.
 */
 
-public class SellerLogin {
+public class SellerLogin extends main {
     private List<User> users;
 
     public SellerLogin() {
@@ -19,13 +19,25 @@ public class SellerLogin {
     }
 
     public void saveToFile(User user) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("SellerLoginDetails.txt", true))) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("SellerLoginDetails.txt", true));
             /*for (int i = 0; i < users.size(); i++) {
                 String toFile = users.get(i).getUsername() + "," + users.get(i).getPassword() + "\n";
                 writer.write(toFile);
             }*/
             String toFile = user.getUsername() + "," + user.getPassword() + "\n";
             writer.write(toFile);
+            writer.close();
+            // set up new Store and a dummyProduct in that store for a new Seller -> if not, will case NullPointer
+            Product prodTemp = new Product("N/A","N/A","N/A",0,0.0);
+            prodTemp.setLimit(0);
+            prodTemp.setReviews(new ArrayList<>());
+            ArrayList products = new ArrayList<>(); products.add(prodTemp);
+            Store storeTemp = new Store(products,"N/A");
+            ArrayList stores = new ArrayList<>(); stores.add(storeTemp);
+            Seller seller = new Seller(stores,user.getUsername());
+            sellers.add(seller);
+            System.out.println("succeed");
         } catch (IOException e) {
             e.printStackTrace();
         }

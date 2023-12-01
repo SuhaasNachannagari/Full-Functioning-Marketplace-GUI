@@ -12,12 +12,12 @@ public class Create extends main {
     private int storeIndex;
     public void setSeller(String userName) {
         for (int i = 0; i < sellers.size(); i++) {
-            Seller sellerTemp = sellers.get(i);
-            if (sellerTemp.getUserName().equals(userName)) {
+            System.out.println(sellers.get(i).getUserName() + " checkName");
+            if (sellers.get(i).getUserName().equals(userName)) {
                 this.seller = sellers.get(i);
                 sellerIndex = i;
+                break;
             }
-            break;
         }
         showStore();
     }
@@ -26,6 +26,9 @@ public class Create extends main {
 
         int index = -1;
         boolean checkFormat;
+        System.out.println(seller.getUserName() + "check01");
+        System.out.println(seller.getStores().get(0).getName() + "check02");
+        System.out.println(seller.getStores().get(0).getProducts().get(0).getName() + "check03");
         ArrayList<Store> stores = seller.getStores();
         do {
             int j = 0;
@@ -106,25 +109,32 @@ public class Create extends main {
                             checkProductExist = true;
                         }
                     } while (checkProductExist);
-                } catch (NumberFormatException e) {
+                } catch (InputMismatchException e) {
                     System.out.println("Please enter the right format!");
                     checkFormat = true;
                 }
             } while (checkFormat);
             // add the newly created product to the designated store
-            if (sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).getName().equals("N/A")) {
-                // if the store hasn't contained any product yet
-                sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setName(product.getName());
-                sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setStoreName(product.getStoreName());
-                sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setDescription(product.getDescription());
-                sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setPrice(product.getPrice());
-                sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setQuantAvailable(product.getQuantAvailable());
-                sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setLimit(product.getLimit());
-                sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setReviews(product.getReviews());
-            } else {
+            try {
+                if (sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).getName().equals("N/A")) {
+                    // if the store hasn't contained any product yet
+                    sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setName(product.getName());
+                    sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setStoreName(product.getStoreName());
+                    sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setDescription(product.getDescription());
+                    sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setPrice(product.getPrice());
+                    sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setQuantAvailable(product.getQuantAvailable());
+                    sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setLimit(product.getLimit());
+                    sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setReviews(product.getReviews());
+                } else {
+                    // if the store already has at least 1 product existed.
+                    sellers.get(sellerIndex).getStores().get(storeIndex).addProduct(product);
+                }
+            } catch (IndexOutOfBoundsException e) {
                 // if the store already has at least 1 product existed.
+                System.out.println("This will be the first product of the store!");
                 sellers.get(sellerIndex).getStores().get(storeIndex).addProduct(product);
             }
+
             System.out.println("Product created!");
         }
     }
