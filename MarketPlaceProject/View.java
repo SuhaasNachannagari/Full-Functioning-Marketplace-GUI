@@ -34,10 +34,10 @@ public class View extends main {
         System.out.println("Here are your available items: ");
         int i = 1;
         for (Product product : listedProducts) {
-            if (!product.getName().equals("N/A")) {
+            //if (!product.getName().equals("N/A")) {
                 System.out.printf("%d. Store: %s, Name: %s, Price: %.2f\n", i, product.getStoreName(), product.getName(), product.getPrice());
                 i++;
-            }
+            //}
         }
     }
 

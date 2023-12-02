@@ -639,11 +639,10 @@ public class main {
                                             }
                                         } while (keepDoing && !customer.getShoppingCar().isEmpty());
 
-
-                                        //Export to CSV and clear shoppingCart
-                                        //ShoppingCartExporter.exportToCSV(shoppingCart, "shopping_cart.csv");
-                                        //Read and display the CSV file
-                                        //CSVReader.readCSV("shopping_cart.csv");
+                                        if (customer.getShoppingCar().isEmpty()) {
+                                            System.out.println("Shopping Cart doesn't contain any products" +
+                                                    ", please add some!");
+                                        }
                                         break;
                                     case 3:
                                         customer.viewShoppingCart();

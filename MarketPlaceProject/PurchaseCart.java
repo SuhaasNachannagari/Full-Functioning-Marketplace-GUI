@@ -57,6 +57,8 @@ public class PurchaseCart extends main {
                                     product.getStoreName().equals(productFromCustomer.getStoreName())) {
                                 storeToUpdate = store;
 
+                                // for scenario: when someone alr bought that many of the item that the store cannot
+                                // afford that number of item you want to get in your shoppingCart
                                 if ( product.getQuantAvailable() - productFromCustomer.getQuantAvailable() < 0) {
                                     boolean checkFormat;
                                     int choiceNum = 0;
@@ -114,8 +116,11 @@ public class PurchaseCart extends main {
                                     storeToUpdate.editProduct(product.getName(), 4, ("" + (product.getQuantAvailable() - productFromCustomer.getQuantAvailable())));
                                     updatedShoppingCart.remove(num - 1);
                                     customer.setShoppingCar(updatedShoppingCart);
-                                }
 
+                                    ArrayList<Product> updatedPurchaseHist = customer.getPurchaseHistory();
+                                    updatedPurchaseHist.add(productFromCustomer);
+                                    customer.setPurchaseHistory(updatedPurchaseHist);
+                                }
                                 store = storeToUpdate;
                             }
                         }
@@ -155,6 +160,10 @@ public class PurchaseCart extends main {
                                     } else {
                                         storeToUpdate.editProduct(product.getName(), 4, ("" + (productFromSeller.getQuantAvailable() - product.getQuantAvailable())));
                                         store = storeToUpdate;
+
+                                        ArrayList<Product> updatedPurchaseHist = customer.getPurchaseHistory();
+                                        updatedPurchaseHist.add(product);
+                                        customer.setPurchaseHistory(updatedPurchaseHist);
                                     }
                                 }
                                 index++;
