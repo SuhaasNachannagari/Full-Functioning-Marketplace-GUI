@@ -36,8 +36,6 @@ public class main {
         sellers = readDataSeller();
         customers = readDataCustomer();
 
-        System.out.println(sellers.size() + " checkSellerSize0");
-
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to the marketplace.");
         boolean correctInput = true;
@@ -233,6 +231,7 @@ public class main {
     }
 
     public static void runSeller() {
+        System.out.println(sellers.get(0).getStores().get(2).getProducts().size() + "checkSize2");
         Scanner scanner = new Scanner(System.in);
         do {
             do {
@@ -803,12 +802,13 @@ public class main {
     public static ArrayList<Seller> readDataSeller() {
         ArrayList<String> tempList = new ArrayList<>();
         try {
-            BufferedReader br = new BufferedReader(new FileReader("C:\\qtri\\Purdue\\CS180\\Jetbrains\\Project4CSGOld\\MarketPlaceProject\\SellerInfo.txt"));
+            BufferedReader br = new BufferedReader(new FileReader("SellerInfo.txt"));
             String line = br.readLine();
-            while (line != null){
+            while (line != null) {
                 tempList.add(line);
                 line = br.readLine();
             }
+            br.close();
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
@@ -843,7 +843,7 @@ public class main {
                     product = new Product(arr[3],arr[1],arr[4],intQuantAvail, doublePrice);
                     product.setReviews(reviewsTemp);
                     product.setLimit(intLimit);
-                    Seller test = sellersTemp.get(indexSeller);
+                    sellersTemp.get(indexSeller).getStores().get(indexStore).addProduct(product);
 
                 } else {
                     // from new Store
@@ -988,12 +988,13 @@ public class main {
     public static ArrayList<Customer> readDataCustomer() {
         ArrayList<String> tempList = new ArrayList<>();
         try {
-            BufferedReader br = new BufferedReader(new FileReader("C:\\qtri\\Purdue\\CS180\\Jetbrains\\Project4CSGOld\\MarketPlaceProject\\CustomerInfo.txt"));
+            BufferedReader br = new BufferedReader(new FileReader("CustomerInfo.txt"));
             String line = br.readLine();
             while (line != null){
                 tempList.add(line);
                 line = br.readLine();
             }
+            br.close();
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
