@@ -179,23 +179,28 @@ public class View extends main {
                 indSeller = i;
             }
         }
-
-        for (Store store: sellers.get(indSeller).getStores() ) {
-            System.out.println(store.getName() + ":");
-            double totalSale = 0;
-            for (Customer cust : customers) {
-                ArrayList<Product> purchaseTemp = cust.getPurchaseHistory();
-                for (int i = 0; i < purchaseTemp.size(); i++) {
-                    if (store.getName().equals(purchaseTemp.get(i).getStoreName())) {
-                        totalSale += purchaseTemp.get(i).getPrice();
-                        double revenue = (purchaseTemp.get(i).getPrice()*purchaseTemp.get(i).getQuantAvailable());
-                        System.out.println(String.format("Customer name: %s     Product: %s     Revenue: %.2f",
-                                cust.getCustomerUserName(), purchaseTemp.get(i).getName(), revenue));
+        // new update
+        if (sellers.get(indSeller).getStores().get(0).getName().equals("N/A")) {
+            System.out.println("This user has no stores, create new ones please!");
+        } else {
+            for (Store store : sellers.get(indSeller).getStores()) {
+                System.out.println(store.getName() + ":");
+                double totalSale = 0;
+                for (Customer cust : customers) {
+                    ArrayList<Product> purchaseTemp = cust.getPurchaseHistory();
+                    for (int i = 0; i < purchaseTemp.size(); i++) {
+                        if (store.getName().equals(purchaseTemp.get(i).getStoreName())) {
+                            totalSale += purchaseTemp.get(i).getPrice();
+                            double revenue = (purchaseTemp.get(i).getPrice() * purchaseTemp.get(i).getQuantAvailable());
+                            System.out.println(String.format("Customer name: %s     Product: %s     Revenue: %.2f",
+                                    cust.getCustomerUserName(), purchaseTemp.get(i).getName(), revenue));
+                        }
                     }
                 }
+                System.out.println("Total Sales: " + totalSale + "\n");
             }
-            System.out.println("Total Sales: " + totalSale + "\n");
         }
+        // to here
     }
 
     public void viewShoppingCart() {
@@ -206,21 +211,26 @@ public class View extends main {
             }
         }
 
-        for (Store store: sellers.get(indSeller).getStores()) {
-            System.out.println(store.getName() + ":");
-            for (Customer cust: customers) {
-                ArrayList<Product> cartTemp = cust.getPurchaseHistory();
-                for (Product prod : cartTemp) {
-                    if (store.getName().equals(prod.getStoreName())) {
-                        System.out.println(String.format("Customer name: %s     Product: %s     Description: %s" +
-                                "   Quantity: %d ", cust.getCustomerUserName(), prod.getName(), prod.getDescription()
-                                 , prod.getQuantAvailable()));
+        // new code update
+        if (sellers.get(indSeller).getStores().get(0).getName().equals("N/A")) {
+            System.out.println("This user has no stores, please add some!");
+        } else {
+            for (Store store : sellers.get(indSeller).getStores()) {
+                System.out.println(store.getName() + ":");
+                for (Customer cust : customers) {
+                    ArrayList<Product> cartTemp = cust.getPurchaseHistory();
+                    for (Product prod : cartTemp) {
+                        if (store.getName().equals(prod.getStoreName())) {
+                            System.out.println(String.format("Customer name: %s     Product: %s     Description: %s" +
+                                            "   Quantity: %d ", cust.getCustomerUserName(), prod.getName(), prod.getDescription()
+                                    , prod.getQuantAvailable()));
+                        }
                     }
                 }
+                System.out.println();
             }
-            System.out.println();
         }
-
+        // to here
     }
 
 }

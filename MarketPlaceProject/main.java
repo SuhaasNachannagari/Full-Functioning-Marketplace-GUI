@@ -227,7 +227,6 @@ public class main {
     }
 
     public static void runSeller() {
-        System.out.println(sellers.get(0).getStores().get(2).getProducts().size() + "checkSize2");
         Scanner scanner = new Scanner(System.in);
         do {
             do {

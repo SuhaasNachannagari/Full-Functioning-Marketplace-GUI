@@ -20,8 +20,8 @@ public class Edit extends main {
             if (sellerTemp.getUserName().equals(userName)) {
                 this.seller = sellers.get(i);
                 sellerIndex = i;
+                break;
             }
-            break;
         }
         showStore();
     }
