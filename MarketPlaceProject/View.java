@@ -16,7 +16,6 @@ import java.io.*;
 
 public class View extends main {
     private ArrayList<Seller> listedSellers = getSellers();
-
     private ArrayList<Customer> listedCustomers = getCustomers();
 
     ArrayList<Product> listedProducts = new ArrayList<>();
@@ -94,8 +93,11 @@ public class View extends main {
                             quantity, productFromSeller.getPrice());
                     productToAdd.setLimit(productFromSeller.getLimit());
                     productToAdd.setReviews(productFromSeller.getReviews());
-
-                    updatedShoppingCart.add(productToAdd);
+                    if (updatedShoppingCart.get(0).getName().equals("N/A")) {
+                        updatedShoppingCart.set(0, productToAdd);
+                    } else {
+                        updatedShoppingCart.add(productToAdd);
+                    }
                     customer.setShoppingCar(updatedShoppingCart);
                     System.out.println("Item added!");
                 }
@@ -116,33 +118,36 @@ public class View extends main {
                     System.out.println("There is only " + productFromSeller.getQuantAvailable()
                             + " units left, you are attempting to buy above that limit");
                 } else {
-                    Product productToBuy = new Product(productFromSeller.getName(), productFromSeller.getStoreName(),
-                            productFromSeller.getDescription(), quantity, productFromSeller.getPrice());
+                    Product productToBuy = new Product(productFromSeller.getName(),
+                            productFromSeller.getStoreName(),
+                            productFromSeller.getDescription(),
+                            quantity,
+                            productFromSeller.getPrice());
                     productToBuy.setLimit(productFromSeller.getLimit());
                     productToBuy.setReviews(productFromSeller.getReviews());
-
-                    updatedPurchaseHistory.add(productToBuy);
+                    if (updatedPurchaseHistory.get(0).getName().equals("N/A")) {
+                        updatedPurchaseHistory.set(0, productToBuy);
+                    } else {
+                        updatedPurchaseHistory.add(productToBuy);
+                    }
                     customer.setPurchaseHistory(updatedPurchaseHistory);
-                    productFromSeller.setQuantAvailable(productFromSeller.getQuantAvailable() - quantity);
                     Store storeToUpdate = null;
                     for (Seller seller : sellers) {
                         ArrayList<Store> stores = seller.getStores();
                         for (Store store : stores) {
                             ArrayList<Product> products = store.getProducts();
-                            for (Product product : products) { //consider using storeName to compare when finding a correct produc.
+                            for (Product product : products) {
                                 if (product.getName().equals(productToBuy.getName())) {
                                     storeToUpdate = store;
-                                    storeToUpdate.editProduct(product.getName(), 4, ("" + (productFromSeller.getQuantAvailable() - quantity)));
+                                    storeToUpdate.editProduct(product.getName(), 4,
+                                            ("" + (productFromSeller.getQuantAvailable() - quantity)));
                                     store = storeToUpdate;
                                 }
                             }
                         }
                         seller.setStores(stores);
                     }
-                    if (productFromSeller.getQuantAvailable() - quantity == 0) {
-                        System.out.println("You have bought the entire stock");
-                    }
-                    System.out.println("Item purchased!");
+                    System.out.println("Item purchased");
                 }
             }
         }
