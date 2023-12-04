@@ -95,14 +95,17 @@ public class Search extends main {
                             productFromSeller.getStoreName(),
                             productFromSeller.getDescription(),
                             quantity, productFromSeller.getPrice());
-
                     productToAdd.setLimit(productFromSeller.getLimit());
                     productToAdd.setReviews(productFromSeller.getReviews());
-
+                    if (updatedShoppingCart.get(0).getName().equals("N/A")) {
+                        updatedShoppingCart.set(0, productToAdd);
+                    } else {
+                        updatedShoppingCart.add(productToAdd);
+                    }
                     updatedShoppingCart.add(productToAdd);
                     customer.setShoppingCar(updatedShoppingCart);
+                    System.out.println("Item added!");
                 }
-
             }
         }
     }
@@ -113,21 +116,25 @@ public class Search extends main {
             if (customer.getCustomerUserName().equals(username)) {
                 ArrayList<Product> updatedPurchaseHistory = customer.getPurchaseHistory();
                 if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
-                    System.out.println("You are attempting to buy more than the limit of " +
-                            productFromSeller.getLimit() + " units set by the seller");
+                    System.out.println("You are attempting to buy more than the limit of "
+                            + productFromSeller.getLimit() + " units set by the seller");
                 } else if (quantity > productFromSeller.getQuantAvailable()) {
-                    System.out.println("There is only " + productFromSeller.getQuantAvailable() +
-                            " units left, you are attempting to buy above that limit");
+                    System.out.println("There is only " + productFromSeller.getQuantAvailable()
+                            + " units left, you are attempting to buy above that limit");
                 } else {
-                    Product productToBuy = new Product(productFromSeller.getName(), productFromSeller.getStoreName(),
-                            productFromSeller.getDescription(), quantity, productFromSeller.getPrice());
-
+                    Product productToBuy = new Product(productFromSeller.getName(),
+                            productFromSeller.getStoreName(),
+                            productFromSeller.getDescription(),
+                            quantity,
+                            productFromSeller.getPrice());
                     productToBuy.setLimit(productFromSeller.getLimit());
                     productToBuy.setReviews(productFromSeller.getReviews());
-
-                    updatedPurchaseHistory.add(productToBuy);
+                    if (updatedPurchaseHistory.get(0).getName().equals("N/A")) {
+                        updatedPurchaseHistory.set(0, productToBuy);
+                    } else {
+                        updatedPurchaseHistory.add(productToBuy);
+                    }
                     customer.setPurchaseHistory(updatedPurchaseHistory);
-                    productFromSeller.setQuantAvailable(productFromSeller.getQuantAvailable() - quantity);
                     Store storeToUpdate = null;
                     for (Seller seller : sellers) {
                         ArrayList<Store> stores = seller.getStores();
@@ -144,9 +151,7 @@ public class Search extends main {
                         }
                         seller.setStores(stores);
                     }
-                    if (productFromSeller.getQuantAvailable() - quantity == 0) {
-                        System.out.println("You have bought the entire stock");
-                    }
+                    System.out.println("Item purchased");
                 }
             }
         }
@@ -171,3 +176,5 @@ public class Search extends main {
 
     }
 }
+
+
