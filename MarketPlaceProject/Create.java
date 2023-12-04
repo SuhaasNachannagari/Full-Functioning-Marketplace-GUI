@@ -34,7 +34,7 @@ public class Create extends main {
             int j = 0;
             for (int i = 0; i < stores.size(); i++) {
                 Store store = stores.get(i);
-                if (!store.getName().equals("")) {
+                if (!store.getName().equals("N/A")) {
                     j = i + 1;
                     System.out.print(j + ". " + store.getName() + "\t\t");
                 }
@@ -60,7 +60,13 @@ public class Create extends main {
         storeIndex = indexTemp - 1;
         Scanner scan = new Scanner(System.in);
 
-        if (storeIndex == seller.getStores().size()) {
+        if (seller.getStores().get(0).getName().equals("N/A")) {
+            System.out.println("Enter the name of the new store:");
+            String name = scan.nextLine();
+            sellers.get(sellerIndex).getStores().get(0).setName(name);
+            sellers.get(sellerIndex).getStores().get(0).setSales(0);
+            System.out.println("Store created!");
+        } else if (storeIndex == seller.getStores().size()) {
             System.out.println("Enter the name of the new store:");
             String name = scan.nextLine();
             //sellers.get(sellerIndex).getStores().get(storeIndex).addProduct(new
