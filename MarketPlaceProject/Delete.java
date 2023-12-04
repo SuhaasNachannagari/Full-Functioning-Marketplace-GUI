@@ -20,8 +20,8 @@ public class Delete extends main {
             if (sellerTemp.getUserName().equals(userName)) {
                 this.seller = sellers.get(i);
                 sellerIndex = i;
+                break;
             }
-            break;
         }
         // when seller doesn't have any stores
         if ( seller.getStores().size() == 0) {
