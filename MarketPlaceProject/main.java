@@ -205,10 +205,6 @@ public class main {
                         System.out.println("Please enter your password.");
                         String password = scanner.nextLine();
                         customerLogin.createUser(username, password);
-
-                        ArrayList<Product> shoppingCart = new ArrayList<>();
-                        shoppingCart.add(new Product("", "", "", 0, 0.0));
-                        customers.add(new Customer(null, username));
                     /*
                     Rest of the code for a new account.
                      */
@@ -1064,7 +1060,10 @@ public class main {
                     prodHistory.setLimit(intLimit);
                     listHist.add(prodHistory);
                     index++;
-                    arr = tempList.get(index).split("/-");
+                    try {
+                        arr = tempList.get(index).split("/-");
+                    } catch (IndexOutOfBoundsException e) {
+                    }
                 }
                 customerTemp.get(indexCust).setShoppingCar(listShop);
                 customerTemp.get(indexCust).setPurchaseHistory(listHist);

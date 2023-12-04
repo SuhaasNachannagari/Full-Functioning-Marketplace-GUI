@@ -272,7 +272,7 @@ public class Sort extends main {
                             productFromSeller.getPrice());
                     productToBuy.setLimit(productFromSeller.getLimit());
                     productToBuy.setReviews(productFromSeller.getReviews());
-                    if (updatedPurchaseHistory.get(0).getName().equals("N/A")) {
+                    if ((updatedPurchaseHistory != null) && (updatedPurchaseHistory.get(0).getName().equals("N/A"))) {
                         updatedPurchaseHistory.set(0, productToBuy);
                     } else {
                         updatedPurchaseHistory.add(productToBuy);

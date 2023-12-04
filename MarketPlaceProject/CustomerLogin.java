@@ -11,7 +11,7 @@ If: The account doesn't exist, ask them for a username and return an error if th
 ask them for a password.
 */
 
-public class CustomerLogin {
+public class CustomerLogin extends main{
     private List<User> users;
 
     public CustomerLogin() {
@@ -25,6 +25,17 @@ public class CustomerLogin {
                 writer.write(toFile);
             }*/
             String toFile = user.getUsername() + "," + user.getPassword() + "\n";
+            ArrayList<Product> purchaseHis = new ArrayList<>();
+            ArrayList<Product> shoppingCart = new ArrayList<>();
+            Product prod = new Product("N/A", "N/A", "N/A", 0, 0.0);
+            prod.setReviews(new ArrayList<>());
+            prod.setLimit(0);
+            shoppingCart.add(prod);
+            purchaseHis.add(prod);
+            Customer currentCustomer = new Customer(shoppingCart, username);
+            currentCustomer.setPurchaseHistory(purchaseHis);
+            currentCustomer.setShoppingCar(shoppingCart);
+            customers.add(currentCustomer);
             writer.write(toFile);
         } catch (IOException e) {
             e.printStackTrace();

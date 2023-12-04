@@ -2,3 +2,13 @@ Suhaas,Suhaas
 Tri,Tri
 Raghav,Raghav
 bacl,back
+mc,mc
+cool,cool
+bro,bro
+bro1,bro1
+broo,broo
+hey,hey
+hello,hello
+he,he
+bro2,bro2
+bother,bother
