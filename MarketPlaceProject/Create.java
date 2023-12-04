@@ -26,9 +26,6 @@ public class Create extends main {
 
         int index = -1;
         boolean checkFormat;
-        System.out.println(seller.getUserName() + "check01");
-        System.out.println(seller.getStores().get(0).getName() + "check02");
-        System.out.println(seller.getStores().get(0).getProducts().get(0).getName() + "check03");
         ArrayList<Store> stores = seller.getStores();
         do {
             int j = 0;
