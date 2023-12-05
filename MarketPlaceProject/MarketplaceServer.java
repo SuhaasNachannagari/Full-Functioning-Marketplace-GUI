@@ -13,84 +13,126 @@ public class MarketplaceServer {
     private static int sellerIndex;
     private static Customer customer;
     private static int customerIndex;
-    public static void delete() {
-        if ( seller.getStores().size() == 0) {
-            System.out.println("This seller doesn't have any stores!");
+    public static String showStore() {
+        if (seller.getStores().isEmpty() || seller.getStores().get(0).getName().equals("N/A")) {
+            return "No Stores";
         } else {
-            Scanner scan = new Scanner(System.in);
-
-            int index = 0;
-            boolean checkFormat1;
-            ArrayList<Store> stores = seller.getStores();
-            do {
-                for (int i = 0; i < stores.size(); i++) {
-                    Store store = stores.get(i);
-                    int j = i + 1;
-                    System.out.print( j + "." + store.getName() + "\t");
+            String showStores = "";
+            int j = 0;
+            for (Store store : seller.getStores()) {
+                j++;
+                showStores += j + "." + store.getName() + "/-";
+            }
+            return showStores;
+        }
+    }
+    public static String showProducts(String storeName) {
+        for (Store store: seller.getStores()) {
+            String productNames = "";
+            if (store.getName().equals(storeName)) {
+                int j = 0;
+                for (Product prod: store.getProducts()) {
+                    j++;
+                    productNames += j + "." + prod.getName() + "/-";
                 }
-                do {
-                    checkFormat1 = true;
-                    try {
-                        System.out.println("Enter the index of the store you want to edit: ");
-                        index = scan.nextInt();
-                        scan.nextLine();
-                    } catch (InputMismatchException e) {
-                        checkFormat1 = false;
-                        System.out.println("Please enter the right format!");
+            }
+            return productNames;
+        }
+        return null;
+    }
+    public static String deleteDeleteProduct(String storeName, String productName) {
+        int storeIndex = 0;
+        int productIndex = 0;
+        for (int i = 0; i < seller.getStores().size(); i++ ) {
+            if (seller.getStores().get(i).getName().equals(storeName)) {
+                storeIndex = i;
+                for (int j = 0; j < seller.getStores().get(i).getProducts().size(); j++) {
+                    if (seller.getStores().get(i).getProducts().get(j).getName().equals(productName)) {
+                        productIndex = j;
+                        break;
                     }
-                } while(!checkFormat1);
-            } while (index > stores.size() || index <= 0);
-
-            int storeIndex = index - 1;
-            Store store = seller.getStores().get(storeIndex);
-
-            int indexProductTemp = 0;
-            boolean checkFormat2;
-            do {
-                String[] nameCheck = new String[store.getProducts().size()]; //
-                for (int i = 0; i < store.getProducts().size(); i++) {
-                    Product product = store.getProducts().get(i);
-                    int j = i + 1;
-                    System.out.print(j + ". " + product.getName() + "\t\t");
-                    nameCheck[i] = product.getName();
-                    // explain message
-                    if (nameCheck[i].equals("N/A")) {
-                        System.out.println("\n*N/A means the store doesn't contain any products*" +
-                                "\n*if you remove N/A, you will remove the store itself*");
-                    }
-                }
-
-                do {
-                    checkFormat2 = true;
-                    try {
-                        System.out.println("Enter the index of the product you want to delete: ");
-                        indexProductTemp = scan.nextInt();
-                        scan.nextLine();
-                    } catch (InputMismatchException e) {
-                        checkFormat2 = false;
-                        System.out.println("Please enter the right format!");
-                    }
-                } while (!checkFormat2);
-            } while (indexProductTemp <= 0 || indexProductTemp > store.getProducts().size());
-
-            int indexProduct = indexProductTemp - 1;
-
-            if ( sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).getName().equals("N/A") ) {
-                sellers.get(sellerIndex).getStores().remove(storeIndex);
-                System.out.println("Store removed!");
-            } else {
-                sellers.get(sellerIndex).getStores().get(storeIndex).deleteProduct(indexProduct);
-                System.out.println("Product deleted!");
-
-                // when the last product is deleted, add a dummy product named "N/A"
-                if (sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().size() == 0) {
-                    Product prodNull = new Product("N/A","N/A","N/A",0,0.0);
-                    prodNull.setReviews(new ArrayList<>());
-                    prodNull.setLimit(0);
-                    sellers.get(sellerIndex).getStores().get(storeIndex).addProduct(prodNull);
                 }
             }
         }
+
+        if ( sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).getName().equals("N/A") ) {
+            sellers.get(sellerIndex).getStores().remove(storeIndex);
+            return "Store removed!";
+        } else {
+            sellers.get(sellerIndex).getStores().get(storeIndex).deleteProduct(productIndex);
+            // when the last product is deleted, add a dummy product named "N/A"
+            if (sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().size() == 0) {
+                Product prodNull = new Product("N/A","N/A","N/A",0,0.0);
+                prodNull.setReviews(new ArrayList<>());
+                prodNull.setLimit(0);
+                sellers.get(sellerIndex).getStores().get(storeIndex).addProduct(prodNull);
+            }
+            return "Product deleted!";
+        }
+    }
+    public static String checkNoProductMessage(String storeChoice) {
+        for (Store store: seller.getStores()) {
+            if (store.getName().equals(storeChoice)) {
+                if (store.getProducts().get(0).getName().equals("N/A")) {
+                    return "No Products";
+                }
+                return "Yes Products";
+            }
+        }
+        return null;
+    }
+    public static String editProduct(String storeChoice, String productChoice,String choice, String valueChange) {
+        int storeIndex = 0;
+        int productIndex = 0;
+        int newStoreIndex = 0;
+        for (int i = 0; i < seller.getStores().size(); i++ ) {
+            if (seller.getStores().get(i).getName().equals(storeChoice)) {
+                storeIndex = i;
+                for (int j = 0; j < seller.getStores().get(i).getProducts().size(); j++) {
+                    if (seller.getStores().get(i).getProducts().get(j).getName().equals(productChoice)) {
+                        productIndex = j;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (choice.equals("2. Store Name")) {
+            for (int i = 0; i < seller.getStores().size(); i++ ) {
+                if (seller.getStores().get(i).getName().equals(valueChange)) {
+                    newStoreIndex = i;
+                }
+            }
+
+            String storeName = sellers.get(sellerIndex).getStores().get(newStoreIndex).getName();
+            Product oldProduct = sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(productIndex);
+            Product newProduct = new Product(oldProduct.getName(),storeName, oldProduct.getDescription(),
+                    oldProduct.getQuantAvailable(),oldProduct.getPrice());
+            newProduct.setLimit(oldProduct.getLimit());
+            newProduct.setReviews(oldProduct.getReviews());
+            sellers.get(sellerIndex).getStores().get(newStoreIndex).addProduct(newProduct);
+            sellers.get(sellerIndex).getStores().get(storeIndex).deleteProduct(productIndex);
+        } else {
+            String name = seller.getStores().get(storeIndex).getProducts().get(productIndex).getName();
+            int indexChange = 0;
+            if (choice.equals("1. Name")) { indexChange = 1; }
+            if (choice.equals("3. Description")) { indexChange = 3; }
+            if (choice.equals("4. Quantity Available")) { indexChange = 4; }
+            if (choice.equals("5. Price")) { indexChange = 5; } if (choice.equals("6. Limit")) { indexChange = 6; }
+            boolean checkOption = sellers.get(sellerIndex).getStores().get(storeIndex).editProduct(name, indexChange, valueChange);
+        }
+
+        return "Product Edited";
+    }
+    public static String showAllStore() {
+        String showStores = "";
+        int j = 0;
+        for (Store store : seller.getStores()) {
+            j++;
+            showStores += j + "." + store.getName() + "/-";
+        }
+        showStores += ( seller.getStores().size() + "." + "Create new store");
+        return showStores;
     }
     public static void setSeller(String username) {
         int i = 0;
@@ -98,7 +140,6 @@ public class MarketplaceServer {
             if (seller.getUserName().equals(username)) {
                 MarketplaceServer.seller = seller;
                 sellerIndex = i;
-                i++;
             }
         }
     }
@@ -108,7 +149,6 @@ public class MarketplaceServer {
             if (customer.getCustomerUserName().equals(username)) {
                 MarketplaceServer.customer = customer;
                 customerIndex = i;
-                i++;
             }
         }
     }
