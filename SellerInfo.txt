@@ -1,4 +1,4 @@
-tri/-tri's store1/-0.0/-headphone/-white in color/-76/-40.3/--1/-bad/-bebbebeb/-
-tri/-tri's store1/-0.0/-beer/-white in color/-80/-40.3/--1/-bad/-good/-evil/-
-tri/-tri's store2/-0.0/-coat/-orange/-84/-30.2/-6/-
-tri/-tri's store2/-0.0/-laptop/-Rog Flow/-17/-40.5/-8/-reveiw1/-
+tri/-tri's store1/-0.0/-headphone/-white in color/-0/-40.3/--1/-bad/-bebbebeb/-m/-
+tri/-tri's store1/-0.0/-beer/-white in color/-70/-40.3/--1/-bad/-good/-evil/-
+tri/-tri's store2/-0.0/-coat/-orange/-70/-30.2/-6/-
+tri/-tri's store2/-0.0/-laptop/-Rog Flow/-1/-40.5/-8/-reveiw1/-

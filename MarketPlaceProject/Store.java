@@ -60,7 +60,6 @@ public class Store {
     public boolean editProduct(String name, int input, String val) {
 
         boolean checkItemExist = false;
-        System.out.println("check41");
         for (Product item: products) {
             if (item.getName().equals(name)) {
                 checkItemExist = true;
@@ -70,11 +69,9 @@ public class Store {
                         break;
                     // case(2) is in the Edit class, last method
                     case (3):
-                        System.out.println("check42");
                         item.setDescription(val);
                         break;
                     case (4):
-                        System.out.println("check43");
                         int quantAvailable = Integer.parseInt(val);
                         item.setQuantAvailable(quantAvailable);
                         if (quantAvailable == 0) {

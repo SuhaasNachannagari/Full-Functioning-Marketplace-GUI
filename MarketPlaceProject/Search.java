@@ -99,15 +99,17 @@ public class Search extends main {
 
                     productToAdd.setLimit(productFromSeller.getLimit());
                     productToAdd.setReviews(productFromSeller.getReviews());
-                    if (updatedShoppingCart.get(0).getName().equals("N/A")) {
-                        updatedShoppingCart.set(0, productToAdd);
-                    } else {
-                        updatedShoppingCart.add(productToAdd);
+                    if (updatedShoppingCart != null && updatedShoppingCart.size() != 0) {
+                        if (updatedShoppingCart.get(0).getName().equals("N/A")) {
+                            updatedShoppingCart.set(0, productToAdd);
+                        }
+                        else {
+                            updatedShoppingCart.add(productToAdd);
+                        }
                     }
-                    updatedShoppingCart.add(productToAdd);
                     customer.setShoppingCar(updatedShoppingCart);
                 }
-
+                System.out.println("Item added");
             }
         }
     }
@@ -129,12 +131,14 @@ public class Search extends main {
 
                     productToBuy.setLimit(productFromSeller.getLimit());
                     productToBuy.setReviews(productFromSeller.getReviews());
-                    if (updatedPurchaseHistory.get(0).getName().equals("N/A")) {
-                        updatedPurchaseHistory.set(0, productToBuy);
-                    } else {
-                        updatedPurchaseHistory.add(productToBuy);
+                    if (updatedPurchaseHistory != null && updatedPurchaseHistory.size() != 0) {
+                        if (updatedPurchaseHistory.get(0).getName().equals("N/A")) {
+                            updatedPurchaseHistory.set(0, productToBuy);
+                        }
+                        else {
+                            updatedPurchaseHistory.add(productToBuy);
+                        }
                     }
-                    updatedPurchaseHistory.add(productToBuy);
                     customer.setPurchaseHistory(updatedPurchaseHistory);
                     Store storeToUpdate = null;
                     for (Seller seller : sellers) {
@@ -152,9 +156,7 @@ public class Search extends main {
                         }
                         seller.setStores(stores);
                     }
-                    if (productFromSeller.getQuantAvailable() - quantity == 0) {
-                        System.out.println("You have bought the entire stock");
-                    }
+                    System.out.println("Item purchased");
                 }
             }
         }
