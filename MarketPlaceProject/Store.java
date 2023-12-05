@@ -77,6 +77,9 @@ public class Store {
                         System.out.println("check43");
                         int quantAvailable = Integer.parseInt(val);
                         item.setQuantAvailable(quantAvailable);
+                        if (quantAvailable == 0) {
+                            System.out.println("You have bought the entire stock");
+                        }
                         break;
                     case (5):
                         System.out.println("check44");

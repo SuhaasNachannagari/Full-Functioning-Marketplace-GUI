@@ -3,3 +3,5 @@ rohan,rohan
 tri,tri
 suhaas,suhaas
 thomas,thomas
+Suhaas,Suhaas
+Niva,Niva

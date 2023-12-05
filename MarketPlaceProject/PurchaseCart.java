@@ -116,7 +116,6 @@ public class PurchaseCart extends main {
                                     storeToUpdate.editProduct(product.getName(), 4, ("" + (product.getQuantAvailable() - productFromCustomer.getQuantAvailable())));
                                     updatedShoppingCart.remove(num - 1);
                                     customer.setShoppingCar(updatedShoppingCart);
-
                                     ArrayList<Product> updatedPurchaseHist = customer.getPurchaseHistory();
                                     updatedPurchaseHist.add(productFromCustomer);
                                     customer.setPurchaseHistory(updatedPurchaseHist);
