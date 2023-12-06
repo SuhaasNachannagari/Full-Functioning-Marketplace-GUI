@@ -38,8 +38,6 @@ public class CustomerDashboard extends main {
             System.out.println(storeNames2.get(i) + " - " + numberOfPurchases.get(i));
         }
 
-
-
         for (int i = 0; i < customer.getPurchaseHistory().size(); i++) {
             String storeName = customer.getPurchaseHistory().get(i).getStoreName();
             String productBought = customer.getPurchaseHistory().get(i).getName();

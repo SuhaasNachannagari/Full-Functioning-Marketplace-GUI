@@ -21,6 +21,7 @@ public class Search extends main {
 
     public boolean searchProducts(String search) {
         ArrayList<Product> matchingProducts = new ArrayList<>();
+        listedProducts = new ArrayList<>();
         for (Seller seller : listedSellers) {
             ArrayList<Store> stores = seller.getStores();
             for (Store store : stores) {
@@ -95,17 +96,20 @@ public class Search extends main {
                             productFromSeller.getStoreName(),
                             productFromSeller.getDescription(),
                             quantity, productFromSeller.getPrice());
+
                     productToAdd.setLimit(productFromSeller.getLimit());
                     productToAdd.setReviews(productFromSeller.getReviews());
-                    if (updatedShoppingCart.get(0).getName().equals("N/A")) {
-                        updatedShoppingCart.set(0, productToAdd);
-                    } else {
-                        updatedShoppingCart.add(productToAdd);
+                    if (updatedShoppingCart != null && updatedShoppingCart.size() != 0) {
+                        if (updatedShoppingCart.get(0).getName().equals("N/A")) {
+                            updatedShoppingCart.set(0, productToAdd);
+                        }
+                        else {
+                            updatedShoppingCart.add(productToAdd);
+                        }
                     }
-                    updatedShoppingCart.add(productToAdd);
                     customer.setShoppingCar(updatedShoppingCart);
-                    System.out.println("Item added!");
                 }
+                System.out.println("Item added");
             }
         }
     }
@@ -116,23 +120,24 @@ public class Search extends main {
             if (customer.getCustomerUserName().equals(username)) {
                 ArrayList<Product> updatedPurchaseHistory = customer.getPurchaseHistory();
                 if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
-                    System.out.println("You are attempting to buy more than the limit of "
-                            + productFromSeller.getLimit() + " units set by the seller");
+                    System.out.println("You are attempting to buy more than the limit of " +
+                            productFromSeller.getLimit() + " units set by the seller");
                 } else if (quantity > productFromSeller.getQuantAvailable()) {
-                    System.out.println("There is only " + productFromSeller.getQuantAvailable()
-                            + " units left, you are attempting to buy above that limit");
+                    System.out.println("There is only " + productFromSeller.getQuantAvailable() +
+                            " units left, you are attempting to buy above that limit");
                 } else {
-                    Product productToBuy = new Product(productFromSeller.getName(),
-                            productFromSeller.getStoreName(),
-                            productFromSeller.getDescription(),
-                            quantity,
-                            productFromSeller.getPrice());
+                    Product productToBuy = new Product(productFromSeller.getName(), productFromSeller.getStoreName(),
+                            productFromSeller.getDescription(), quantity, productFromSeller.getPrice());
+
                     productToBuy.setLimit(productFromSeller.getLimit());
                     productToBuy.setReviews(productFromSeller.getReviews());
-                    if (updatedPurchaseHistory.get(0).getName().equals("N/A")) {
-                        updatedPurchaseHistory.set(0, productToBuy);
-                    } else {
-                        updatedPurchaseHistory.add(productToBuy);
+                    if (updatedPurchaseHistory != null && updatedPurchaseHistory.size() != 0) {
+                        if (updatedPurchaseHistory.get(0).getName().equals("N/A")) {
+                            updatedPurchaseHistory.set(0, productToBuy);
+                        }
+                        else {
+                            updatedPurchaseHistory.add(productToBuy);
+                        }
                     }
                     customer.setPurchaseHistory(updatedPurchaseHistory);
                     Store storeToUpdate = null;
@@ -176,5 +181,3 @@ public class Search extends main {
 
     }
 }
-
-

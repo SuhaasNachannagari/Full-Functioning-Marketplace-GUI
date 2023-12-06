@@ -307,26 +307,29 @@ public class main {
                                     }
                                 }
                             } else if (choice == 2) {
-                                System.out.println("Enter product details you want to add to export file:");
-                                String productName = scanner.nextLine();
+                                System.out.println("Which store do you want to export products for:");
                                 String storeName = scanner.nextLine();
-                                String description = scanner.nextLine();
-                                int quantity = scanner.nextInt(); scanner.nextLine();
-                                double price = scanner.nextDouble(); scanner.nextLine();
 
-                                Product product = new Product(productName, storeName, description, quantity, price);
+                                boolean checkIfSaved = true;
 
                                 for (int i = 0; i < sellers.size(); i++) {
                                     if (sellers.get(i).getUserName().equals(username)) {
-                                        if (sellers.get(i).getStores().get(i).getName().equals(storeName)) {
-                                            sellers.get(i).saveToFileProduct(product);
+                                        for(int j = 0; j < sellers.get(i).getStores().size(); j++) {
+                                            if (sellers.get(i).getStores().get(j).getName().equals(storeName)) {
+                                                for(int k = 0; k < sellers.get(i).getStores().get(j).getProducts().size(); k++) {
+                                                    System.out.println(k);
+                                                    Product product = sellers.get(i).getStores().get(j).getProducts().get(k);
+                                                    sellers.get(i).saveToFileProduct(product);
+                                                }
+                                                System.out.println("Saved to file!");
+                                                checkIfSaved = false;
+                                                break;
+                                            }
                                         }
-                                    } else {
-                                        System.out.println("No store found. Making a new one.");
-                                        ArrayList<Product> productsInStore = new ArrayList<>();
-                                        productsInStore.add(product);
-                                        Store store = new Store(productsInStore, storeName);
-                                        sellers.get(i).getStores().add(store);
+                                        if(checkIfSaved) {
+                                            System.out.println("No store found.");
+                                        }
+                                        break;
                                     }
                                 }
                             } else if (choice == 3) {

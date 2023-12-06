@@ -5,10 +5,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.text.ParseException;
-import java.util.InputMismatchException;
-import java.util.Scanner;
-
 public class ClientSide extends Thread {
     private static int ind1 = 0;
     private static int ind2 = 0;
