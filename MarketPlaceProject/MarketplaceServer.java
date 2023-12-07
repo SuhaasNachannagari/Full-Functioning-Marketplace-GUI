@@ -9,11 +9,13 @@ import java.util.Scanner;
 public class MarketplaceServer {
     public static ArrayList<Seller> sellers = new ArrayList<>();
     public static ArrayList<Customer> customers = new ArrayList<>();
-    private static Seller seller;
-    private static int sellerIndex;
-    private static Customer customer;
-    private static int customerIndex;
-    public static String showStore() {
+    public static String showStore(String username) {
+        Seller seller = null;
+        for (Seller sellerTemp: sellers) {
+            if (sellerTemp.getUserName().equals(username)) {
+                seller = sellerTemp;
+            }
+        }
         if (seller.getStores().isEmpty() || seller.getStores().get(0).getName().equals("N/A")) {
             return "No Stores";
         } else {
@@ -26,25 +28,40 @@ public class MarketplaceServer {
             return showStores;
         }
     }
-    public static String showProducts(String storeName) {
+    public static String showProducts(String storeName, String username) {
+        Seller seller = null;
+        for (Seller sellerTemp: sellers) {
+            if (sellerTemp.getUserName().equals(username)) {
+                seller = sellerTemp;
+            }
+        }
         for (Store store: seller.getStores()) {
             String productNames = "";
-            if (store.getName().equals(storeName)) {
+            if (store.getName().equals(storeName.substring(2))) {
                 int j = 0;
                 for (Product prod: store.getProducts()) {
                     j++;
                     productNames += j + "." + prod.getName() + "/-";
                 }
+                return productNames;
             }
-            return productNames;
         }
         return null;
     }
-    public static String deleteDeleteProduct(String storeName, String productName) {
+    public static String deleteDeleteProduct(String storeChoice, String productName, String username) {
+        Seller seller = null;
+        int sellerIndex = 0;
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                seller = sellers.get(i);
+                sellerIndex = i;
+                break;
+            }
+        }
         int storeIndex = 0;
         int productIndex = 0;
         for (int i = 0; i < seller.getStores().size(); i++ ) {
-            if (seller.getStores().get(i).getName().equals(storeName)) {
+            if (seller.getStores().get(i).getName().equals(storeChoice.substring(2))) {
                 storeIndex = i;
                 for (int j = 0; j < seller.getStores().get(i).getProducts().size(); j++) {
                     if (seller.getStores().get(i).getProducts().get(j).getName().equals(productName)) {
@@ -70,9 +87,15 @@ public class MarketplaceServer {
             return "Product deleted!";
         }
     }
-    public static String checkNoProductMessage(String storeChoice) {
+    public static String checkNoProductMessage(String storeChoice, String username) {
+        Seller seller = null;
+        for (Seller sellerTemp: sellers) {
+            if (sellerTemp.getUserName().equals(username)) {
+                seller = sellerTemp;    break;
+            }
+        }
         for (Store store: seller.getStores()) {
-            if (store.getName().equals(storeChoice)) {
+            if (store.getName().equals(storeChoice.substring(2))) {
                 if (store.getProducts().get(0).getName().equals("N/A")) {
                     return "No Products";
                 }
@@ -81,15 +104,24 @@ public class MarketplaceServer {
         }
         return null;
     }
-    public static String editProduct(String storeChoice, String productChoice,String choice, String valueChange) {
+    public static String editProduct(String storeChoice, String productChoice, String choice, String valueChange, String username) {
+        Seller seller = null;
+        int sellerIndex = 0;
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                seller = sellers.get(i);
+                sellerIndex = i;
+                break;
+            }
+        }
         int storeIndex = 0;
         int productIndex = 0;
         int newStoreIndex = 0;
         for (int i = 0; i < seller.getStores().size(); i++ ) {
-            if (seller.getStores().get(i).getName().equals(storeChoice)) {
+            if (seller.getStores().get(i).getName().equals(storeChoice.substring(2))) {
                 storeIndex = i;
                 for (int j = 0; j < seller.getStores().get(i).getProducts().size(); j++) {
-                    if (seller.getStores().get(i).getProducts().get(j).getName().equals(productChoice)) {
+                    if (seller.getStores().get(i).getProducts().get(j).getName().equals(productChoice.substring(2))) {
                         productIndex = j;
                         break;
                     }
@@ -97,9 +129,9 @@ public class MarketplaceServer {
             }
         }
 
-        if (choice.equals("2. Store Name")) {
+        if (choice.equals("2.Store Name")) {
             for (int i = 0; i < seller.getStores().size(); i++ ) {
-                if (seller.getStores().get(i).getName().equals(valueChange)) {
+                if (seller.getStores().get(i).getName().equals(valueChange.substring(2))) {
                     newStoreIndex = i;
                 }
             }
@@ -115,37 +147,66 @@ public class MarketplaceServer {
         } else {
             String name = seller.getStores().get(storeIndex).getProducts().get(productIndex).getName();
             int indexChange = 0;
-            if (choice.equals("1. Name")) { indexChange = 1; }
-            if (choice.equals("3. Description")) { indexChange = 3; }
-            if (choice.equals("4. Quantity Available")) { indexChange = 4; }
-            if (choice.equals("5. Price")) { indexChange = 5; } if (choice.equals("6. Limit")) { indexChange = 6; }
+            if (choice.equals("1.Name")) { indexChange = 1; }
+            if (choice.equals("3.Description")) { indexChange = 3; }
+            if (choice.equals("4.Quantity Available")) { indexChange = 4; }
+            if (choice.equals("5.Price")) { indexChange = 5; } if (choice.equals("6.Limit")) { indexChange = 6; }
             boolean checkOption = sellers.get(sellerIndex).getStores().get(storeIndex).editProduct(name, indexChange, valueChange);
         }
 
         return "Product Edited";
     }
-    public static String showAllStore() {
+    public static String showAllStore(String username) {
+        Seller seller = null;
+        for (Seller sellerTemp: sellers) {
+            if (sellerTemp.getUserName().equals(username)) {
+                seller = sellerTemp; break;
+            }
+        }
         String showStores = "";
         int j = 0;
         for (Store store : seller.getStores()) {
             j++;
             showStores += j + "." + store.getName() + "/-";
         }
-        showStores += ( seller.getStores().size() + "." + "Create new store");
+        showStores += ( (seller.getStores().size() + 1) + "." + "Create new store");
         return showStores;
     }
-    public static String createStoreNA(String storeName) {
+    public static String createStoreNA(String storeName, String username) {
+        int sellerIndex = 0;
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                sellerIndex = i;
+                break;
+            }
+        }
         sellers.get(sellerIndex).getStores().get(0).setName(storeName);
         sellers.get(sellerIndex).getStores().get(0).setSales(0);
         return ("Store created!");
     }
-    public static String createStore(String storeName) {
+    public static String createStore(String storeName, String username) {
+        Seller seller = null;
+        int sellerIndex = 0;
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                seller = sellers.get(i);
+                sellerIndex = i;
+                break;
+            }
+        }
         int storeIndex = seller.getStores().size();
         sellers.get(sellerIndex).getStores().add( new Store(new ArrayList<>(),storeName));
         sellers.get(sellerIndex).getStores().get(storeIndex).setSales(0);
         return ("Store created!");
     }
-    public static boolean checkProductName(String storeChoice, String productName) {
+    public static boolean checkProductName(String storeChoice, String productName, String username) {
+        Seller seller = null;
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                seller = sellers.get(i);
+                break;
+            }
+        }
         for (int i = 0; i < seller.getStores().size(); i++) {
             if (seller.getStores().get(i).getName().equals(storeChoice.substring(2))) {
                 for (Product prod: seller.getStores().get(i).getProducts()) {
@@ -158,7 +219,16 @@ public class MarketplaceServer {
         return true;
     }
     public static String createProduct(String storeChoice, String prodName, String prodDes, String prodQuant,
-                                       String prodPrice, String prodLimit ) {
+                                       String prodPrice, String prodLimit, String username ) {
+        Seller seller = null;
+        int sellerIndex = 0;
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                seller = sellers.get(i);
+                sellerIndex = i;
+                break;
+            }
+        }
         int storeIndex = 0;
         for (int i = 0; i < seller.getStores().size(); i++) {
             if (seller.getStores().get(i).getName().equals(storeChoice.substring(2))) {
@@ -166,6 +236,7 @@ public class MarketplaceServer {
                 Product product = new Product(prodName,storeChoice.substring(2),prodDes,
                         Integer.parseInt(prodQuant),Double.parseDouble(prodPrice));
                 product.setLimit(Integer.parseInt(prodLimit));
+                product.setReviews(new ArrayList<>());
                 try {
                     if (sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).getName().equals("N/A")) {
                         // if the store hasn't contained any product yet
@@ -191,23 +262,66 @@ public class MarketplaceServer {
         }
         return null;
     }
-    public static void setSeller(String username) {
-        int i = 0;
-        for (Seller seller: sellers) {
-            if (seller.getUserName().equals(username)) {
-                MarketplaceServer.seller = seller;
+    public static String viewStores(String username) {
+        int sellerIndex = 0;
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
                 sellerIndex = i;
+                break;
             }
         }
+        String salesByStores = "";
+        if (sellers.get(sellerIndex).getStores().get(0).getName().equals("N/A")) {
+            return "No stores";
+        } else {
+            for (Store store : sellers.get(sellerIndex).getStores()) {
+                salesByStores += store.getName() + ":/-";
+                double totalSale = 0;
+                for (Customer cust : customers) {
+                    ArrayList<Product> purchaseTemp = cust.getPurchaseHistory();
+                    for (int i = 0; i < purchaseTemp.size(); i++) {
+                        if (store.getName().equals(purchaseTemp.get(i).getStoreName())) {
+                            totalSale += purchaseTemp.get(i).getPrice();
+                            double revenue = (purchaseTemp.get(i).getPrice() * purchaseTemp.get(i).getQuantAvailable());
+                            salesByStores += String.format("Customer name: %s     Product: %s     Revenue: %.2f/-",
+                                    cust.getCustomerUserName(), purchaseTemp.get(i).getName(), revenue);
+                        }
+                    }
+                }
+                salesByStores += "Total Sales: " + totalSale + "/-";
+            }
+        }
+        return salesByStores;
     }
-    public static void setCustomer(String username) {
-        int i = 0;
-        for (Customer customer: customers) {
-            if (customer.getCustomerUserName().equals(username)) {
-                MarketplaceServer.customer = customer;
-                customerIndex = i;
+    public static String viewShoppingCart(String username) {
+        int sellerIndex = 0;
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                sellerIndex = i;
+                break;
             }
         }
+        String shoppingCartResult = "";
+        if (sellers.get(sellerIndex).getStores().get(0).getName().equals("N/A")) {
+            System.out.println("This user has no stores, please add some!");
+            return "No stores";
+        } else {
+            for (Store store : sellers.get(sellerIndex).getStores()) {
+                shoppingCartResult += (store.getName() + ":/-");
+                for (Customer cust : customers) {
+                    ArrayList<Product> cartTemp = cust.getPurchaseHistory();
+                    for (Product prod : cartTemp) {
+                        if (store.getName().equals(prod.getStoreName())) {
+                            shoppingCartResult += (String.format("Customer name: %s     Product: %s     Description: %s" +
+                                            "   Quantity: %d/-", cust.getCustomerUserName(), prod.getName(), prod.getDescription()
+                                    , prod.getQuantAvailable()));
+                        }
+                    }
+                }
+                shoppingCartResult += "/-";
+            }
+        }
+        return shoppingCartResult;
     }
 
     public static void writeDataSeller() {
@@ -378,6 +492,7 @@ public class MarketplaceServer {
                 }
             }
         }
+        MarketplaceServer.sellers = sellersTemp;
         return sellersTemp;
     }
     public static void writeDataCustomer(){
@@ -538,6 +653,7 @@ public class MarketplaceServer {
                 customerTemp.get(indexCust).setCustomerUserName(custName);
             }
         }
+        MarketplaceServer.customers = customerTemp;
         return customerTemp;
     }
 
