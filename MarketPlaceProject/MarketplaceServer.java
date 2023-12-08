@@ -1,4 +1,5 @@
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -322,6 +323,537 @@ public class MarketplaceServer {
             }
         }
         return shoppingCartResult;
+    }
+
+    public static ArrayList<Product> searchProducts(String search) {
+        ArrayList<Product> listedProducts = new ArrayList<>();
+        for (Seller seller : sellers) {
+            ArrayList<Store> stores = seller.getStores();
+            for (Store store : stores) {
+                ArrayList<Product> products = store.getProducts();
+                for (Product product : products) {
+                    listedProducts.add(product);
+                }
+            }
+        }
+        ArrayList<Product> matchingProducts = new ArrayList<>();
+
+
+        for (Product product : listedProducts) {
+            if (product.getName().contains(search) || product.getDescription().contains(search) ||
+                    product.getStoreName().contains(search)) {
+                matchingProducts.add(product);
+            }
+        }
+
+        if (matchingProducts.size() == 0) {
+            return null;
+        }
+        return matchingProducts;
+    }
+
+    public static ArrayList<Product> sortProducts(int sortType) {
+        ArrayList<Product> quantityListedProducts = new ArrayList<>();
+        ArrayList<Product> priceListedProducts = new ArrayList<>();
+        //below is sorting by quantity
+        for (Seller seller : sellers) {
+            ArrayList<Store> stores = seller.getStores();
+            for (Store store : stores) {
+                ArrayList<Product> products = store.getProducts();
+                for (Product product : products) {
+                    quantityListedProducts.add(product);
+                }
+            }
+        }
+        for (int i = 1; i < quantityListedProducts.size(); i++) {
+            for (int j = 0; j < i; j++) {
+                if (quantityListedProducts.get(i).getQuantAvailable() <
+                        quantityListedProducts.get(j).getQuantAvailable()) {
+                    Product smallerproduct = quantityListedProducts.get(i);
+                    quantityListedProducts.set(i, quantityListedProducts.get(j));
+                    quantityListedProducts.set(j, smallerproduct);
+                }
+            }
+        }
+        // below is sorting for price
+        for (Seller seller : sellers) {
+            ArrayList<Store> stores = seller.getStores();
+            for (Store store : stores) {
+                ArrayList<Product> products = store.getProducts();
+                for (Product product : products) {
+                    priceListedProducts.add(product);
+                }
+            }
+        }
+        for (int i = 1; i < priceListedProducts.size(); i++) {
+            for (int j = 0; j < i; j++) {
+                if (priceListedProducts.get(i).getPrice() < priceListedProducts.get(j).getPrice()) {
+                    Product smallerproduct = priceListedProducts.get(i);
+                    priceListedProducts.set(i, priceListedProducts.get(j));
+                    priceListedProducts.set(j, smallerproduct);
+                }
+            }
+        }
+        //below is returning the proper arraylist
+        if (sortType == 1) {
+            return priceListedProducts;
+        } else {
+            return quantityListedProducts;
+        }
+
+       /* System.out.println("Here are your available items sorted by quantity (lowest to highest)");
+        int i = 1;
+        for (Product product : quantityListedProducts) {
+            System.out.printf("%d. Store: %s, Name: %s, Quantity: %d\n",
+                    i,
+                    product.getStoreName(),
+                    product.getName(),
+                    product.getQuantAvailable());
+            i++;
+        } */
+    }
+
+    public static ArrayList<Product> viewProducts() {
+        ArrayList<Product> viewProducts = new ArrayList<>();
+        //below is sorting by quantity
+        for (Seller seller : sellers) {
+            ArrayList<Store> stores = seller.getStores();
+            for (Store store : stores) {
+                ArrayList<Product> products = store.getProducts();
+                for (Product product : products) {
+                    viewProducts.add(product);
+                }
+            }
+        }
+
+        //below is returning the proper arraylist
+        return viewProducts;
+    }
+
+    public static String priceAddToShoppingCart(ArrayList<Product> priceListedProducts, String username, int quantity, int num) {
+        Product productFromSeller = priceListedProducts.get(num - 1);
+        for (Customer customer : customers) {
+            if (customer.getCustomerUserName().equals(username)) {
+                ArrayList<Product> updatedShoppingCart = customer.getShoppingCar();
+                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
+                    return ("You are attempting to add more than the limit of "
+                            + productFromSeller.getLimit()
+                            + " units set by the seller");
+                } else if (quantity > productFromSeller.getQuantAvailable()) {
+                    return ("There is only " + productFromSeller.getQuantAvailable()
+                            + " units left, you are attempting to add above that limit");
+                } else {
+                    Product productToAdd = new Product(productFromSeller.getName(),
+                            productFromSeller.getStoreName(),
+                            productFromSeller.getDescription(),
+                            quantity, productFromSeller.getPrice());
+
+                    productToAdd.setLimit(productFromSeller.getLimit());
+                    productToAdd.setReviews(productFromSeller.getReviews());
+                    if (updatedShoppingCart != null && updatedShoppingCart.size() != 0) {
+                        if (updatedShoppingCart.get(0).getName().equals("N/A")) {
+                            updatedShoppingCart.set(0, productToAdd);
+                        } else {
+                            updatedShoppingCart.add(productToAdd);
+                        }
+                    }
+                    customer.setShoppingCar(updatedShoppingCart);
+                }
+            }
+        }
+        return ("Item added!");
+    }
+
+    public static String quantityAddToShoppingCart(ArrayList<Product> quantityListedProducts, String username, int quantity, int num) {
+        Product productFromSeller = quantityListedProducts.get(num - 1);
+        for (Customer customer : customers) {
+            if (customer.getCustomerUserName().equals(username)) {
+                ArrayList<Product> updatedShoppingCart = customer.getShoppingCar();
+                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
+                    return ("You are attempting to add more than the limit of "
+                            + productFromSeller.getLimit()
+                            + " units set by the seller");
+                } else if (quantity > productFromSeller.getQuantAvailable()) {
+                    return ("There is only " + productFromSeller.getQuantAvailable()
+                            + " units left, you are attempting to add above that limit");
+                } else {
+                    Product productToAdd = new Product(productFromSeller.getName(),
+                            productFromSeller.getStoreName(),
+                            productFromSeller.getDescription(),
+                            quantity, productFromSeller.getPrice());
+
+                    productToAdd.setLimit(productFromSeller.getLimit());
+                    productToAdd.setReviews(productFromSeller.getReviews());
+                    if (updatedShoppingCart != null && updatedShoppingCart.size() != 0) {
+                        if (updatedShoppingCart.get(0).getName().equals("N/A")) {
+                            updatedShoppingCart.set(0, productToAdd);
+                        }
+                        else {
+                            updatedShoppingCart.add(productToAdd);
+                        }
+                    }
+                    customer.setShoppingCar(updatedShoppingCart);
+                }
+            }
+        }
+        return ("Item added!");
+    }
+    public static String addToShoppingCart(ArrayList<Product> listedProducts, String username, int quantity, int num) {
+        Product productFromSeller = listedProducts.get(num - 1);
+        for (Customer customer : customers) {
+            if (customer.getCustomerUserName().equals(username)) {
+                ArrayList<Product> updatedShoppingCart = customer.getShoppingCar();
+                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
+                    return ("You are attempting to add more than the limit of "
+                            + productFromSeller.getLimit()
+                            + " units set by the seller");
+                } else if (quantity > productFromSeller.getQuantAvailable()) {
+                    return ("There is only " + productFromSeller.getQuantAvailable()
+                            + " units left, you are attempting to add above that limit");
+                } else {
+                    Product productToAdd = new Product(productFromSeller.getName(),
+                            productFromSeller.getStoreName(),
+                            productFromSeller.getDescription(),
+                            quantity, productFromSeller.getPrice());
+
+                    productToAdd.setLimit(productFromSeller.getLimit());
+                    productToAdd.setReviews(productFromSeller.getReviews());
+                    if (updatedShoppingCart != null && updatedShoppingCart.size() != 0) {
+                        if (updatedShoppingCart.get(0).getName().equals("N/A")) {
+                            updatedShoppingCart.set(0, productToAdd);
+                        }
+                        else {
+                            updatedShoppingCart.add(productToAdd);
+                        }
+                    }
+                    customer.setShoppingCar(updatedShoppingCart);
+                }
+            }
+        }
+        return ("Item added!");
+    }
+
+    public static String pricePurchaseItem(ArrayList<Product> priceListedProducts, String username, int quantity, int num) {
+        Product productFromSeller = priceListedProducts.get(num - 1);
+        for (Customer customer : customers) {
+            if (customer.getCustomerUserName().equals(username)) {
+                ArrayList<Product> updatedPurchaseHistory = customer.getPurchaseHistory();
+                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
+                    return ("You are attempting to buy more than the limit of "
+                            + productFromSeller.getLimit() + " units set by the seller");
+                } else if (quantity > productFromSeller.getQuantAvailable()) {
+                    return ("There is only " + productFromSeller.getQuantAvailable()
+                            + " units left, you are attempting to buy above that limit");
+                } else {
+                    Product productToBuy = new Product(productFromSeller.getName(),
+                            productFromSeller.getStoreName(),
+                            productFromSeller.getDescription(),
+                            quantity,
+                            productFromSeller.getPrice());
+                    productToBuy.setLimit(productFromSeller.getLimit());
+                    productToBuy.setReviews(productFromSeller.getReviews());
+                    if (updatedPurchaseHistory != null && updatedPurchaseHistory.size() != 0) {
+                        if (updatedPurchaseHistory.get(0).getName().equals("N/A")) {
+                            updatedPurchaseHistory.set(0, productToBuy);
+                        }
+                        else {
+                            updatedPurchaseHistory.add(productToBuy);
+                        }
+                    }
+                    customer.setPurchaseHistory(updatedPurchaseHistory);
+                    Store storeToUpdate = null;
+                    for (Seller seller : sellers) {
+                        ArrayList<Store> stores = seller.getStores();
+                        for (Store store : stores) {
+                            ArrayList<Product> products = store.getProducts();
+                            for (Product product : products) {
+                                if (product.getName().equals(productToBuy.getName())) {
+                                    storeToUpdate = store;
+                                    storeToUpdate.editProduct(product.getName(), 4,
+                                            ("" + (productFromSeller.getQuantAvailable() - quantity)));
+                                    store = storeToUpdate;
+                                }
+                            }
+                        }
+                        seller.setStores(stores);
+                    }
+                }
+            }
+        }
+        return ("Item purchased");
+    }
+
+    public static String quantityPurchaseItems(ArrayList<Product> quantityListedProducts, String username, int quantity, int num) {
+        Product productFromSeller = quantityListedProducts.get(num - 1);
+        for (Customer customer : customers) {
+            if (customer.getCustomerUserName().equals(username)) {
+                ArrayList<Product> updatedPurchaseHistory = customer.getPurchaseHistory();
+                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
+                    return ("You are attempting to buy more than the limit of "
+                            + productFromSeller.getLimit() + " units set by the seller");
+                } else if (quantity > productFromSeller.getQuantAvailable()) {
+                    return ("There is only " + productFromSeller.getQuantAvailable()
+                            + " units left, you are attempting to buy above that limit");
+                } else {
+                    Product productToBuy = new Product(productFromSeller.getName(),
+                            productFromSeller.getStoreName(),
+                            productFromSeller.getDescription(),
+                            quantity,
+                            productFromSeller.getPrice());
+                    productToBuy.setLimit(productFromSeller.getLimit());
+                    productToBuy.setReviews(productFromSeller.getReviews());
+                    if (updatedPurchaseHistory != null && updatedPurchaseHistory.size() != 0) {
+                        if (updatedPurchaseHistory.get(0).getName().equals("N/A")) {
+                            updatedPurchaseHistory.set(0, productToBuy);
+                        }
+                        else {
+                            updatedPurchaseHistory.add(productToBuy);
+                        }
+                    }
+                    customer.setPurchaseHistory(updatedPurchaseHistory);
+                    Store storeToUpdate = null;
+                    for (Seller seller : sellers) {
+                        ArrayList<Store> stores = seller.getStores();
+                        for (Store store : stores) {
+                            ArrayList<Product> products = store.getProducts();
+                            for (Product product : products) {
+                                if (product.getName().equals(productToBuy.getName())) {
+                                    storeToUpdate = store;
+                                    storeToUpdate.editProduct(product.getName(), 4,
+                                            ("" + (productFromSeller.getQuantAvailable() - quantity)));
+                                    store = storeToUpdate;
+                                }
+                            }
+                        }
+                        seller.setStores(stores);
+                    }
+                }
+            }
+        }
+        return ("Item purchased");
+    }
+    public static String purchaseItem(ArrayList<Product> listedProducts, String username, int quantity, int num) {
+        Product productFromSeller = listedProducts.get(num - 1);
+        for (Customer customer : customers) {
+            if (customer.getCustomerUserName().equals(username)) {
+                ArrayList<Product> updatedPurchaseHistory = customer.getPurchaseHistory();
+                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
+                    return ("You are attempting to buy more than the limit of "
+                            + productFromSeller.getLimit() + " units set by the seller");
+                } else if (quantity > productFromSeller.getQuantAvailable()) {
+                    return ("There is only " + productFromSeller.getQuantAvailable()
+                            + " units left, you are attempting to buy above that limit");
+                } else {
+                    Product productToBuy = new Product(productFromSeller.getName(),
+                            productFromSeller.getStoreName(),
+                            productFromSeller.getDescription(),
+                            quantity,
+                            productFromSeller.getPrice());
+                    productToBuy.setLimit(productFromSeller.getLimit());
+                    productToBuy.setReviews(productFromSeller.getReviews());
+                    if (updatedPurchaseHistory != null && updatedPurchaseHistory.size() != 0) {
+                        if (updatedPurchaseHistory.get(0).getName().equals("N/A")) {
+                            updatedPurchaseHistory.set(0, productToBuy);
+                        }
+                        else {
+                            updatedPurchaseHistory.add(productToBuy);
+                        }
+                    }
+                    customer.setPurchaseHistory(updatedPurchaseHistory);
+                    Store storeToUpdate = null;
+                    for (Seller seller : sellers) {
+                        ArrayList<Store> stores = seller.getStores();
+                        for (Store store : stores) {
+                            ArrayList<Product> products = store.getProducts();
+                            for (Product product : products) {
+                                if (product.getName().equals(productToBuy.getName())) {
+                                    storeToUpdate = store;
+                                    storeToUpdate.editProduct(product.getName(), 4,
+                                            ("" + (productFromSeller.getQuantAvailable() - quantity)));
+                                    store = storeToUpdate;
+                                }
+                            }
+                        }
+                        seller.setStores(stores);
+                    }
+                }
+            }
+        }
+        return ("Item purchased");
+    }
+    public static String addReviewPrice(ArrayList<Product> priceListedProducts, String review, int num) {
+        Product productToReview = priceListedProducts.get(num - 1);
+        ArrayList<String> updatedReviews = productToReview.getReviews();
+        updatedReviews.add(review);
+        productToReview.setReviews(updatedReviews);
+
+        for (Seller seller : sellers) {
+            for (Store store : seller.getStores()) {
+                for (Product product : store.getProducts()) {
+                    if (product.getName().equals(productToReview.getName()) &&
+                            product.getStoreName().equals(productToReview.getStoreName())) {
+                        product.setReviews(productToReview.getReviews());
+                    }
+                }
+            }
+        }
+        return "Review added";
+    }
+
+    public static String addReviewQuantity(ArrayList<Product> quantityListedProducts, String review, int num) {
+        Product productToReview = quantityListedProducts.get(num - 1);
+        ArrayList<String> updatedReviews = productToReview.getReviews();
+        updatedReviews.add(review);
+        productToReview.setReviews(updatedReviews);
+
+        for (Seller seller : sellers) {
+            for (Store store : seller.getStores()) {
+                for ( Product product : store.getProducts()) {
+                    if (product.getName().equals(productToReview.getName()) &&
+                            product.getStoreName().equals(productToReview.getStoreName())) {
+                        product.setReviews(productToReview.getReviews());
+                    }
+                }
+            }
+        }
+
+        return "Review added";
+    }
+    public static String addReview(ArrayList<Product> listedProducts, String review, int num) {
+        Product productToReview = listedProducts.get(num - 1);
+        ArrayList<String> updatedReviews = productToReview.getReviews();
+        updatedReviews.add(review);
+        productToReview.setReviews(updatedReviews);
+
+        for (Seller seller : sellers) {
+            for (Store store : seller.getStores()) {
+                for ( Product product : store.getProducts()) {
+                    if (product.getName().equals(productToReview.getName()) &&
+                            product.getStoreName().equals(productToReview.getStoreName())) {
+                        product.setReviews(productToReview.getReviews());
+                    }
+                }
+            }
+        }
+
+        return "Review added";
+    }
+
+    public static ArrayList<Product> getCustomerShoppingCart(String username) {
+        int customerIndex = 0;
+        for (int i = 0; i < customers.size(); i++) {
+            if (customers.get(i).getCustomerUserName().equals(username)) {
+                customerIndex = i;
+                break;
+            }
+        }
+        ArrayList<Product> shoppingCartResult = new ArrayList<>();
+        if (customers.get(customerIndex).getShoppingCar().get(0).getName().equals("N/A")) {
+            return null;
+        } else {
+            for (Product product : customers.get(customerIndex).getShoppingCar()) {
+                shoppingCartResult.add(product);
+            }
+        }
+        return shoppingCartResult;
+    }
+
+    public static String removeItem(String username, ArrayList<Product> shoppingCart, int num) {
+        int customerIndex = 0;
+        Product productToRemove = shoppingCart.get(num-1);
+        for (int i = 0; i < customers.size(); i++) {
+            if (customers.get(i).getCustomerUserName().equals(username)) {
+                customerIndex = i;
+                break;
+            }
+        }
+        for (Product product : shoppingCart) {
+            if (product.equals(productToRemove)) {
+                shoppingCart.remove(product);
+                break;
+            }
+        }
+        return "Removed";
+    }
+
+    public static String purchaseItemALL(String username) {
+        ArrayList<Product> updatedShoppingCart = new ArrayList<>();
+        for (Customer customer : customers) {
+            if (customer.getCustomerUserName().equalsIgnoreCase(username)) {
+                updatedShoppingCart = customer.getShoppingCar();
+                customer.setShoppingCar(new ArrayList<>());
+                Store storeToUpdate;
+                int index = 1;
+                for (Product product : updatedShoppingCart) {
+                    for (Seller seller : sellers) {
+                        ArrayList<Store> stores = seller.getStores();
+                        for (Store store : stores) {
+                            ArrayList<Product> products = store.getProducts();
+                            for (Product productFromSeller : products) {
+                                if (product.getName().equals(productFromSeller.getName()) &&
+                                        product.getStoreName().equals(productFromSeller.getStoreName())) {
+                                    storeToUpdate = store;
+                                    if (productFromSeller.getQuantAvailable() - product.getQuantAvailable() < 0 ) {
+                                        return ("Not enough stocks for item number " + index + "\nHave only " +
+                                                productFromSeller.getQuantAvailable() +
+                                                " left, but your order requires " + product.getQuantAvailable()
+                                                + "\n return to shopping cart and remove this item");
+                                    } else {
+                                        storeToUpdate.editProduct(product.getName(), 4, ("" + (productFromSeller.getQuantAvailable() - product.getQuantAvailable())));
+                                        store = storeToUpdate;
+                                        ArrayList<Product> updatedPurchaseHist = customer.getPurchaseHistory();
+                                        updatedPurchaseHist.add(product);
+                                        customer.setPurchaseHistory(updatedPurchaseHist);
+                                    }
+                                }
+                                index++;
+                            }
+                        }
+                        seller.setStores(stores);
+                    }
+                }
+                customer.setShoppingCar(new ArrayList<>());
+            }
+        }
+        return "All Items Purchased, Your Shopping Cart Is Now Empty";
+    }
+
+    public static ArrayList<Product> customerViewHistory(String username) {
+        int customerIndex = 0;
+        for (int i = 0; i < customers.size(); i++) {
+            if (customers.get(i).getCustomerUserName().equals(username)) {
+                customerIndex = i;
+                break;
+            }
+        }
+        Customer historyCustomer = customers.get(customerIndex);
+        if (historyCustomer.getShoppingCar().get(0).getName().equals("N/A")) {
+            return null;
+        }
+        return historyCustomer.getShoppingCar();
+    }
+    public static String exportPurchaseHistory(ArrayList<Product> purchaseHistory, String fileName, String username) {
+        try (FileWriter fw = new FileWriter(fileName)) {
+            // write header
+            fw.append(username + "'s" + "Purchase history:\n");
+            fw.append("Name/Description/Price/Quantity Bought\n");
+
+            //data
+            for (Product product : purchaseHistory) {
+                fw.append(product.getName());
+                fw.append("/");
+                fw.append(product.getDescription());
+                fw.append("/");
+                fw.append(String.valueOf(product.getPrice()));
+                fw.append("/");
+                String reviews = "";
+                fw.append(String.valueOf(product.getQuantAvailable()));
+                fw.append("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return ("Export succeeded!");
     }
 
     public static void writeDataSeller() {
