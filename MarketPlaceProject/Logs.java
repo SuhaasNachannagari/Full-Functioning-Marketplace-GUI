@@ -3,16 +3,12 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Logs {
-    private List<User> Customers;
-    private List<User> Sellers;
+public class Logs{
+
 
     String username;
 
-    public Logs() {
-        Customers = new ArrayList<>();
-        Sellers = new ArrayList<>();
-    }
+    public Logs() {}
 
     public void saveToCustomerFile(User user) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("CustomerLoginDetails.txt", true))) {
@@ -23,7 +19,8 @@ public class Logs {
         }
     }
 
-    public void loadFromCustomerFile() {
+    public List<User> loadFromCustomerFile() {
+        List<User> Customers = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader("CustomerLoginDetails.txt")) ){
             String line;
             while ((line = reader.readLine()) != null && !(line.isEmpty())) {
@@ -31,13 +28,13 @@ public class Logs {
                 User user = new User(userdet[0], userdet[1]);
                 Customers.add(user);
             }
+            return Customers;
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public boolean checkExistingCustomerUserName(String userName) {
-        loadFromCustomerFile();
+    public boolean checkExistingCustomerUserName(String userName, List<User> Customers) {
         boolean exists = false;
         for (int i = 0; i < Customers.size(); i++) {
             if (Customers.get(i).getUsername().equals(userName)) {
@@ -48,26 +45,23 @@ public class Logs {
         return exists;
     }
 
-    public boolean createCustomer(String username, String password) {
-        loadFromCustomerFile();
+    public User createCustomer(String username, String password, List<User> Customers) {
         boolean created = false;
         // Check if the username already exists
-        if (getCustomerByUsername(username) == null) {
+        if (getCustomerByUsername(username,Customers) == null) {
             User newUser = new User(username, password);
             Customers.add(newUser);
             JOptionPane.showMessageDialog(null, "User " + username + " created successfully.",
                     "Marketplace", JOptionPane.PLAIN_MESSAGE);
-            saveToCustomerFile(newUser);
-            created = true;
+            return newUser;
         } else {
             JOptionPane.showMessageDialog(null, "Username already exists. Please choose a different one.",
                     "Marketplace", JOptionPane.PLAIN_MESSAGE);
-            created = false;
+            return null;
         }
-        return created;
     }
 
-    private User getCustomerByUsername(String username) {
+    private User getCustomerByUsername(String username, List<User> Customers) {
         for (User user : Customers) {
             if (user.getUsername().equals(username)) {
                 return user;
@@ -76,9 +70,9 @@ public class Logs {
         return null;
     }
 
-    public boolean loginCustomer(String username, String password) {
+    public boolean loginCustomer(String username, String password, List<User> Customers) {
         loadFromCustomerFile();
-        User user = getCustomerByUsername(username);
+        User user = getCustomerByUsername(username, Customers);
         if (user != null && user.getPassword().equals(password)) {
             JOptionPane.showMessageDialog(null, "Login successful for " + username,
                     "Marketplace", JOptionPane.PLAIN_MESSAGE);
@@ -99,21 +93,22 @@ public class Logs {
         }
     }
 
-    public void loadFromSellerFile() {
+    public List<User> loadFromSellerFile() {
         try (BufferedReader reader = new BufferedReader(new FileReader("SellerLoginDetails.txt")) ){
             String line;
+            List<User> Sellers = new ArrayList<>();
             while ((line = reader.readLine()) != null && !(line.isEmpty())) {
                 String[] userdet = line.split(",");
                 User user = new User(userdet[0], userdet[1]);
                 Sellers.add(user);
             }
+            return Sellers;
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public boolean checkExistingSellerUserName(String userName) {
-        loadFromSellerFile();
+    public boolean checkExistingSellerUserName(String userName, List<User> Sellers) {
         boolean exists = false;
         for (int i = 0; i < Sellers.size(); i++) {
             if (Sellers.get(i).getUsername().equals(userName)) {
@@ -124,26 +119,24 @@ public class Logs {
         return exists;
     }
 
-    public boolean createSeller(String username, String password) {
-        loadFromSellerFile();
+    public User createSeller(String username, String password, List<User> Sellers) {
         boolean created = false;
         // Check if the username already exists
-        if (getSellerByUsername(username) == null) {
+        if (getSellerByUsername(username, Sellers) == null) {
             User newUser = new User(username, password);
-            Sellers.add(newUser);
             JOptionPane.showMessageDialog(null, "User " + username + " created successfully.",
                     "Marketplace", JOptionPane.PLAIN_MESSAGE);
-            saveToSellerFile(newUser);
             created = true;
+            return newUser;
         } else {
             JOptionPane.showMessageDialog(null, "Username already exists. Please choose a different one.",
                     "Marketplace", JOptionPane.PLAIN_MESSAGE);
             created = false;
+            return null;
         }
-        return created;
     }
 
-    private User getSellerByUsername(String username) {
+    private User getSellerByUsername(String username, List<User> Sellers) {
         for (User user : Sellers) {
             if (user.getUsername().equals(username)) {
                 return user;
@@ -152,9 +145,8 @@ public class Logs {
         return null;
     }
 
-    public boolean loginSeller(String username, String password) {
-        loadFromSellerFile();
-        User user = getSellerByUsername(username);
+    public boolean loginSeller(String username, String password, List<User> Sellers) {
+        User user = getSellerByUsername(username, Sellers);
         if (user != null && user.getPassword().equals(password)) {
             JOptionPane.showMessageDialog(null, "Login successful for " + username,
                     "Marketplace", JOptionPane.PLAIN_MESSAGE);
@@ -167,8 +159,10 @@ public class Logs {
     }
 
 
-    public int LogIn() {
+    public List<Object> LogIn(List<User> Customers, List<User> Sellers) {
         String password;
+        User newUser = null;
+        List<Object> toReturn = new ArrayList<>();
         JOptionPane.showMessageDialog(null, "Welcome to the marketplace.",
                 "Marketplace", JOptionPane.PLAIN_MESSAGE);
         String[] SellerCustomer = {"Seller", "Customer"};
@@ -187,7 +181,7 @@ public class Logs {
                         do {
                             username = JOptionPane.showInputDialog(null, "Please enter your username('back' to go back).",
                                     "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                            checkUsername = checkExistingSellerUserName(username);
+                            checkUsername = checkExistingSellerUserName(username, Sellers);
                             if (username.equals("back")) {
                                 input = false;
                                 break;
@@ -203,15 +197,20 @@ public class Logs {
                         }
                         password = JOptionPane.showInputDialog(null, "Please enter your password",
                                 "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                        input = loginSeller(username,password);
+                        input = loginSeller(username,password,Sellers);
+                        newUser = new User(username,password);
                     } while (!input);
+                    toReturn.add(newUser);
+                    toReturn.add("Seller");
+                    toReturn.add("false");
+                    return toReturn;
                 } else {
                     do {
                         boolean input1 = false;
                         do {
                             username = JOptionPane.showInputDialog(null, "Please enter your username('back' to go back).",
                                     "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                            checkUsername = checkExistingCustomerUserName(username);
+                            checkUsername = checkExistingSellerUserName(username,Sellers);
                             if (username.equals("back")) {
                                 input = false;
                                 break;
@@ -223,15 +222,20 @@ public class Logs {
                             }
                         } while (input1);
                         if (username.equals("back") || (checkUsername)){
+                            input = false;
                             break;
                         }
                         password = JOptionPane.showInputDialog(null, "Please enter your password",
                                 "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                        input = createCustomer(username,password);
+                        newUser = createSeller(username,password,Sellers);
+                        input = true;
                     } while (!input);
+                    toReturn.add(newUser);
+                    toReturn.add("Seller");
+                    toReturn.add("true");
+                    return toReturn;
                 }
             } while (!input);
-            return 1;
         } else if (response.equals("Customer")) {
             boolean input = false;
             do {
@@ -243,7 +247,7 @@ public class Logs {
                         do {
                             username = JOptionPane.showInputDialog(null, "Please enter your username('back' to go back).",
                                     "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                            checkUsername = checkExistingCustomerUserName(username);
+                            checkUsername = checkExistingCustomerUserName(username, Customers);
                             if (username.equals("back")) {
                                 input = false;
                                 break;
@@ -259,15 +263,20 @@ public class Logs {
                         }
                         password = JOptionPane.showInputDialog(null, "Please enter your password",
                                 "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                        input = loginCustomer(username,password);
+                        input = loginCustomer(username,password,Customers);
+                        newUser = new User(username,password);
                     } while (!input);
+                    toReturn.add(newUser);
+                    toReturn.add("Customer");
+                    toReturn.add("false");
+                    return toReturn;
                 } else {
                     do {
                         boolean input1 = false;
                         do {
                             username = JOptionPane.showInputDialog(null, "Please enter your username('back' to go back).",
                                     "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                            checkUsername = checkExistingCustomerUserName(username);
+                            checkUsername = checkExistingCustomerUserName(username,Customers);
                             if (username.equals("back")) {
                                 input = false;
                                 break;
@@ -279,23 +288,27 @@ public class Logs {
                             }
                         } while (input1);
                         if (username.equals("back") || (checkUsername)){
+                            input = false;
                             break;
                         }
                         password = JOptionPane.showInputDialog(null, "Please enter your password",
                                 "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                        input = createCustomer(username,password);
+                        newUser = createCustomer(username,password,Customers);
+                        input = true;
                     } while (!input);
+                    toReturn.add(newUser);
+                    toReturn.add("Customer");
+                    toReturn.add("true");
+                    return toReturn;
                 }
             } while (!input);
-            return 0;
         }
-        return 0;
+        return null;
     }
 
-
-
-    public static void main(String[] args) {
-        Logs log = new Logs();
-        log.LogIn();
+    public String getUsername() {
+        return username;
     }
+
+    public static void main(String[] args) {}
 }
