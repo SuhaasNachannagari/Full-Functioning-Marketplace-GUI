@@ -5,6 +5,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+
 public class ClientSide extends Thread {
     private static int ind1 = 0;
     private static int ind2 = 0;
@@ -33,8 +35,8 @@ public class ClientSide extends Thread {
             e.printStackTrace();
             throw new RuntimeException();
         }
-        int checkUser = 1; //Logs.runLogs();
-        username = "tri"; //Logs.getUsername();
+        int checkUser = 0; //Logs.runLogs();
+        username = "Tri"; //Logs.getUsername();
         //1
         pw.println(checkUser);
         pw.flush();
@@ -378,9 +380,540 @@ public class ClientSide extends Thread {
                             break;
                     }
                 }
-
-
                 if (checkUser == 0) {
+                    String[] showOptions = {"Sort", "View", "Search", "Shoppping Cart", "Purchase History", "6 - Dashboard"};
+                    String option = (String) (JOptionPane.showInputDialog(null, "What do you want to do?",
+                            "Choice", JOptionPane.QUESTION_MESSAGE, null, showOptions, showOptions[0]));
+                    if (option == null) {
+                        throw new Exception();
+                    }
+                    //1st send to server in customer
+                    pw.write(option + "\n");
+                    pw.flush();
+                    switch (option) {
+                        case "Sort":
+                            // 1st reception from server, don't really need anything
+                            String useless = bfr.readLine();
+                            String[] priceOrQuantity = {"Price", "Quantity"};
+                            String sortOption = (String) JOptionPane.showInputDialog(null, "How do you want to sort?",
+                                    "Sort Choice", JOptionPane.QUESTION_MESSAGE, null, priceOrQuantity, priceOrQuantity[0]);
+                            //2nd send to server, sends sortoption
+                            pw.write(sortOption + "\n");
+                            pw.flush();
+                            //2nd receiving from the server
+                            String productListingText = bfr.readLine();
+
+                            if (!(productListingText.equals("There are no products"))) {
+                                String[] productOptions = productListingText.split("/-");
+                                String productNum = "";
+                                if (sortOption.equals("Price")) {
+                                    productNum = "" + ((String) JOptionPane.showInputDialog(null, "Here are your products sorted by price",
+                                            "Price Sorted Products", JOptionPane.QUESTION_MESSAGE, null, productOptions, productOptions[0])).charAt(0);
+                                } else {
+                                    productNum = "" + ((String) JOptionPane.showInputDialog(null, "Here are your products sorted by quantity",
+                                            "Quantity Sorted Products", JOptionPane.QUESTION_MESSAGE, null, productOptions, productOptions[0])).charAt(0);
+                                }
+                                //3rd sending, which product would the consumer like to look at
+                                pw.write(productNum + "\n");
+                                pw.flush();
+                                //3rd receiving from server
+                                String productDetails = bfr.readLine();
+
+                                //4th sending to server, useless
+                                pw.write("" + "\n");
+                                pw.flush();
+                                //4th receiving from server, limit and quantity availble
+                                String[] limitAndQuantString = bfr.readLine().split("/");
+
+                                int[] limitAndQuant = new int[2];
+                                for (int k = 0; k < 2; k++) {
+                                    limitAndQuant[k] = Integer.parseInt(limitAndQuantString[k]);
+                                }
+                                JOptionPane.showMessageDialog(null,
+                                        productDetails, "Product Details",
+                                        JOptionPane.INFORMATION_MESSAGE);
+                                String[] actionsWithProduct = {"Purchase Product", "Add To Shopping Cart", "Leave a Review"};
+                                String actionWithProduct = (String) JOptionPane.showInputDialog(null, "What do you want to do with this product?",
+                                        "Product", JOptionPane.QUESTION_MESSAGE, null, actionsWithProduct, actionsWithProduct[0]);
+                                if (actionWithProduct.equals("Purchase Product")) {
+                                    boolean isNotValidInt = true;
+                                    int quantity = 0;
+                                    do {
+                                        try {
+                                            quantity = Integer.parseInt(JOptionPane.showInputDialog(null,
+                                                    "How Much Would You Like To Buy?", "Purchase Form",
+                                                    JOptionPane.QUESTION_MESSAGE));
+                                            isNotValidInt = false;
+                                            if (quantity <= 0) {
+                                                JOptionPane.showMessageDialog(null,
+                                                        "Enter a number greater than 0",
+                                                        "Purchase Form",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                isNotValidInt = true;
+                                            } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
+                                                JOptionPane.showMessageDialog(null,
+                                                        "You are attempting to buy more than the limit of " +
+                                                                limitAndQuant[0] + " units set by the seller",
+                                                        "Purchase Form",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                isNotValidInt = true;
+                                            } else if (quantity > limitAndQuant[0]) {
+                                                JOptionPane.showMessageDialog(null, "There is only "
+                                                                + limitAndQuant[1] +
+                                                                " units left, you are attempting to buy above that limit",
+                                                        "Purchase Form",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                isNotValidInt = true;
+                                            }
+                                        } catch (NumberFormatException e) {
+                                            JOptionPane.showMessageDialog(null, "Enter an integer", "Order Form",
+                                                    JOptionPane.ERROR_MESSAGE);
+                                            isNotValidInt = true;
+                                        }
+                                    } while (isNotValidInt);
+                                    String purchaseQuantity = "Purchase," + quantity;
+                                    //5th sending to the ServerSide
+                                    pw.write(purchaseQuantity + "\n");
+                                    pw.flush();
+                                    //5th receiving from server
+                                    String finalSortOutput = bfr.readLine();
+                                    JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
+                                            JOptionPane.INFORMATION_MESSAGE);
+                                } else if (actionWithProduct.equals("Add To Shopping Cart")) {
+                                    boolean isNotValidInt = true;
+                                    int quantity = 0;
+                                    do {
+                                        try {
+                                            quantity = Integer.parseInt(JOptionPane.showInputDialog(null,
+                                                    "How Much Would You Like To Add?", "Add To Cart",
+                                                    JOptionPane.QUESTION_MESSAGE));
+                                            isNotValidInt = false;
+                                            if (quantity <= 0) {
+                                                JOptionPane.showMessageDialog(null,
+                                                        "Enter a number greater than 0",
+                                                        "Add To Cart",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                isNotValidInt = true;
+                                            } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
+                                                JOptionPane.showMessageDialog(null,
+                                                        "You are attempting to add more than the limit of " +
+                                                                limitAndQuant[0] + " units set by the seller",
+                                                        "Add To Cart",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                isNotValidInt = true;
+                                            } else if (quantity > limitAndQuant[0]) {
+                                                JOptionPane.showMessageDialog(null, "There is only "
+                                                                + limitAndQuant[1] +
+                                                                " units left, you are attempting to add above that limit",
+                                                        "Add To Cart",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                isNotValidInt = true;
+                                            }
+                                        } catch (NumberFormatException e) {
+                                            JOptionPane.showMessageDialog(null, "Enter an integer", "Order Form",
+                                                    JOptionPane.ERROR_MESSAGE);
+                                            isNotValidInt = true;
+                                        }
+                                    } while (isNotValidInt);
+                                    String cartQuantity = "Cart," + quantity;
+                                    //5th sending to the ServerSide
+                                    pw.write(cartQuantity + "\n");
+                                    pw.flush();
+                                    //5th receiving from server
+                                    String finalSortOutput = bfr.readLine();
+                                    JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
+                                            JOptionPane.INFORMATION_MESSAGE);
+                                } else if (actionWithProduct.equals("Leave a Review")) {
+                                    String review = JOptionPane.showInputDialog(null,
+                                            "Add Your Review", "Review Form",
+                                            JOptionPane.QUESTION_MESSAGE);
+                                    //5th sending to the ServerSide
+                                    pw.write("Review," + review + "\n");
+                                    pw.flush();
+                                    //5th receiving from server
+                                    String finalSortOutput = bfr.readLine();
+                                    JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
+                                            JOptionPane.INFORMATION_MESSAGE);
+                                }
+
+                            } else {
+                                JOptionPane.showMessageDialog(null,
+                                        "There are no products for you to view", "Explain Message",
+                                        JOptionPane.INFORMATION_MESSAGE);
+                            }
+                            break;
+                        case "View":
+                            //1st receiving from the server
+                            String listingText = bfr.readLine();
+
+                            if (!(listingText.equals("There are no products"))) {
+                                String[] productOptions = listingText.split("/-");
+                                String productNum = "";
+                                productNum = "" + ((String) JOptionPane.showInputDialog(null, "Here are the products in this marketplace",
+                                        "Price Sorted Products", JOptionPane.QUESTION_MESSAGE, null, productOptions, productOptions[0])).charAt(0);
+                                //2nd sending, which product would the consumer like to look at
+                                pw.write(productNum + "\n");
+                                pw.flush();
+                                //2nd receiving from server
+                                String productDetails = bfr.readLine();
+
+                                //3rd sending to server, useless
+                                pw.write("" + "\n");
+                                pw.flush();
+                                //3rd receiving from server, limit and quantity availble
+                                String[] limitAndQuantString = bfr.readLine().split("/");
+
+                                int[] limitAndQuant = new int[2];
+                                for (int k = 0; k < 2; k++) {
+                                    limitAndQuant[k] = Integer.parseInt(limitAndQuantString[k]);
+                                }
+                                JOptionPane.showMessageDialog(null,
+                                        productDetails, "Product Details",
+                                        JOptionPane.INFORMATION_MESSAGE);
+                                String[] actionsWithProduct = {"Purchase Product", "Add To Shopping Cart", "Leave a Review"};
+                                String actionWithProduct = (String) JOptionPane.showInputDialog(null, "What do you want to do with this product?",
+                                        "Product", JOptionPane.QUESTION_MESSAGE, null, actionsWithProduct, actionsWithProduct[0]);
+                                if (actionWithProduct.equals("Purchase Product")) {
+                                    boolean isNotValidInt = true;
+                                    int quantity = 0;
+                                    do {
+                                        try {
+                                            quantity = Integer.parseInt(JOptionPane.showInputDialog(null,
+                                                    "How Much Would You Like To Buy?", "Purchase Form",
+                                                    JOptionPane.QUESTION_MESSAGE));
+                                            isNotValidInt = false;
+                                            if (quantity <= 0) {
+                                                JOptionPane.showMessageDialog(null,
+                                                        "Enter a number greater than 0",
+                                                        "Purchase Form",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                isNotValidInt = true;
+                                            } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
+                                                JOptionPane.showMessageDialog(null,
+                                                        "You are attempting to buy more than the limit of " +
+                                                                limitAndQuant[0] + " units set by the seller",
+                                                        "Purchase Form",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                isNotValidInt = true;
+                                            } else if (quantity > limitAndQuant[0]) {
+                                                JOptionPane.showMessageDialog(null, "There is only "
+                                                                + limitAndQuant[1] +
+                                                                " units left, you are attempting to buy above that limit",
+                                                        "Purchase Form",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                isNotValidInt = true;
+                                            }
+                                        } catch (NumberFormatException e) {
+                                            JOptionPane.showMessageDialog(null, "Enter an integer", "Order Form",
+                                                    JOptionPane.ERROR_MESSAGE);
+                                            isNotValidInt = true;
+                                        }
+                                    } while (isNotValidInt);
+                                    String purchaseQuantity = "Purchase," + quantity;
+                                    //4th sending to the ServerSide
+                                    pw.write(purchaseQuantity + "\n");
+                                    pw.flush();
+                                    //4th receiving from server
+                                    String finalSortOutput = bfr.readLine();
+                                    JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
+                                            JOptionPane.INFORMATION_MESSAGE);
+                                } else if (actionWithProduct.equals("Add To Shopping Cart")) {
+                                    boolean isNotValidInt = true;
+                                    int quantity = 0;
+                                    do {
+                                        try {
+                                            quantity = Integer.parseInt(JOptionPane.showInputDialog(null,
+                                                    "How Much Would You Like To Add?", "Add To Cart",
+                                                    JOptionPane.QUESTION_MESSAGE));
+                                            isNotValidInt = false;
+                                            if (quantity <= 0) {
+                                                JOptionPane.showMessageDialog(null,
+                                                        "Enter a number greater than 0",
+                                                        "Add To Cart",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                isNotValidInt = true;
+                                            } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
+                                                JOptionPane.showMessageDialog(null,
+                                                        "You are attempting to add more than the limit of " +
+                                                                limitAndQuant[0] + " units set by the seller",
+                                                        "Add To Cart",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                isNotValidInt = true;
+                                            } else if (quantity > limitAndQuant[0]) {
+                                                JOptionPane.showMessageDialog(null, "There is only "
+                                                                + limitAndQuant[1] +
+                                                                " units left, you are attempting to add above that limit",
+                                                        "Add To Cart",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                isNotValidInt = true;
+                                            }
+                                        } catch (NumberFormatException e) {
+                                            JOptionPane.showMessageDialog(null, "Enter an integer", "Order Form",
+                                                    JOptionPane.ERROR_MESSAGE);
+                                            isNotValidInt = true;
+                                        }
+                                    } while (isNotValidInt);
+                                    String cartQuantity = "Cart," + quantity;
+                                    //4th sending to the ServerSide
+                                    pw.write(cartQuantity + "\n");
+                                    pw.flush();
+                                    //4th receiving from server
+                                    String finalSortOutput = bfr.readLine();
+                                    JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
+                                            JOptionPane.INFORMATION_MESSAGE);
+                                } else if (actionWithProduct.equals("Leave a Review")) {
+                                    String review = JOptionPane.showInputDialog(null,
+                                            "Add Your Review", "Review Form",
+                                            JOptionPane.QUESTION_MESSAGE);
+                                    //4th sending to the ServerSide
+                                    pw.write("Review," + review + "\n");
+                                    pw.flush();
+                                    //4th receiving from server
+                                    String finalSortOutput = bfr.readLine();
+                                    JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
+                                            JOptionPane.INFORMATION_MESSAGE);
+                                }
+
+                            } else {
+                                JOptionPane.showMessageDialog(null,
+                                        "There are no products for you to view", "Explain Message",
+                                        JOptionPane.INFORMATION_MESSAGE);
+                            }
+                            break;
+                        case "Search":
+                            // 1st reception from server, don't really need anything
+                            String uselessSearch = bfr.readLine();
+                            String search = JOptionPane.showInputDialog(
+                                    null,
+                                    "What would you like to search?",
+                                    "Search", JOptionPane.QUESTION_MESSAGE
+                            );
+                            //2nd send to the server class, giving search input
+                            pw.write(search + "\n");
+                            pw.flush();
+                            //2nd reception of server class, gets search results
+                            String searchResult = bfr.readLine();
+                            if (!(searchResult.equals("There are no products that match your search"))) {
+                                String[] productOptions = searchResult.split("/-");
+                                String productNum = "";
+                                productNum = "" + ((String) JOptionPane.showInputDialog(null,
+                                        "Here are the products that match your search",
+                                        "Search Results", JOptionPane.QUESTION_MESSAGE, null,
+                                        productOptions, productOptions[0])).charAt(0);
+                                //3rd sending, which product would the consumer like to look at
+                                pw.write(productNum + "\n");
+                                pw.flush();
+                                //3rd receiving from server
+                                String productDetails = bfr.readLine();
+
+                                //4th sending to server, useless
+                                pw.write("" + "\n");
+                                pw.flush();
+                                //4th receiving from server, limit and quantity availble
+                                String[] limitAndQuantString = bfr.readLine().split("/");
+
+                                int[] limitAndQuant = new int[2];
+                                for (int k = 0; k < 2; k++) {
+                                    limitAndQuant[k] = Integer.parseInt(limitAndQuantString[k]);
+                                }
+                                JOptionPane.showMessageDialog(null,
+                                        productDetails, "Product Details",
+                                        JOptionPane.INFORMATION_MESSAGE);
+                                String[] actionsWithProduct = {"Purchase Product", "Add To Shopping Cart", "Leave a Review"};
+                                String actionWithProduct = (String) JOptionPane.showInputDialog(null, "What do you want to do with this product?",
+                                        "Product", JOptionPane.QUESTION_MESSAGE, null, actionsWithProduct, actionsWithProduct[0]);
+                                if (actionWithProduct.equals("Purchase Product")) {
+                                    boolean isNotValidInt = true;
+                                    int quantity = 0;
+                                    do {
+                                        try {
+                                            quantity = Integer.parseInt(JOptionPane.showInputDialog(null,
+                                                    "How Much Would You Like To Buy?", "Purchase Form",
+                                                    JOptionPane.QUESTION_MESSAGE));
+                                            isNotValidInt = false;
+                                            if (quantity <= 0) {
+                                                JOptionPane.showMessageDialog(null,
+                                                        "Enter a number greater than 0",
+                                                        "Purchase Form",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                isNotValidInt = true;
+                                            } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
+                                                JOptionPane.showMessageDialog(null,
+                                                        "You are attempting to buy more than the limit of " +
+                                                                limitAndQuant[0] + " units set by the seller",
+                                                        "Purchase Form",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                isNotValidInt = true;
+                                            } else if (quantity > limitAndQuant[0]) {
+                                                JOptionPane.showMessageDialog(null, "There is only "
+                                                                + limitAndQuant[1] +
+                                                                " units left, you are attempting to buy above that limit",
+                                                        "Purchase Form",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                isNotValidInt = true;
+                                            }
+                                        } catch (NumberFormatException e) {
+                                            JOptionPane.showMessageDialog(null, "Enter an integer", "Order Form",
+                                                    JOptionPane.ERROR_MESSAGE);
+                                            isNotValidInt = true;
+                                        }
+                                    } while (isNotValidInt);
+                                    String purchaseQuantity = "Purchase," + quantity;
+                                    //5th sending to the ServerSide
+                                    pw.write(purchaseQuantity + "\n");
+                                    pw.flush();
+                                    //5th receiving from server
+                                    String finalSortOutput = bfr.readLine();
+                                    JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
+                                            JOptionPane.INFORMATION_MESSAGE);
+                                } else if (actionWithProduct.equals("Add To Shopping Cart")) {
+                                    boolean isNotValidInt = true;
+                                    int quantity = 0;
+                                    do {
+                                        try {
+                                            quantity = Integer.parseInt(JOptionPane.showInputDialog(null,
+                                                    "How Much Would You Like To Add?", "Add To Cart",
+                                                    JOptionPane.QUESTION_MESSAGE));
+                                            isNotValidInt = false;
+                                            if (quantity <= 0) {
+                                                JOptionPane.showMessageDialog(null,
+                                                        "Enter a number greater than 0",
+                                                        "Add To Cart",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                isNotValidInt = true;
+                                            } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
+                                                JOptionPane.showMessageDialog(null,
+                                                        "You are attempting to add more than the limit of " +
+                                                                limitAndQuant[0] + " units set by the seller",
+                                                        "Add To Cart",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                isNotValidInt = true;
+                                            } else if (quantity > limitAndQuant[0]) {
+                                                JOptionPane.showMessageDialog(null, "There is only "
+                                                                + limitAndQuant[1] +
+                                                                " units left, you are attempting to add above that limit",
+                                                        "Add To Cart",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                isNotValidInt = true;
+                                            }
+                                        } catch (NumberFormatException e) {
+                                            JOptionPane.showMessageDialog(null, "Enter an integer", "Order Form",
+                                                    JOptionPane.ERROR_MESSAGE);
+                                            isNotValidInt = true;
+                                        }
+                                    } while (isNotValidInt);
+                                    String cartQuantity = "Cart," + quantity;
+                                    //5th sending to the ServerSide
+                                    pw.write(cartQuantity + "\n");
+                                    pw.flush();
+                                    //5th receiving from server
+                                    String finalSortOutput = bfr.readLine();
+                                    JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
+                                            JOptionPane.INFORMATION_MESSAGE);
+                                } else if (actionWithProduct.equals("Leave a Review")) {
+                                    String review = JOptionPane.showInputDialog(null,
+                                            "Add Your Review", "Review Form",
+                                            JOptionPane.QUESTION_MESSAGE);
+                                    //5th sending to the ServerSide
+                                    pw.write("Review," + review + "\n");
+                                    pw.flush();
+                                    //5th receiving from server
+                                    String finalSortOutput = bfr.readLine();
+                                    JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
+                                            JOptionPane.INFORMATION_MESSAGE);
+                                }
+                            } else {
+                                JOptionPane.showMessageDialog(null, searchResult, "Search",
+                                        JOptionPane.INFORMATION_MESSAGE,
+                                        null);
+                            }
+                            break;
+                        case "Shopping Cart":
+                            //1st reception from Server, cart contents
+                            String shoppingCart = bfr.readLine();
+                            if (shoppingCart.equals("Your shopping cart is empty")) {
+                                JOptionPane.showMessageDialog(null, shoppingCart, "Shopping Cart",
+                                        JOptionPane.INFORMATION_MESSAGE, null);
+                            } else {
+                                String[] cartOptions = {"Remove From Cart", "Checkout Cart"};
+                                String[] cartProducts = shoppingCart.split("/-");
+                                shoppingCart = "";
+                                for (String cProduct : cartProducts) {
+                                    shoppingCart += cProduct + "\n";
+                                }
+                                JOptionPane.showMessageDialog(null, shoppingCart, "Shopping Cart", JOptionPane.INFORMATION_MESSAGE, null);
+                                String cartOption = (String) JOptionPane.showInputDialog(null,
+                                        "What would you like to do?", "Shopping Cart",
+                                        JOptionPane.QUESTION_MESSAGE, null, cartOptions, cartOptions[0]);
+                                if (cartOption.equals("Remove From Cart")) {
+                                    String remove = (String) JOptionPane.showInputDialog(null,
+                                            "Which product would you like to remove?", "Shopping Cart",
+                                            JOptionPane.QUESTION_MESSAGE, null, cartProducts, cartProducts[0]);
+                                    String removeNum = remove.split(".")[0];
+                                    //2nd sending to server, what to do with shopping cart
+                                    pw.write(cartOption + "," + removeNum + "\n");
+                                    pw.flush();
+                                    //2nd reception from server, result of everything
+                                    String result = bfr.readLine();
+                                    JOptionPane.showMessageDialog(null, result, "Shopping Cart",
+                                            JOptionPane.INFORMATION_MESSAGE, null);
+
+                                } else {
+                                    //2nd sending to server, what to do with shopping cart
+                                    pw.write(cartOption + "," + "0" + "\n");
+                                    pw.flush();
+                                    //2nd reception from server, result of everything
+                                    String result = bfr.readLine();
+                                    JOptionPane.showMessageDialog(null, result, "Shopping Cart",
+                                            JOptionPane.INFORMATION_MESSAGE, null);
+                                }
+                            }
+                            break;
+                        case "Purchase History":
+                            //1st receiving from sever
+                            String purchaseHistory = bfr.readLine();
+                            if (!(purchaseHistory.equals("You haven't bought anything"))) {
+                                String[] purchasedProducts = purchaseHistory.split("/-");
+                                purchaseHistory = "";
+                                for (String purchasedProduct : purchasedProducts) {
+                                    purchaseHistory += purchasedProduct;
+                                }
+                                JOptionPane.showMessageDialog(null,
+                                        purchaseHistory, "Purchase History",
+                                        JOptionPane.INFORMATION_MESSAGE, null);
+                                int exportFile = JOptionPane.showConfirmDialog(null,
+                                        "Would you like to export this file?", "Purchase History",
+                                        JOptionPane.YES_NO_OPTION);
+                                if (exportFile == 0) {
+                                    String filename = JOptionPane.showInputDialog(
+                                            null,
+                                            "What would you like to name your file? (Don't include the .txt)",
+                                            "Search", JOptionPane.QUESTION_MESSAGE
+                                    );
+                                    // 2nd sending, yes file and file name
+                                    pw.write("0," + filename + "\n");
+                                    pw.flush();
+                                    //2nd reception from server, confirmation message
+                                    String historyDone = bfr.readLine();
+                                    JOptionPane.showMessageDialog(null, historyDone, "Purchase History",
+                                            JOptionPane.INFORMATION_MESSAGE, null);
+                                } else {
+                                    // 2nd sending, no file and no file name
+                                    pw.write("1,nope" + "\n");
+                                    pw.flush();
+                                }
+                            } else {
+                                JOptionPane.showMessageDialog(null, purchaseHistory, "Purchase History",
+                                        JOptionPane.INFORMATION_MESSAGE, null);
+                            }
+                            break;
+                        case "Dashboard":
+                            break;
+                        default:
+                            System.out.println("Please enter the correct number!");
+                            checkIndexOption = false;
+                            break;
+                    }
 
                 }
 
