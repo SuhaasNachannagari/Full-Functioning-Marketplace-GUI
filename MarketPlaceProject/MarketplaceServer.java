@@ -14,6 +14,9 @@ public class MarketplaceServer {
     public synchronized static void createCustomer(Customer customer) {
         customers.add(customer);
     }
+    public synchronized static void createSeller(Seller seller) {
+        sellers.add(seller);
+    }
     public  static String showStore(String username) {
         Seller seller = null;
         for (Seller sellerTemp: sellers) {
