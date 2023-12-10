@@ -10,6 +10,10 @@ import java.util.Scanner;
 public class MarketplaceServer {
     public static ArrayList<Seller> sellers = new ArrayList<>();
     public static ArrayList<Customer> customers = new ArrayList<>();
+    
+    public synchronized static void createCustomer(Customer customer) {
+        customers.add(customer);
+    }
     public  static String showStore(String username) {
         Seller seller = null;
         for (Seller sellerTemp: sellers) {
@@ -29,7 +33,7 @@ public class MarketplaceServer {
             return showStores;
         }
     }
-    public  static String showProducts(String storeName, String username) {
+    public static String showProducts(String storeName, String username) {
         Seller seller = null;
         for (Seller sellerTemp: sellers) {
             if (sellerTemp.getUserName().equals(username)) {
