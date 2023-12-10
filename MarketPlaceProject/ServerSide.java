@@ -221,11 +221,11 @@ class WorkFlow extends Thread {
                             pw.write("" + "\n");
                             pw.flush();
                             //2nd reception, sort option
-                            String sortOption = bfr.readLine();
+                            String[] sortOption = bfr.readLine().split(":");
                             int sortBy = 0;
-                            if (sortOption.equals("Price")) {
+                            if (sortOption[0].equals("Price")) {
                                 sortBy = 1;
-                                ArrayList<Product> priceProducts = MarketplaceServer.sortProducts(sortBy);
+                                ArrayList<Product> priceProducts = MarketplaceServer.sortProducts(sortBy, sortOption[1]);
                                 String priceListing = "";
                                 int i = 1;
                                 for (Product product : priceProducts) {
@@ -307,7 +307,7 @@ class WorkFlow extends Thread {
                                 }
                             } else {
                                 sortBy = 2;
-                                ArrayList<Product> quantityProducts = MarketplaceServer.sortProducts(sortBy);
+                                ArrayList<Product> quantityProducts = MarketplaceServer.sortProducts(sortBy, sortOption[1]);
                                 String quantityListing = "";
                                 int i = 1;
                                 if (quantityListing != null) {
@@ -643,24 +643,24 @@ class WorkFlow extends Thread {
                             String[] inputDashboard = bfr.readLine().split(",");
                             if (inputDashboard[0].equals("Store Sales")) {
                                 if (inputDashboard[1].equals("0")) {
-                                    String dashboard = MarketplaceServer.dashboardCheckSell(true);
+                                    String dashboard = MarketplaceServer.dashboardCheckSell(true, inputDashboard[2]);
                                     //2nd send to client, wresult
                                     pw.write(dashboard + "\n");
                                     pw.flush();
                                 } else {
-                                    String dashboard = MarketplaceServer.dashboardCheckSell(false);
+                                    String dashboard = MarketplaceServer.dashboardCheckSell(false, inputDashboard[2]);
                                     //2nd send to client, wresult
                                     pw.write(dashboard + "\n");
                                     pw.flush();
                                 }
                             } else {
                                 if (inputDashboard[1].equals("0")) {
-                                    String dashboard = MarketplaceServer.dashBoardCheckCust(true, username);
+                                    String dashboard = MarketplaceServer.dashBoardCheckCust(true, username, inputDashboard[2]);
                                     //2nd send to client, wresult
                                     pw.write(dashboard + "\n");
                                     pw.flush();
                                 } else {
-                                    String dashboard = MarketplaceServer.dashBoardCheckCust(false, username);
+                                    String dashboard = MarketplaceServer.dashBoardCheckCust(false, username, inputDashboard[2]);
                                     //2nd send to client, wresult
                                     pw.write(dashboard + "\n");
                                     pw.flush();
@@ -675,6 +675,7 @@ class WorkFlow extends Thread {
                     } else {
                         break;
                     }
+
             }
         } catch(IOException e){
             throw new RuntimeException(e);
