@@ -1,1461 +1,1625 @@
-import javax.swing.*;
 import java.io.*;
-import java.net.InetAddress;
+import java.lang.reflect.Array;
+import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.InputMismatchException;
+import java.util.PrimitiveIterator;
+import java.util.Scanner;
 
-public class ClientSide extends Thread {
-    private static int ind1 = 0;
-    private static int ind2 = 0;
-    public boolean checkIndexOption;
-    public boolean checkIndexDoAgain;
-    public int checkDoAgain; //1 for Yes, 2 for No
-    public String username = null;
-    private static Object gateKeeper = new Object();
+public class MarketplaceServer {
+    public static ArrayList<Seller> sellers = new ArrayList<>();
+    public static ArrayList<Customer> customers = new ArrayList<>();
 
-    public static void main(String[] args) {
-        ClientSide cs = new ClientSide();
-        cs.start();
+    public synchronized static void createCustomer(Customer customer) {
+        customers.add(customer);
     }
-    public void run() {
-        Socket socket = null;
-        BufferedReader bfr;
-        PrintWriter pw;
-        ObjectOutputStream outputStream;
-        ObjectInputStream inputStream;
+    public  static String showStore(String username) {
+        Seller seller = null;
+        for (Seller sellerTemp: sellers) {
+            if (sellerTemp.getUserName().equals(username)) {
+                seller = sellerTemp;
+            }
+        }
+        if (seller.getStores().isEmpty() || seller.getStores().get(0).getName().equals("N/A")) {
+            return "No Stores";
+        } else {
+            String showStores = "";
+            int j = 0;
+            for (Store store : seller.getStores()) {
+                j++;
+                showStores += j + "." + store.getName() + "/-";
+            }
+            return showStores;
+        }
+    }
+    public static String showProducts(String storeName, String username) {
+        Seller seller = null;
+        for (Seller sellerTemp: sellers) {
+            if (sellerTemp.getUserName().equals(username)) {
+                seller = sellerTemp;
+            }
+        }
+        for (Store store: seller.getStores()) {
+            String productNames = "";
+            if (store.getName().equals(storeName.substring(2))) {
+                int j = 0;
+                for (Product prod: store.getProducts()) {
+                    j++;
+                    productNames += j + "." + prod.getName() + "/-";
+                }
+                return productNames;
+            }
+        }
+        return null;
+    }
+    public synchronized static String deleteDeleteProduct(String storeChoice, String productName, String username) {
+        Seller seller = null;
+        int sellerIndex = 0;
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                seller = sellers.get(i);
+                sellerIndex = i;
+                break;
+            }
+        }
+        int storeIndex = 0;
+        int productIndex = 0;
+        for (int i = 0; i < seller.getStores().size(); i++ ) {
+            if (seller.getStores().get(i).getName().equals(storeChoice.substring(2))) {
+                storeIndex = i;
+                for (int j = 0; j < seller.getStores().get(i).getProducts().size(); j++) {
+                    if (seller.getStores().get(i).getProducts().get(j).getName().equals(productName)) {
+                        productIndex = j;
+                        break;
+                    }
+                }
+            }
+        }
 
-        try {
-            System.out.println("check1");
-            InetAddress ia = InetAddress.getByName("localhost");
-            socket = new Socket(ia,  4242);
-            bfr = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            pw = new PrintWriter(socket.getOutputStream());
-            inputStream = new ObjectInputStream(socket.getInputStream());
-            outputStream = new ObjectOutputStream(socket.getOutputStream());
-            System.out.println("check2");
+        if ( sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).getName().equals("N/A") ) {
+            sellers.get(sellerIndex).getStores().remove(storeIndex);
+            return "Store removed!";
+        } else {
+            sellers.get(sellerIndex).getStores().get(storeIndex).deleteProduct(productIndex);
+            // when the last product is deleted, add a dummy product named "N/A"
+            if (sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().size() == 0) {
+                Product prodNull = new Product("N/A","N/A","N/A",0,0.0);
+                prodNull.setReviews(new ArrayList<>());
+                prodNull.setLimit(0);
+                sellers.get(sellerIndex).getStores().get(storeIndex).addProduct(prodNull);
+            }
+            return "Product deleted!";
+        }
+    }
+    public  static String checkNoProductMessage(String storeChoice, String username) {
+        Seller seller = null;
+        for (Seller sellerTemp: sellers) {
+            if (sellerTemp.getUserName().equals(username)) {
+                seller = sellerTemp;    break;
+            }
+        }
+        for (Store store: seller.getStores()) {
+            if (store.getName().equals(storeChoice.substring(2))) {
+                if (store.getProducts().get(0).getName().equals("N/A")) {
+                    return "No Products";
+                }
+                return "Yes Products";
+            }
+        }
+        return null;
+    }
+    public synchronized static String editProduct(String storeChoice, String productChoice, String choice, String valueChange, String username) {
+        Seller seller = null;
+        int sellerIndex = 0;
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                seller = sellers.get(i);
+                sellerIndex = i;
+                break;
+            }
+        }
+        int storeIndex = 0;
+        int productIndex = 0;
+        int newStoreIndex = 0;
+        for (int i = 0; i < seller.getStores().size(); i++ ) {
+            if (seller.getStores().get(i).getName().equals(storeChoice.substring(2))) {
+                storeIndex = i;
+                for (int j = 0; j < seller.getStores().get(i).getProducts().size(); j++) {
+                    if (seller.getStores().get(i).getProducts().get(j).getName().equals(productChoice.substring(2))) {
+                        productIndex = j;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (choice.equals("2.Store Name")) {
+            for (int i = 0; i < seller.getStores().size(); i++ ) {
+                if (seller.getStores().get(i).getName().equals(valueChange.substring(2))) {
+                    newStoreIndex = i;
+                }
+            }
+
+            String storeName = sellers.get(sellerIndex).getStores().get(newStoreIndex).getName();
+            Product oldProduct = sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(productIndex);
+            Product newProduct = new Product(oldProduct.getName(),storeName, oldProduct.getDescription(),
+                    oldProduct.getQuantAvailable(),oldProduct.getPrice());
+            newProduct.setLimit(oldProduct.getLimit());
+            newProduct.setReviews(oldProduct.getReviews());
+            sellers.get(sellerIndex).getStores().get(newStoreIndex).addProduct(newProduct);
+            sellers.get(sellerIndex).getStores().get(storeIndex).deleteProduct(productIndex);
+        } else {
+            String name = seller.getStores().get(storeIndex).getProducts().get(productIndex).getName();
+            int indexChange = 0;
+            if (choice.equals("1.Name")) { indexChange = 1; }
+            if (choice.equals("3.Description")) { indexChange = 3; }
+            if (choice.equals("4.Quantity Available")) { indexChange = 4; }
+            if (choice.equals("5.Price")) { indexChange = 5; } if (choice.equals("6.Limit")) { indexChange = 6; }
+            boolean checkOption = sellers.get(sellerIndex).getStores().get(storeIndex).editProduct(name, indexChange, valueChange);
+        }
+
+        return "Product Edited";
+    }
+    public static String showAllStore(String username) {
+        Seller seller = null;
+        for (Seller sellerTemp: sellers) {
+            if (sellerTemp.getUserName().equals(username)) {
+                seller = sellerTemp; break;
+            }
+        }
+        String showStores = "";
+        int j = 0;
+        for (Store store : seller.getStores()) {
+            j++;
+            showStores += j + "." + store.getName() + "/-";
+        }
+        showStores += ( (seller.getStores().size() + 1) + "." + "Create new store");
+        return showStores;
+    }
+    public synchronized static String createStoreNA(String storeName, String username) {
+        int sellerIndex = 0;
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                sellerIndex = i;
+                break;
+            }
+        }
+        sellers.get(sellerIndex).getStores().get(0).setName(storeName);
+        sellers.get(sellerIndex).getStores().get(0).setSales(0);
+        return ("Store created!");
+    }
+    public synchronized static String createStore(String storeName, String username) {
+        Seller seller = null;
+        int sellerIndex = 0;
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                seller = sellers.get(i);
+                sellerIndex = i;
+                break;
+            }
+        }
+        int storeIndex = seller.getStores().size();
+        sellers.get(sellerIndex).getStores().add( new Store(new ArrayList<>(),storeName));
+        sellers.get(sellerIndex).getStores().get(storeIndex).setSales(0);
+        return ("Store created!");
+    }
+    public static boolean checkProductName(String storeChoice, String productName, String username) {
+        Seller seller = null;
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                seller = sellers.get(i);
+                break;
+            }
+        }
+        for (int i = 0; i < seller.getStores().size(); i++) {
+            if (seller.getStores().get(i).getName().equals(storeChoice.substring(2))) {
+                for (Product prod: seller.getStores().get(i).getProducts()) {
+                    if (prod.getName().equals(productName)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    public synchronized static String createProduct(String storeChoice, String prodName, String prodDes, String prodQuant,
+                                       String prodPrice, String prodLimit, String username ) {
+        Seller seller = null;
+        int sellerIndex = 0;
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                seller = sellers.get(i);
+                sellerIndex = i;
+                break;
+            }
+        }
+        int storeIndex = 0;
+        for (int i = 0; i < seller.getStores().size(); i++) {
+            if (seller.getStores().get(i).getName().equals(storeChoice.substring(2))) {
+                storeIndex = i;
+                Product product = new Product(prodName,storeChoice.substring(2),prodDes,
+                        Integer.parseInt(prodQuant),Double.parseDouble(prodPrice));
+                product.setLimit(Integer.parseInt(prodLimit));
+                product.setReviews(new ArrayList<>());
+                try {
+                    if (sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).getName().equals("N/A")) {
+                        // if the store hasn't contained any product yet
+                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setName(product.getName());
+                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setStoreName(product.getStoreName());
+                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setDescription(product.getDescription());
+                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setPrice(product.getPrice());
+                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setQuantAvailable(product.getQuantAvailable());
+                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setLimit(product.getLimit());
+                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setReviews(product.getReviews());
+                        return ("This will be the first product of the store!");
+                    } else {
+                        // if the store already has at least 1 product existed.
+                        sellers.get(sellerIndex).getStores().get(storeIndex).addProduct(product);
+                        return ("Product created!");
+                    }
+                } catch (IndexOutOfBoundsException e) {
+                    // if the store already has at least 1 product existed.
+                    sellers.get(sellerIndex).getStores().get(storeIndex).addProduct(product);
+                    return ("This will be the first product of the store!");
+                }
+            }
+        }
+        return null;
+    }
+    public static String viewStores(String username) {
+        int sellerIndex = 0;
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                sellerIndex = i;
+                break;
+            }
+        }
+        String salesByStores = "";
+        if (sellers.get(sellerIndex).getStores().get(0).getName().equals("N/A")) {
+            return "No stores";
+        } else {
+            for (Store store : sellers.get(sellerIndex).getStores()) {
+                salesByStores += store.getName() + ":/-";
+                int totalSale = 0;
+                for (Customer cust : customers) {
+                    ArrayList<Product> purchaseTemp = cust.getPurchaseHistory();
+                    for (int i = 0; i < purchaseTemp.size(); i++) {
+                        if (store.getName().equals(purchaseTemp.get(i).getStoreName())) {
+                            totalSale += purchaseTemp.get(i).getQuantAvailable();
+                            double revenue = (purchaseTemp.get(i).getPrice() * purchaseTemp.get(i).getQuantAvailable());
+                            salesByStores += String.format("Customer name: %s     Product: %s     Revenue: %.2f/-",
+                                    cust.getCustomerUserName(), purchaseTemp.get(i).getName(), revenue);
+                        }
+                    }
+                }
+                salesByStores += "Total Sales: " + totalSale + " product(s)/-";
+            }
+        }
+        return salesByStores;
+    }
+    public static String viewShoppingCart(String username) {
+        int sellerIndex = 0;
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                sellerIndex = i;
+                break;
+            }
+        }
+        String shoppingCartResult = "";
+        if (sellers.get(sellerIndex).getStores().get(0).getName().equals("N/A")) {
+            System.out.println("This user has no stores, please add some!");
+            return "No stores";
+        } else {
+            for (Store store : sellers.get(sellerIndex).getStores()) {
+                shoppingCartResult += (store.getName() + ":/-");
+                for (Customer cust : customers) {
+                    ArrayList<Product> cartTemp = cust.getPurchaseHistory();
+                    for (Product prod : cartTemp) {
+                        if (store.getName().equals(prod.getStoreName())) {
+                            shoppingCartResult += (String.format("Customer name: %s     Product: %s     Description: %s" +
+                                            "   Quantity: %d/-", cust.getCustomerUserName(), prod.getName(), prod.getDescription()
+                                    , prod.getQuantAvailable()));
+                        }
+                    }
+                }
+                shoppingCartResult += "/-";
+            }
+        }
+        return shoppingCartResult;
+    }
+    public static String saveToFileProduct(String storeName, String username, String fileName) {
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                for( int j = 0; j < sellers.get(i).getStores().size(); j++) {
+                    if (sellers.get(i).getStores().get(j).getName().equals(storeName.substring(2))) {
+                        for(int k = 0; k < sellers.get(i).getStores().get(j).getProducts().size(); k++) {
+                            Product product = sellers.get(i).getStores().get(j).getProducts().get(k);
+                            sellers.get(i).saveToFileProductSeller(product, fileName);
+                        }
+                    }
+                }
+            }
+        }
+        return "Saved to File";
+    }
+    public synchronized static String loadFromFileProduct(String fileName) {
+        ArrayList<String> productData = new ArrayList<>();
+        ArrayList<String> sellerInfo = new ArrayList<>();
+        writeDataSeller();
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName)) ){
+            String line;
+            while ((line = reader.readLine()) != null) {
+                productData.add(line);
+            }
+            if(productData == null || productData.isEmpty()) {
+                return "No data in file!";
+            } else {
+                PrintWriter pwr = new PrintWriter(new FileOutputStream("SellerInfo.txt", true), true);
+                for (int i = 1; i < productData.size(); i++) { //start from one cuz the first line is the title.
+                    String[] parts = productData.get(i).split(",");
+                    String toSellerInfo = "";
+                    for (int j = 0; j < parts.length; j++) {
+                        if (j == 0) {
+                            toSellerInfo += parts[j];
+                        } else if (j == 2) {
+                            toSellerInfo += "/-0.0/-" + parts[j];
+                        } else if (j == (parts.length-1)) {
+                            String[] reviews = parts[j].split("/");
+                            for (String review : reviews) {
+                                toSellerInfo += "/-" + review;
+                            }
+                            toSellerInfo += "/-";
+                        } else {
+                            toSellerInfo += "/-" + parts[j];
+                        }
+                    }
+                    sellerInfo.add(toSellerInfo);
+                }
+                for (String product : sellerInfo) {
+                    pwr.println(product);
+                }
+                pwr.flush();
+                pwr.close();
+                ArrayList<String[]> products = new ArrayList<>();
+                BufferedReader br = new BufferedReader(new FileReader("SellerInfo.txt"));
+                String arrangeLine;
+                while ((arrangeLine = br.readLine()) != null) {
+                    String[] parts = arrangeLine.split("/-");
+                    products.add(parts);
+                }
+                br.close();
+                int n = products.size();
+                for (int i = 0; i < n - 1; i++) {
+                    for (int j = 0; j < n - i - 1; j++) {
+                        String[] current = products.get(j);
+                        String[] next = products.get(j + 1);
+                        if (current[0].compareTo(next[0]) > 0 ||
+                                (current[0].equals(next[0]) && current[1].compareTo(next[1]) > 0)) {
+                            products.set(j, next);
+                            products.set(j + 1, current);
+                        }
+                    }
+                }
+                BufferedWriter bw = new BufferedWriter(new FileWriter("SellerInfo.txt", false));
+                for (String[] product : products) {
+                    bw.write(String.join("/-", product));
+                    bw.newLine();
+                }
+                bw.flush();
+                bw.close();
+                sellers = readDataSeller();
+                System.out.println("File imported success");
+            }
+            return "Imported succeed!";
+
+        } catch (IOException ex) {
+            return "File doesn't exist!";
+        }
+        //System.out.println("User data loaded from " + "filler.txt");
+    }
+
+    public static ArrayList<Product> searchProducts(String search) {
+        ArrayList<Product> listedProducts = new ArrayList<>();
+        for (Seller seller : sellers) {
+            ArrayList<Store> stores = seller.getStores();
+            for (Store store : stores) {
+                ArrayList<Product> products = store.getProducts();
+                for (Product product : products) {
+                    listedProducts.add(product);
+                }
+            }
+        }
+        ArrayList<Product> matchingProducts = new ArrayList<>();
+
+
+        for (Product product : listedProducts) {
+            if (product.getName().contains(search) || product.getDescription().contains(search) ||
+                    product.getStoreName().contains(search)) {
+                matchingProducts.add(product);
+            }
+        }
+
+        if (matchingProducts.size() == 0) {
+            return null;
+        }
+        return matchingProducts;
+    }
+
+    public static ArrayList<Product> sortProducts(int sortType, String sortBy) {
+        ArrayList<Product> quantityListedProducts = new ArrayList<>();
+        ArrayList<Product> priceListedProducts = new ArrayList<>();
+        //below is sorting by quantity
+        for (Seller seller : sellers) {
+            ArrayList<Store> stores = seller.getStores();
+            for (Store store : stores) {
+                ArrayList<Product> products = store.getProducts();
+                for (Product product : products) {
+                    quantityListedProducts.add(product);
+                }
+            }
+        }
+        if (sortBy.equals(" Low To High")) {
+            for (int i = 1; i < quantityListedProducts.size(); i++) {
+                for (int j = 0; j < i; j++) {
+                    if (quantityListedProducts.get(i).getQuantAvailable() <
+                            quantityListedProducts.get(j).getQuantAvailable()) {
+                        Product smallerproduct = quantityListedProducts.get(i);
+                        quantityListedProducts.set(i, quantityListedProducts.get(j));
+                        quantityListedProducts.set(j, smallerproduct);
+                    }
+                }
+            }
+        } else {
+            for (int i = 1; i < quantityListedProducts.size(); i++) {
+                for (int j = 0; j < i; j++) {
+                    if (quantityListedProducts.get(i).getQuantAvailable() >
+                            quantityListedProducts.get(j).getQuantAvailable()) {
+                        Product largerProduct = quantityListedProducts.get(i);
+                        quantityListedProducts.set(i, quantityListedProducts.get(j));
+                        quantityListedProducts.set(j, largerProduct);
+                    }
+                }
+            }
+        }
+        // below is sorting for price
+        for (Seller seller : sellers) {
+            ArrayList<Store> stores = seller.getStores();
+            for (Store store : stores) {
+                ArrayList<Product> products = store.getProducts();
+                for (Product product : products) {
+                    priceListedProducts.add(product);
+                }
+            }
+        }
+        if (sortBy.equals(" Low To High")) {
+            for (int i = 1; i < priceListedProducts.size(); i++) {
+                for (int j = 0; j < i; j++) {
+                    if (priceListedProducts.get(i).getPrice() < priceListedProducts.get(j).getPrice()) {
+                        Product smallerproduct = priceListedProducts.get(i);
+                        priceListedProducts.set(i, priceListedProducts.get(j));
+                        priceListedProducts.set(j, smallerproduct);
+                    }
+                }
+            }
+        } else {
+            for (int i = 1; i < priceListedProducts.size(); i++) {
+                for (int j = 0; j < i; j++) {
+                    if (priceListedProducts.get(i).getPrice() > priceListedProducts.get(j).getPrice()) {
+                        Product largerProduct = priceListedProducts.get(i);
+                        priceListedProducts.set(i, priceListedProducts.get(j));
+                        priceListedProducts.set(j, largerProduct);
+                    }
+                }
+            }
+
+        }
+        //below is returning the proper arraylist
+        if (sortType == 1) {
+            return priceListedProducts;
+        } else {
+            return quantityListedProducts;
+        }
+
+       /* System.out.println("Here are your available items sorted by quantity (lowest to highest)");
+        int i = 1;
+        for (Product product : quantityListedProducts) {
+            System.out.printf("%d. Store: %s, Name: %s, Quantity: %d\n",
+                    i,
+                    product.getStoreName(),
+                    product.getName(),
+                    product.getQuantAvailable());
+            i++;
+        } */
+    }
+
+    public static ArrayList<Product> viewProducts() {
+        ArrayList<Product> viewProducts = new ArrayList<>();
+        //below is sorting by quantity
+        for (Seller seller : sellers) {
+            ArrayList<Store> stores = seller.getStores();
+            for (Store store : stores) {
+                ArrayList<Product> products = store.getProducts();
+                for (Product product : products) {
+                    viewProducts.add(product);
+                }
+            }
+        }
+
+        //below is returning the proper arraylist
+        return viewProducts;
+    }
+
+    public synchronized static String priceAddToShoppingCart(ArrayList<Product> priceListedProducts, String username, int quantity, int num) {
+        Product productFromSeller = priceListedProducts.get(num - 1);
+        for (Customer customer : customers) {
+            if (customer.getCustomerUserName().equals(username)) {
+                ArrayList<Product> updatedShoppingCart = customer.getShoppingCar();
+                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
+                    return ("You are attempting to add more than the limit of "
+                            + productFromSeller.getLimit()
+                            + " units set by the seller");
+                } else if (quantity > productFromSeller.getQuantAvailable()) {
+                    return ("There is only " + productFromSeller.getQuantAvailable()
+                            + " units left, you are attempting to add above that limit");
+                } else {
+                    Product productToAdd = new Product(productFromSeller.getName(),
+                            productFromSeller.getStoreName(),
+                            productFromSeller.getDescription(),
+                            quantity, productFromSeller.getPrice());
+
+                    productToAdd.setLimit(productFromSeller.getLimit());
+                    productToAdd.setReviews(productFromSeller.getReviews());
+                    if (updatedShoppingCart != null && updatedShoppingCart.size() != 0) {
+                        if (updatedShoppingCart.get(0).getName().equals("N/A")) {
+                            updatedShoppingCart.set(0, productToAdd);
+                        } else {
+                            updatedShoppingCart.add(productToAdd);
+                        }
+                    } else {
+                        updatedShoppingCart.add(productToAdd);
+                    }
+                    ArrayList<Product> combinedList = new ArrayList<>();
+                    for (Product currentProduct : updatedShoppingCart) {
+                        boolean found = false;
+                        // Check if the product is already in the combined list
+                        for (Product combinedProduct : combinedList) {
+                            if (currentProduct.getName().equals(combinedProduct.getName()) &&
+                                    currentProduct.getStoreName().equals(combinedProduct.getStoreName()) &&
+                                    currentProduct.getDescription().equals(combinedProduct.getDescription()) &&
+                                    currentProduct.getPrice() == combinedProduct.getPrice()) {
+                                // If found, update the quantity
+                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() + currentProduct.getQuantAvailable());
+                                found = true;
+                                break;
+                            }
+                        }
+                        // If not found, add it to the combined list
+                        if (!found) {
+                            combinedList.add(new Product(
+                                    currentProduct.getName(),
+                                    currentProduct.getStoreName(),
+                                    currentProduct.getDescription(),
+                                    currentProduct.getQuantAvailable(),
+                                    currentProduct.getPrice()
+                            ));
+                        }
+                    }
+                    customer.setShoppingCar(combinedList);
+                }
+            }
+        }
+        return ("Item added!");
+    }
+
+    public synchronized static String quantityAddToShoppingCart(ArrayList<Product> quantityListedProducts, String username, int quantity, int num) {
+        Product productFromSeller = quantityListedProducts.get(num - 1);
+        for (Customer customer : customers) {
+            if (customer.getCustomerUserName().equals(username)) {
+                ArrayList<Product> updatedShoppingCart = customer.getShoppingCar();
+                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
+                    return ("You are attempting to add more than the limit of "
+                            + productFromSeller.getLimit()
+                            + " units set by the seller");
+                } else if (quantity > productFromSeller.getQuantAvailable()) {
+                    return ("There is only " + productFromSeller.getQuantAvailable()
+                            + " units left, you are attempting to add above that limit");
+                } else {
+                    Product productToAdd = new Product(productFromSeller.getName(),
+                            productFromSeller.getStoreName(),
+                            productFromSeller.getDescription(),
+                            quantity, productFromSeller.getPrice());
+
+                    productToAdd.setLimit(productFromSeller.getLimit());
+                    productToAdd.setReviews(productFromSeller.getReviews());
+                    if (updatedShoppingCart != null && updatedShoppingCart.size() != 0) {
+                        if (updatedShoppingCart.get(0).getName().equals("N/A")) {
+                            updatedShoppingCart.set(0, productToAdd);
+                        }
+                        else {
+                            updatedShoppingCart.add(productToAdd);
+                        }
+                    } else {
+                        updatedShoppingCart.add(productToAdd);
+                    }
+                    ArrayList<Product> combinedList = new ArrayList<>();
+                    for (Product currentProduct : updatedShoppingCart) {
+                        boolean found = false;
+                        // Check if the product is already in the combined list
+                        for (Product combinedProduct : combinedList) {
+                            if (currentProduct.getName().equals(combinedProduct.getName()) &&
+                                    currentProduct.getStoreName().equals(combinedProduct.getStoreName()) &&
+                                    currentProduct.getDescription().equals(combinedProduct.getDescription()) &&
+                                    currentProduct.getPrice() == combinedProduct.getPrice()) {
+                                // If found, update the quantity
+                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() + currentProduct.getQuantAvailable());
+                                found = true;
+                                break;
+                            }
+                        }
+                        // If not found, add it to the combined list
+                        if (!found) {
+                            combinedList.add(new Product(
+                                    currentProduct.getName(),
+                                    currentProduct.getStoreName(),
+                                    currentProduct.getDescription(),
+                                    currentProduct.getQuantAvailable(),
+                                    currentProduct.getPrice()
+                            ));
+                        }
+                    }
+                    customer.setShoppingCar(combinedList);
+                }
+            }
+        }
+        return ("Item added!");
+    }
+    public synchronized static String addToShoppingCart(ArrayList<Product> listedProducts, String username, int quantity, int num) {
+        Product productFromSeller = listedProducts.get(num - 1);
+        for (Customer customer : customers) {
+            if (customer.getCustomerUserName().equals(username)) {
+                ArrayList<Product> updatedShoppingCart = customer.getShoppingCar();
+                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
+                    return ("You are attempting to add more than the limit of "
+                            + productFromSeller.getLimit()
+                            + " units set by the seller");
+                } else if (quantity > productFromSeller.getQuantAvailable()) {
+                    return ("There is only " + productFromSeller.getQuantAvailable()
+                            + " units left, you are attempting to add above that limit");
+                } else {
+                    Product productToAdd = new Product(productFromSeller.getName(),
+                            productFromSeller.getStoreName(),
+                            productFromSeller.getDescription(),
+                            quantity, productFromSeller.getPrice());
+
+                    productToAdd.setLimit(productFromSeller.getLimit());
+                    productToAdd.setReviews(productFromSeller.getReviews());
+                    if (updatedShoppingCart != null && updatedShoppingCart.size() != 0) {
+                        if (updatedShoppingCart.get(0).getName().equals("N/A")) {
+                            updatedShoppingCart.set(0, productToAdd);
+                        }
+                        else {
+                            updatedShoppingCart.add(productToAdd);
+                        }
+                    } else {
+                        updatedShoppingCart.add(productToAdd);
+                    }
+                    ArrayList<Product> combinedList = new ArrayList<>();
+                    for (Product currentProduct : updatedShoppingCart) {
+                        boolean found = false;
+                        // Check if the product is already in the combined list
+                        for (Product combinedProduct : combinedList) {
+                            if (currentProduct.getName().equals(combinedProduct.getName()) &&
+                                    currentProduct.getStoreName().equals(combinedProduct.getStoreName()) &&
+                                    currentProduct.getDescription().equals(combinedProduct.getDescription()) &&
+                                    currentProduct.getPrice() == combinedProduct.getPrice()) {
+                                // If found, update the quantity
+                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() + currentProduct.getQuantAvailable());
+                                found = true;
+                                break;
+                            }
+                        }
+                        // If not found, add it to the combined list
+                        if (!found) {
+                            combinedList.add(new Product(
+                                    currentProduct.getName(),
+                                    currentProduct.getStoreName(),
+                                    currentProduct.getDescription(),
+                                    currentProduct.getQuantAvailable(),
+                                    currentProduct.getPrice()
+                            ));
+                        }
+                    }
+                    customer.setShoppingCar(combinedList);
+                }
+            }
+        }
+        return ("Item added!");
+    }
+
+    public synchronized static String pricePurchaseItem(ArrayList<Product> priceListedProducts, String username, int quantity, int num) {
+        Product productFromSeller = priceListedProducts.get(num - 1);
+        for (Customer customer : customers) {
+            if (customer.getCustomerUserName().equals(username)) {
+                ArrayList<Product> updatedPurchaseHistory = customer.getPurchaseHistory();
+                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
+                    return ("You are attempting to buy more than the limit of "
+                            + productFromSeller.getLimit() + " units set by the seller");
+                } else if (quantity > productFromSeller.getQuantAvailable()) {
+                    return ("There is only " + productFromSeller.getQuantAvailable()
+                            + " units left, you are attempting to buy above that limit");
+                } else {
+                    Product productToBuy = new Product(productFromSeller.getName(),
+                            productFromSeller.getStoreName(),
+                            productFromSeller.getDescription(),
+                            quantity,
+                            productFromSeller.getPrice());
+                    productToBuy.setLimit(productFromSeller.getLimit());
+                    productToBuy.setReviews(productFromSeller.getReviews());
+                    if (updatedPurchaseHistory != null && updatedPurchaseHistory.size() != 0) {
+                        if (updatedPurchaseHistory.get(0).getName().equals("N/A")) {
+                            updatedPurchaseHistory.set(0, productToBuy);
+                        } else {
+                            updatedPurchaseHistory.add(productToBuy);
+                        }
+                    } else {
+                        updatedPurchaseHistory.add(productToBuy);
+                    }
+                    ArrayList<Product> combinedList = new ArrayList<>();
+                    for (Product currentProduct : updatedPurchaseHistory) {
+                        boolean found = false;
+                        // Check if the product is already in the combined list
+                        for (Product combinedProduct : combinedList) {
+                            if (currentProduct.getName().equals(combinedProduct.getName()) &&
+                                    currentProduct.getStoreName().equals(combinedProduct.getStoreName()) &&
+                                    currentProduct.getDescription().equals(combinedProduct.getDescription()) &&
+                                    currentProduct.getPrice() == combinedProduct.getPrice()) {
+                                // If found, update the quantity
+                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() + currentProduct.getQuantAvailable());
+                                found = true;
+                                break;
+                            }
+                        }
+                        // If not found, add it to the combined list
+                        if (!found) {
+                            combinedList.add(new Product(
+                                    currentProduct.getName(),
+                                    currentProduct.getStoreName(),
+                                    currentProduct.getDescription(),
+                                    currentProduct.getQuantAvailable(),
+                                    currentProduct.getPrice()
+                            ));
+                        }
+                    }
+                    customer.setPurchaseHistory(combinedList);
+                    Store storeToUpdate = null;
+                    for (Seller seller : sellers) {
+                        ArrayList<Store> stores = seller.getStores();
+                        for (Store store : stores) {
+                            ArrayList<Product> products = store.getProducts();
+                            for (Product product : products) {
+                                if (product.getName().equals(productToBuy.getName())) {
+                                    storeToUpdate = store;
+                                    storeToUpdate.editProduct(product.getName(), 4,
+                                            ("" + (productFromSeller.getQuantAvailable() - quantity)));
+                                    store = storeToUpdate;
+                                }
+                            }
+                        }
+                        seller.setStores(stores);
+                    }
+                }
+            }
+        }
+        return ("Item purchased");
+    }
+
+    public synchronized static String quantityPurchaseItems(ArrayList<Product> quantityListedProducts, String username, int quantity, int num) {
+        Product productFromSeller = quantityListedProducts.get(num - 1);
+        for (Customer customer : customers) {
+            if (customer.getCustomerUserName().equals(username)) {
+                ArrayList<Product> updatedPurchaseHistory = customer.getPurchaseHistory();
+                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
+                    return ("You are attempting to buy more than the limit of "
+                            + productFromSeller.getLimit() + " units set by the seller");
+                } else if (quantity > productFromSeller.getQuantAvailable()) {
+                    return ("There is only " + productFromSeller.getQuantAvailable()
+                            + " units left, you are attempting to buy above that limit");
+                } else {
+                    Product productToBuy = new Product(productFromSeller.getName(),
+                            productFromSeller.getStoreName(),
+                            productFromSeller.getDescription(),
+                            quantity,
+                            productFromSeller.getPrice());
+                    productToBuy.setLimit(productFromSeller.getLimit());
+                    productToBuy.setReviews(productFromSeller.getReviews());
+                    if (updatedPurchaseHistory != null && updatedPurchaseHistory.size() != 0) {
+                        if (updatedPurchaseHistory.get(0).getName().equals("N/A")) {
+                            updatedPurchaseHistory.set(0, productToBuy);
+                        } else {
+                            updatedPurchaseHistory.add(productToBuy);
+                        }
+                    } else {
+                        updatedPurchaseHistory.add(productToBuy);
+                    }
+                    ArrayList<Product> combinedList = new ArrayList<>();
+                    for (Product currentProduct : updatedPurchaseHistory) {
+                        boolean found = false;
+                        // Check if the product is already in the combined list
+                        for (Product combinedProduct : combinedList) {
+                            if (currentProduct.getName().equals(combinedProduct.getName()) &&
+                                    currentProduct.getStoreName().equals(combinedProduct.getStoreName()) &&
+                                    currentProduct.getDescription().equals(combinedProduct.getDescription()) &&
+                                    currentProduct.getPrice() == combinedProduct.getPrice()) {
+                                // If found, update the quantity
+                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() + currentProduct.getQuantAvailable());
+                                found = true;
+                                break;
+                            }
+                        }
+                        // If not found, add it to the combined list
+                        if (!found) {
+                            combinedList.add(new Product(
+                                    currentProduct.getName(),
+                                    currentProduct.getStoreName(),
+                                    currentProduct.getDescription(),
+                                    currentProduct.getQuantAvailable(),
+                                    currentProduct.getPrice()
+                            ));
+                        }
+                    }
+                    customer.setPurchaseHistory(combinedList);
+                    Store storeToUpdate = null;
+                    for (Seller seller : sellers) {
+                        ArrayList<Store> stores = seller.getStores();
+                        for (Store store : stores) {
+                            ArrayList<Product> products = store.getProducts();
+                            for (Product product : products) {
+                                if (product.getName().equals(productToBuy.getName())) {
+                                    storeToUpdate = store;
+                                    storeToUpdate.editProduct(product.getName(), 4,
+                                            ("" + (productFromSeller.getQuantAvailable() - quantity)));
+                                    store = storeToUpdate;
+                                }
+                            }
+                        }
+                        seller.setStores(stores);
+                    }
+                }
+            }
+        }
+        return ("Item purchased");
+    }
+    public synchronized static String purchaseItem(ArrayList<Product> listedProducts, String username, int quantity, int num) {
+        Product productFromSeller = listedProducts.get(num - 1);
+        for (Customer customer : customers) {
+            if (customer.getCustomerUserName().equals(username)) {
+                ArrayList<Product> updatedPurchaseHistory = customer.getPurchaseHistory();
+                if ((productFromSeller.getLimit() != -1) && (quantity > productFromSeller.getLimit())) {
+                    return ("You are attempting to buy more than the limit of "
+                            + productFromSeller.getLimit() + " units set by the seller");
+                } else if (quantity > productFromSeller.getQuantAvailable()) {
+                    return ("There is only " + productFromSeller.getQuantAvailable()
+                            + " units left, you are attempting to buy above that limit");
+                } else {
+                    Product productToBuy = new Product(productFromSeller.getName(),
+                            productFromSeller.getStoreName(),
+                            productFromSeller.getDescription(),
+                            quantity,
+                            productFromSeller.getPrice());
+                    productToBuy.setLimit(productFromSeller.getLimit());
+                    productToBuy.setReviews(productFromSeller.getReviews());
+                    if (updatedPurchaseHistory != null && updatedPurchaseHistory.size() != 0) {
+                        if (updatedPurchaseHistory.get(0).getName().equals("N/A")) {
+                            updatedPurchaseHistory.set(0, productToBuy);
+                        } else {
+                            updatedPurchaseHistory.add(productToBuy);
+                        }
+                    } else {
+                        updatedPurchaseHistory.add(productToBuy);
+                    }
+                    ArrayList<Product> combinedList = new ArrayList<>();
+                    for (Product currentProduct : updatedPurchaseHistory) {
+                        boolean found = false;
+                        // Check if the product is already in the combined list
+                        for (Product combinedProduct : combinedList) {
+                            if (currentProduct.getName().equals(combinedProduct.getName()) &&
+                                    currentProduct.getStoreName().equals(combinedProduct.getStoreName()) &&
+                                    currentProduct.getDescription().equals(combinedProduct.getDescription()) &&
+                                    currentProduct.getPrice() == combinedProduct.getPrice()) {
+                                // If found, update the quantity
+                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() + currentProduct.getQuantAvailable());
+                                found = true;
+                                break;
+                            }
+                        }
+                        // If not found, add it to the combined list
+                        if (!found) {
+                            combinedList.add(new Product(
+                                    currentProduct.getName(),
+                                    currentProduct.getStoreName(),
+                                    currentProduct.getDescription(),
+                                    currentProduct.getQuantAvailable(),
+                                    currentProduct.getPrice()
+                            ));
+                        }
+                    }
+                    customer.setPurchaseHistory(combinedList);
+                    Store storeToUpdate = null;
+                    for (Seller seller : sellers) {
+                        ArrayList<Store> stores = seller.getStores();
+                        for (Store store : stores) {
+                            ArrayList<Product> products = store.getProducts();
+                            for (Product product : products) {
+                                if (product.getName().equals(productToBuy.getName())) {
+                                    storeToUpdate = store;
+                                    storeToUpdate.editProduct(product.getName(), 4,
+                                            ("" + (productFromSeller.getQuantAvailable() - quantity)));
+                                    store = storeToUpdate;
+                                }
+                            }
+                        }
+                        seller.setStores(stores);
+                    }
+                }
+            }
+        }
+        return ("Item purchased");
+    }
+    public synchronized static String addReviewPrice(ArrayList<Product> priceListedProducts, String review, int num) {
+        Product productToReview = priceListedProducts.get(num - 1);
+        ArrayList<String> updatedReviews = productToReview.getReviews();
+        updatedReviews.add(review);
+        productToReview.setReviews(updatedReviews);
+
+        for (Seller seller : sellers) {
+            for (Store store : seller.getStores()) {
+                for (Product product : store.getProducts()) {
+                    if (product.getName().equals(productToReview.getName()) &&
+                            product.getStoreName().equals(productToReview.getStoreName())) {
+                        product.setReviews(productToReview.getReviews());
+                    }
+                }
+            }
+        }
+        return "Review added";
+    }
+
+    public static String addReviewQuantity(ArrayList<Product> quantityListedProducts, String review, int num) {
+        Product productToReview = quantityListedProducts.get(num - 1);
+        ArrayList<String> updatedReviews = productToReview.getReviews();
+        updatedReviews.add(review);
+        productToReview.setReviews(updatedReviews);
+
+        for (Seller seller : sellers) {
+            for (Store store : seller.getStores()) {
+                for ( Product product : store.getProducts()) {
+                    if (product.getName().equals(productToReview.getName()) &&
+                            product.getStoreName().equals(productToReview.getStoreName())) {
+                        product.setReviews(productToReview.getReviews());
+                    }
+                }
+            }
+        }
+
+        return "Review added";
+    }
+    public synchronized static String addReview(ArrayList<Product> listedProducts, String review, int num) {
+        Product productToReview = listedProducts.get(num - 1);
+        ArrayList<String> updatedReviews = productToReview.getReviews();
+        updatedReviews.add(review);
+        productToReview.setReviews(updatedReviews);
+
+        for (Seller seller : sellers) {
+            for (Store store : seller.getStores()) {
+                for ( Product product : store.getProducts()) {
+                    if (product.getName().equals(productToReview.getName()) &&
+                            product.getStoreName().equals(productToReview.getStoreName())) {
+                        product.setReviews(productToReview.getReviews());
+                    }
+                }
+            }
+        }
+
+        return "Review added";
+    }
+
+    public static ArrayList<Product> getCustomerShoppingCart(String username) {
+        int customerIndex = 0;
+        for (int i = 0; i < customers.size(); i++) {
+            if (customers.get(i).getCustomerUserName().equals(username)) {
+                customerIndex = i;
+                break;
+            }
+        }
+        ArrayList<Product> shoppingCartResult = new ArrayList<>();
+        if (customers.get(customerIndex).getShoppingCar().size() == 0 || customers.get(customerIndex).getShoppingCar().get(0).getName().equals("N/A")) {
+            return null;
+        } else {
+            for (Product product : customers.get(customerIndex).getShoppingCar()) {
+                shoppingCartResult.add(product);
+            }
+        }
+        return shoppingCartResult;
+    }
+
+    public synchronized static String removeItem(String username, ArrayList<Product> shoppingCart, int num) {
+        int customerIndex = 0;
+        Product productToRemove = shoppingCart.get(num-1);
+        for (int i = 0; i < customers.size(); i++) {
+            if (customers.get(i).getCustomerUserName().equals(username)) {
+                customerIndex = i;
+                break;
+            }
+        }
+        for (Product product : shoppingCart) {
+            if (product.equals(productToRemove)) {
+                shoppingCart.remove(product);
+                break;
+            }
+        }
+        customers.get(customerIndex).setShoppingCar(shoppingCart);
+        return "Removed";
+    }
+
+    public synchronized static String purchaseItemALL(String username) {
+        ArrayList<Product> updatedShoppingCart = new ArrayList<>();
+        for (Customer customer : customers) {
+            if (customer.getCustomerUserName().equalsIgnoreCase(username)) {
+                updatedShoppingCart = customer.getShoppingCar();
+                customer.setShoppingCar(new ArrayList<>());
+                Store storeToUpdate;
+                int index = 1;
+                for (Product product : updatedShoppingCart) {
+                    for (Seller seller : sellers) {
+                        ArrayList<Store> stores = seller.getStores();
+                        for (Store store : stores) {
+                            ArrayList<Product> products = store.getProducts();
+                            for (Product productFromSeller : products) {
+                                if (product.getName().equals(productFromSeller.getName()) &&
+                                        product.getStoreName().equals(productFromSeller.getStoreName())) {
+                                    storeToUpdate = store;
+                                    if (productFromSeller.getQuantAvailable() - product.getQuantAvailable() < 0 ) {
+                                        return ("Not enough stocks for item number " + index + "\nHave only " +
+                                                productFromSeller.getQuantAvailable() +
+                                                " left, but your order requires " + product.getQuantAvailable()
+                                                + "\n return to shopping cart and remove this item");
+                                    } else {
+                                        storeToUpdate.editProduct(product.getName(), 4, ("" + (productFromSeller.getQuantAvailable() - product.getQuantAvailable())));
+                                        store = storeToUpdate;
+                                        ArrayList<Product> updatedPurchaseHist = customer.getPurchaseHistory();
+                                        updatedPurchaseHist.add(product);
+                                        customer.setPurchaseHistory(updatedPurchaseHist);
+                                    }
+                                }
+                                index++;
+                            }
+                        }
+                        seller.setStores(stores);
+                    }
+                }
+                customer.setShoppingCar(new ArrayList<>());
+            }
+        }
+        return "All Items Purchased, Your Shopping Cart Is Now Empty";
+    }
+
+    public static ArrayList<Product> customerViewHistory(String username) {
+        int customerIndex = 0;
+        for (int i = 0; i < customers.size(); i++) {
+            if (customers.get(i).getCustomerUserName().equals(username)) {
+                customerIndex = i;
+                break;
+            }
+        }
+        Customer historyCustomer = customers.get(customerIndex);
+        if (historyCustomer.getPurchaseHistory().size() == 0 || historyCustomer.getPurchaseHistory().get(0).getName().equals("N/A")) {
+            return null;
+        }
+        return historyCustomer.getPurchaseHistory();
+    }
+    public static String exportPurchaseHistory(ArrayList<Product> purchaseHistory, String fileName, String username) {
+        if (fileName.contains(" ")) {
+            fileName = fileName.replace(" ", "_");
+        }
+        if (fileName.contains(".")) {
+            fileName = fileName.replace(".", "~");
+            fileName = fileName.split("~")[0];
+        }
+        try (FileWriter fw = new FileWriter(fileName + ".txt")) {
+            // write header
+            fw.append(username + "'s " + "Purchase history:\n");
+            fw.append("Name/Description/Price/Quantity Bought\n");
+
+            //data
+            for (Product product : purchaseHistory) {
+                fw.append(product.getName());
+                fw.append("/");
+                fw.append(product.getDescription());
+                fw.append("/");
+                fw.append(String.valueOf(product.getPrice()));
+                fw.append("/");
+                fw.append(String.valueOf(product.getQuantAvailable()));
+                fw.append("\n");
+            }
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException();
         }
-        outerloop:
-        while (true) {
-            List<String> customers = null;
-            try {
-                customers = (List<String>) inputStream.readObject();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-            List<String> sellers = null;
-            try {
-                sellers = (List<String>) inputStream.readObject();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-            ClientSide client = new ClientSide();
-            List<ClientSide.User> customer = client.toUser(customers);
-            List<ClientSide.User> seller = client.toUser(sellers);
-            List<Object> details = client.LogIn(customer,seller);//0th index is the user, 1st index is seller or customer, 2nd index tells you whether the account already exists.
-            try {
-                outputStream.writeObject(details);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            String switchToUser = (String) details.get(0);
-            String[] array = switchToUser.split(",");
-            ClientSide.User user = new ClientSide.User(array[0], array[1]);
-            System.out.println(details.get(0));
-            boolean exists;
-            exists = !details.get(2).equals("true");
-            String username = user.getUsername();
-            String checkUser = details.get(1).toString();
-            while (true) {
-                try {
-                    if (checkUser.equals("Seller")) {
-                        String[] showOptions = {"1 - Delete", "2 - Edit", "3 - Create", "4 - View", "5 - Import/Export", "6 - Dashboard"};
-                        String option = (String) (JOptionPane.showInputDialog(null, "What do you want to do?",
-                                "Choice", JOptionPane.QUESTION_MESSAGE, null, showOptions, showOptions[0]));
-                        if (option == null) {
-                            throw new Exception();
-                        }
-                        //1s
-                        pw.write(option + "\n");
-                        pw.flush();
+        return ("Export successful!");
+    }
 
-                        switch (option) {
-                            case "1 - Delete":
-                                //1del - showStore
-                                String message = bfr.readLine();
-                                if (message.equals("No Stores")) {
-                                    JOptionPane.showMessageDialog(null, "This seller doesn't have any stores!",
-                                            "Error", JOptionPane.ERROR_MESSAGE);
-                                } else {
-                                    String[] stores = message.split("/-");
-                                    String storeChoice = (String) (JOptionPane.showInputDialog(null,
-                                            "Enter the index of the store you want to edit: ", "Choice",
-                                            JOptionPane.QUESTION_MESSAGE, null, stores, stores[0]));
-                                    if (storeChoice == null) {
-                                        throw new Exception();
-                                    }
-                                    //2del - storeChoice
-                                    pw.write(storeChoice + "\n");
-                                    pw.flush();
-
-                                    JOptionPane.showMessageDialog(null,
-                                            "N/A means the store doesn't contain any products\n"
-                                                    + "if you remove N/A, you will remove the store itself", "Explain Message",
-                                            JOptionPane.INFORMATION_MESSAGE);
-                                    // 3del - showProducts
-                                    String showProducts = bfr.readLine();
-                                    String[] products = showProducts.split("/-");
-                                    String productChoice = (String) (JOptionPane.showInputDialog(null,
-                                            "Enter the index of the product you want to delete: ", "Choice",
-                                            JOptionPane.QUESTION_MESSAGE, null, products, products[0]));
-                                    if (productChoice == null) {
-                                        throw new Exception();
-                                    }
-                                    // 4del - productChoice
-                                    pw.write(productChoice + "\n");
-                                    pw.flush();
-                                    // 5del - show delete result
-                                    String resultMessage = bfr.readLine();
-                                    JOptionPane.showMessageDialog(null, resultMessage, "Message",
-                                            JOptionPane.INFORMATION_MESSAGE);
-                                }
-                                break;
-                            case "2 - Edit":
-                                JOptionPane.showMessageDialog(null,
-                                        "If limit equals -1, there would be any limit for the customers",
-                                        "Explain Message", JOptionPane.INFORMATION_MESSAGE);
-                                //1edit show Store
-                                String message2 = bfr.readLine();
-                                if (message2.equals("No Stores")) {
-                                    JOptionPane.showMessageDialog(null, "This seller doesn't have any stores!",
-                                            "Error", JOptionPane.ERROR_MESSAGE);
-                                } else {
-                                    String[] stores = message2.split("/-");
-                                    String storeChoice = (String) (JOptionPane.showInputDialog(null,
-                                            "Enter the index of the store you want to edit: ", "Choice",
-                                            JOptionPane.QUESTION_MESSAGE, null, stores, stores[0]));
-                                    if (storeChoice == null) {
-                                        throw new Exception();
-                                    }
-                                    //2edit - storeChoice
-                                    pw.write(storeChoice + "\n");
-                                    pw.flush();
-                                    //3edit - "no product" message
-                                    String noProductMessage = bfr.readLine();
-                                    if (noProductMessage.equals("No Products")) {
-                                        JOptionPane.showMessageDialog(null,
-                                                "This store doesn't have any products! You should create a new product",
-                                                "Explain Message", JOptionPane.INFORMATION_MESSAGE);
-                                    } else {
-                                        //4edit - show Products
-                                        String showProducts2 = bfr.readLine();
-                                        String[] products2 = showProducts2.split("/-");
-                                        String productChoice = (String) (JOptionPane.showInputDialog(null,
-                                                "Enter the index of the product you want to edit: ", "Choice",
-                                                JOptionPane.QUESTION_MESSAGE, null, products2, products2[0]));
-                                        if (productChoice == null) {
-                                            throw new Exception();
-                                        }
-                                        // 5edit - productChoice
-                                        pw.write(productChoice + "\n");
-                                        pw.flush();
-                                        //6edit - productChoiceOptions
-                                        String[] choices = {"1.Name", "2.Store Name", "3.Description", "4.Quantity Available",
-                                                "5.Price", "6.Limit"};
-                                        String productChoiceOption = (String) (JOptionPane.showInputDialog(null,
-                                                "What do you want to change about this product?", "Choice",
-                                                JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]));
-                                        if (productChoiceOption == null) {
-                                            throw new Exception();
-                                        }
-                                        pw.write(productChoiceOption + "\n");
-                                        pw.flush();
-                                        //7edit - **storeName if choose to change** / enter value changed
-                                        if (productChoiceOption.equals("2.Store Name")) {
-                                            String storeNameChange = (String) JOptionPane.showInputDialog(null,
-                                                    "Which store you want to move to?", "Choice",
-                                                    JOptionPane.QUESTION_MESSAGE, null, stores, stores[0]);
-                                            if (storeNameChange == null) {
-                                                throw new Exception();
-                                            }
-                                            pw.write(storeNameChange + "\n");
-                                            pw.flush();
-                                        } else {
-                                            boolean wrongFormat;
-                                            String valueChange;
-                                            do {
-                                                wrongFormat = false;
-                                                valueChange = JOptionPane.showInputDialog(null,
-                                                        "Enter the value you want to change", "Choice",
-                                                        JOptionPane.QUESTION_MESSAGE);
-                                                if (valueChange == null) {
-                                                    throw new Exception();
-                                                }
-                                                try {
-                                                    if (productChoiceOption.equals("4.Quantity Available")) {
-                                                        int checkInt = Integer.parseInt(valueChange);
-                                                    } else if (productChoiceOption.equals("5.Price")) {
-                                                        double checkDouble = Double.parseDouble(valueChange);
-                                                    } else if (productChoiceOption.equals("6.Limit")) {
-                                                        int checkInt = Integer.parseInt(valueChange);
-                                                    }
-                                                } catch (Exception e) {
-                                                    wrongFormat = true;
-                                                    JOptionPane.showMessageDialog(null,
-                                                            "Please enter the correct format!", "Error",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                }
-                                            } while (wrongFormat);
-                                            //7edit - **enter value changed** / storeName if choose to change
-                                            pw.write(valueChange + "\n");
-                                            pw.flush();
-                                        }
-                                        //8edit - show Edit result
-                                        String resultMessage2 = bfr.readLine();
-                                        JOptionPane.showMessageDialog(null, resultMessage2, "Message",
-                                                JOptionPane.INFORMATION_MESSAGE);
-                                    }
-                                }
-                                break;
-                            case "3 - Create":
-                                JOptionPane.showMessageDialog(null,
-                                        "N/A means the seller doesn't have any stores\n"
-                                                + "choose N/A then to create the first store", "Explain Message",
-                                        JOptionPane.INFORMATION_MESSAGE);
-                                JOptionPane.showMessageDialog(null,
-                                        "If limit equals -1, there would be any limit for the customers",
-                                        "Explain Message", JOptionPane.INFORMATION_MESSAGE);
-                                //1cre - showStore
-                                String message3 = bfr.readLine();
-                                String[] stores = message3.split("/-");
-                                String storeChoice = (String) (JOptionPane.showInputDialog(null,
-                                        "Choose the index you want to edit: ", "Choice",
-                                        JOptionPane.QUESTION_MESSAGE, null, stores, stores[0]));
-                                if (storeChoice == null) {
-                                    throw new Exception();
-                                }
-                                //2cre - storeChoice
-                                pw.write(storeChoice + "\n");
-                                pw.flush();
-                                if (storeChoice.equals("1.N/A") || stores[stores.length - 1].equals(storeChoice)) {
-                                    String storeName = JOptionPane.showInputDialog(null,
-                                            "Enter the name of the new store:", "Question",
-                                            JOptionPane.QUESTION_MESSAGE);
-                                    if (storeName == null) {
-                                        throw new Exception();
-                                    }
-                                    //3cre - Name to create new store
-                                    pw.write(storeName + "\n");
-                                    pw.flush();
-                                    //4cre - Create Store Result
-                                    String createResult = bfr.readLine();
-                                    JOptionPane.showMessageDialog(null, createResult, "Message",
-                                            JOptionPane.INFORMATION_MESSAGE);
-                                } else {
-                                    while (true) {
-                                        String productName = JOptionPane.showInputDialog(null, "Name:",
-                                                "Enter the information of the product:", JOptionPane.QUESTION_MESSAGE);
-                                        if (productName == null) {
-                                            throw new Exception();
-                                        }
-                                        //5cre - Create new product's name
-                                        pw.write(productName + "\n");
-                                        pw.flush();
-                                        //6cre - checkName exists
-                                        String checkName = bfr.readLine();
-                                        if (checkName.equals("true")) {
-                                            String productDes = JOptionPane.showInputDialog(null,
-                                                    "Description:", "Enter the information of the product:",
-                                                    JOptionPane.QUESTION_MESSAGE);
-                                            if (productDes == null) {
-                                                throw new Exception();
-                                            }
-                                            if (productDes == null) {
-                                                throw new Exception();
-                                            }
-                                            String productQuant;
-                                            String productPrice;
-                                            String productLimit;
-                                            while (true) {
-                                                try {
-                                                    productQuant = JOptionPane.showInputDialog(null,
-                                                            "Quantity Available:", "Enter the information of the product:",
-                                                            JOptionPane.QUESTION_MESSAGE);
-                                                    if (productQuant == null) {
-                                                        throw new Exception();
-                                                    }
-                                                    int checkQuant = Integer.parseInt(productQuant);
-                                                    productPrice = JOptionPane.showInputDialog(null,
-                                                            "Price:", "Enter the information of the product:",
-                                                            JOptionPane.QUESTION_MESSAGE);
-                                                    if (productPrice == null) {
-                                                        throw new Exception();
-                                                    }
-                                                    double checkPrice = Double.parseDouble(productPrice);
-                                                    productLimit = JOptionPane.showInputDialog(null,
-                                                            "Limit:", "Enter the information of the product:",
-                                                            JOptionPane.QUESTION_MESSAGE);
-                                                    if (productLimit == null) {
-                                                        throw new Exception();
-                                                    }
-                                                    int checkLimit = Integer.parseInt(productLimit);
-                                                    break;
-                                                } catch (Exception e) {
-                                                    JOptionPane.showMessageDialog(null,
-                                                            "Please enter the correct format!", "Error",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                }
-                                            }
-                                            pw.write(productDes + "\n");
-                                            pw.flush(); //7cre - productDescription
-                                            pw.write(productQuant + "\n");
-                                            pw.flush(); //8cre - productQuantity Avail
-                                            pw.write(productPrice + "\n");
-                                            pw.flush(); //8cre - productPrice
-                                            pw.write(productLimit + "\n");
-                                            pw.flush(); //10cre - productLimit
-                                            break;
-                                        } else {
-                                            JOptionPane.showMessageDialog(null,
-                                                    "This product has already existed, please add another product",
-                                                    "Error", JOptionPane.ERROR_MESSAGE);
-                                        }
-                                    }
-                                    //11cre - createProductResult
-                                    String createProductResult = bfr.readLine();
-                                    JOptionPane.showMessageDialog(null, createProductResult, "Message",
-                                            JOptionPane.INFORMATION_MESSAGE);
-                                }
-                                break;
-                            case "4 - View":
-                                String[] message4 = {"1.View Sales by Stores", "2.View Products in Carts"};
-                                String choice4 = (String) JOptionPane.showInputDialog(null,
-                                        "What do you want to view?", "Choice", JOptionPane.QUESTION_MESSAGE,
-                                        null, message4, message4[0]);
-                                if (choice4 == null) {
-                                    throw new Exception();
-                                }
-                                //1vie - Sales or Products
-                                pw.write(choice4 + "\n");
-                                pw.flush();
-                                if (choice4.equals(message4[0])) {
-                                    //2vie - Sales by Stores
-                                    String storesResult = bfr.readLine();
-                                    String viewStoresResult = storesResult.replace("/-", "\n");
-                                    if (viewStoresResult.equals("No stores")) {
-                                        JOptionPane.showMessageDialog(null,
-                                                "This user has no stores, create new ones please!", "Error",
-                                                JOptionPane.ERROR_MESSAGE);
-                                    } else {
-                                        JOptionPane.showMessageDialog(null, viewStoresResult, "Message",
-                                                JOptionPane.INFORMATION_MESSAGE);
-                                    }
-                                } else {
-                                    //2vie - Products in Shopping Cart
-                                    String shoppingCart = bfr.readLine();
-                                    String viewShoppingCart = shoppingCart.replaceAll("/-", "\n");
-                                    if (viewShoppingCart.equals("No stores")) {
-                                        JOptionPane.showMessageDialog(null,
-                                                "This user has no stores, create new ones please!", "Error",
-                                                JOptionPane.ERROR_MESSAGE);
-                                    } else {
-                                        JOptionPane.showMessageDialog(null, viewShoppingCart, "Message",
-                                                JOptionPane.INFORMATION_MESSAGE);
-                                    }
-                                }
-                                break;
-                            case "5 - Import/Export":
-                                String[] message5 = {"1. Import", "2. Export"};
-                                String choice5 = (String) JOptionPane.showInputDialog(null,
-                                        "Do you want to import or export files?", "Choice",
-                                        JOptionPane.QUESTION_MESSAGE, null, message5, message5[0]);
-                                if (choice5 == null) {
-                                    throw new Exception();
-                                }
-                                //1inEx - choice In or Ex
-                                pw.write(choice5 + "\n");
-                                pw.flush();
-                                if (choice5.equals("1. Import")) {
-                                    JOptionPane.showMessageDialog(null,
-                                            "you must include .csv at the end of the file name",
-                                            "Explain Message", JOptionPane.INFORMATION_MESSAGE);
-                                    String filename = JOptionPane.showInputDialog(null,
-                                            "Enter file name:");
-                                    if (filename == null) {
-                                        throw new Exception();
-                                    }
-                                    //2inEx - Import: filename
-                                    pw.write(filename + "\n");
-                                    pw.flush();
-                                    //3inEx - Import: result
-                                    String result = bfr.readLine();
-                                    JOptionPane.showMessageDialog(null, result, "Message",
-                                            JOptionPane.INFORMATION_MESSAGE);
-                                } else {
-                                    //2inEx - showStoreName
-                                    String listStoreName = bfr.readLine();
-                                    String[] storeNameChoice = listStoreName.split("/-");
-                                    String storeName = (String) JOptionPane.showInputDialog(null,
-                                            "Which store do you want to export products for:",
-                                            "Choice", JOptionPane.QUESTION_MESSAGE, null, storeNameChoice,
-                                            storeNameChoice[0]);
-                                    if (storeName == null) {
-                                        throw new Exception();
-                                    }
-                                    //3inEx - Export: Storename
-                                    pw.write(storeName + "\n");
-                                    pw.flush();
-                                    JOptionPane.showMessageDialog(null,
-                                            "you must include .txt at the end of the file name",
-                                            "Explain Message", JOptionPane.INFORMATION_MESSAGE);
-                                    //4inEx - Export: file name
-                                    String fileName = JOptionPane.showInputDialog(null,
-                                            "Enter the name of the file", "Question",
-                                            JOptionPane.QUESTION_MESSAGE);
-                                    pw.write(fileName + "\n");
-                                    pw.flush();
-                                    //4inEx - Export: result
-                                    String result = bfr.readLine();
-                                    JOptionPane.showMessageDialog(null, result, "Message",
-                                            JOptionPane.INFORMATION_MESSAGE);
-                                }
-                                break;
-                            case "6 - Dashboard":
-                                String[] custOrProds = {"1. List of Customers", "2. List of Products"};
-                                String[] minOrMax = {"1. Max to min", "2. Min to max"};
-                                String choiceItem = (String) JOptionPane.showInputDialog(null,
-                                        "What do you want to do?", "Choice", JOptionPane.QUESTION_MESSAGE, null,
-                                        custOrProds, custOrProds[0]);
-                                if (choiceItem == null) {
-                                    throw new Exception();
-                                }
-                                //1dash - choice Cust or Prod
-                                pw.write(choiceItem + "\n");
-                                pw.flush();
-                                //2dash - show Cust or Prod
-                                String data = bfr.readLine();
-                                String showData;
-                                if (data.equals("")) {
-                                    showData = "There is nothing to display";
-                                    JOptionPane.showMessageDialog(null, showData, "Message",
-                                            JOptionPane.INFORMATION_MESSAGE);
-                                } else {
-                                    showData = data.replaceAll("/-", "\n");
-                                    JOptionPane.showMessageDialog(null, showData, "Message",
-                                            JOptionPane.INFORMATION_MESSAGE);
-                                    String choiceOrder = (String) JOptionPane.showInputDialog(null,
-                                            "How do you want to sort?", "Choice", JOptionPane.QUESTION_MESSAGE,
-                                            null, minOrMax, minOrMax[0]);
-                                    if (choiceOrder == null) {
-                                        throw new Exception();
-                                    }
-                                    //3dash - choice Order
-                                    pw.write(choiceOrder + "\n");
-                                    pw.flush();
-                                    //4dash - sortedData
-                                    String data2 = bfr.readLine();
-                                    String sortedData = data2.replaceAll("/-", "\n");
-                                    JOptionPane.showMessageDialog(null, sortedData, "Message",
-                                            JOptionPane.INFORMATION_MESSAGE);
-                                }
-                                break;
-                            default:
-                                System.out.println("Please enter the correct number!");
-                                checkIndexOption = false;
-                                break;
-                        }
-                    }
-                    if (checkUser.equals("Customer")) {
-                        String[] showOptions = {"Sort", "View", "Search", "Shopping Cart", "Purchase History", "Dashboard"};
-                        String option = (String) (JOptionPane.showInputDialog(null, "What do you want to do?",
-                                "Choice", JOptionPane.QUESTION_MESSAGE, null, showOptions, showOptions[0]));
-                        if (option == null) {
-                            throw new Exception();
-                        }
-                        //1st send to server in customer
-                        pw.write(option + "\n");
-                        pw.flush();
-                        switch (option) {
-                            case "Sort":
-                                // 1st reception from server, don't really need anything
-                                String useless = bfr.readLine();
-                                String[] priceOrQuantity = {"Price: Low To High", "Price: High To Low", "Quantity: Low To High", "Quantity: High To Low"};
-                                String sortOption = (String) JOptionPane.showInputDialog(null, "How do you want to sort?",
-                                        "Sort Choice", JOptionPane.QUESTION_MESSAGE, null, priceOrQuantity, priceOrQuantity[0]);
-                                if (sortOption == null) {
-                                    throw new Exception();
-                                }
-                                //2nd send to server, sends sortoption
-                                pw.write(sortOption + "\n");
-                                pw.flush();
-                                //2nd receiving from the server
-                                String productListingText = bfr.readLine();
-
-                                if (!(productListingText.equals("There are no products"))) {
-                                    String[] productOptions = productListingText.split("/-");
-                                    String productNum = "";
-                                    if (sortOption.equals("Price")) {
-                                        productNum = "" + ((String) JOptionPane.showInputDialog(null,
-                                                "Here are your products sorted by price",
-                                                "Price Sorted Products", JOptionPane.QUESTION_MESSAGE, null,
-                                                productOptions, productOptions[0])).charAt(0);
-                                        if (productNum == null) {
-                                            throw new Exception();
-                                        }
-                                        //3rd sending, which product would the consumer like to look at
-
-                                        pw.write(productNum + "\n");
-                                        pw.flush();
-                                    } else {
-                                        productNum = "" + ((String) JOptionPane.showInputDialog(null,
-                                                "Here are your products sorted by quantity",
-                                                "Quantity Sorted Products", JOptionPane.QUESTION_MESSAGE, null,
-                                                productOptions, productOptions[0])).charAt(0);
-                                        if (productNum == null) {
-                                            throw new Exception();
-                                        }
-                                        //3rd sending, which product would the consumer like to look at
-                                        pw.write(productNum + "\n");
-                                        pw.flush();
-                                    }
-
-                                    //3rd receiving from server
-                                    String productDetails = bfr.readLine();
-                                    productDetails = productDetails.replace("...", "\n");
-                                    //4th sending to server, useless
-                                    pw.write("" + "\n");
-                                    pw.flush();
-                                    //4th receiving from server, limit and quantity availble
-                                    String[] limitAndQuantString = bfr.readLine().split("/");
-
-                                    int[] limitAndQuant = new int[2];
-                                    for (int k = 0; k < 2; k++) {
-                                        limitAndQuant[k] = Integer.parseInt(limitAndQuantString[k]);
-                                    }
-                                    JOptionPane.showMessageDialog(null,
-                                            productDetails, "Product Details",
-                                            JOptionPane.INFORMATION_MESSAGE);
-                                    String[] actionsWithProduct = {"Purchase Product", "Add To Shopping Cart", "Leave a Review"};
-                                    String actionWithProduct = (String) JOptionPane.showInputDialog(null,
-                                            "What do you want to do with this product?",
-                                            "Product", JOptionPane.QUESTION_MESSAGE, null,
-                                            actionsWithProduct, actionsWithProduct[0]);
-                                    if (actionWithProduct == null) {
-                                        throw new Exception();
-                                    }
-                                    if (actionWithProduct.equals("Purchase Product")) {
-                                        boolean isNotValidInt = true;
-                                        int quantity = 0;
-                                        do {
-                                            try {
-                                                String quantityTwo = JOptionPane.showInputDialog(null,
-                                                        "How Much Would You Like To Buy?", "Purchase Form",
-                                                        JOptionPane.QUESTION_MESSAGE);
-                                                if (quantityTwo == null) {
-                                                    throw new Exception();
-                                                }
-                                                quantity = Integer.parseInt(quantityTwo);
-                                                isNotValidInt = false;
-
-                                                if (quantity <= 0) {
-                                                    JOptionPane.showMessageDialog(null,
-                                                            "Enter a number greater than 0",
-                                                            "Purchase Form",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
-                                                    JOptionPane.showMessageDialog(null,
-                                                            "You are attempting to buy more than the limit of " +
-                                                                    limitAndQuant[0] + " units set by the seller",
-                                                            "Purchase Form",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                } else if (quantity > limitAndQuant[1]) {
-                                                    JOptionPane.showMessageDialog(null, "There is only "
-                                                                    + limitAndQuant[1] +
-                                                                    " units left, you are attempting to buy more than what's available",
-                                                            "Purchase Form",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                }
-                                            } catch (NumberFormatException e) {
-                                                JOptionPane.showMessageDialog(null,
-                                                        "Enter an integer",
-                                                        "Order Form",
-                                                        JOptionPane.ERROR_MESSAGE);
-                                                isNotValidInt = true;
-                                            }
-                                        } while (isNotValidInt);
-                                        String purchaseQuantity = "Purchase," + quantity;
-                                        //5th sending to the ServerSide
-                                        pw.write(purchaseQuantity + "\n");
-                                        pw.flush();
-                                        //5th receiving from server
-                                        String finalSortOutput = bfr.readLine();
-                                        JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
-                                                JOptionPane.INFORMATION_MESSAGE);
-                                    } else if (actionWithProduct.equals("Add To Shopping Cart")) {
-                                        boolean isNotValidInt = true;
-                                        int quantity = 0;
-                                        do {
-                                            try {
-                                                String quantityTwo = JOptionPane.showInputDialog(null,
-                                                        "How Much Would You Like To Add?", "Add To Cart",
-                                                        JOptionPane.QUESTION_MESSAGE);
-                                                if (quantityTwo == null) {
-                                                    throw new Exception();
-                                                }
-                                                quantity = Integer.parseInt(quantityTwo);
-                                                isNotValidInt = false;
-
-                                                if (quantity <= 0) {
-                                                    JOptionPane.showMessageDialog(null,
-                                                            "Enter a number greater than 0",
-                                                            "Add To Cart",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
-                                                    JOptionPane.showMessageDialog(null,
-                                                            "You are attempting to add more than the limit of " +
-                                                                    limitAndQuant[0] + " units set by the seller",
-                                                            "Add To Cart",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                } else if (quantity > limitAndQuant[1]) {
-                                                    JOptionPane.showMessageDialog(null, "There is only "
-                                                                    + limitAndQuant[1] +
-                                                                    " units left, you are attempting to add more than what's available",
-                                                            "Add To Cart",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                }
-                                            } catch (NumberFormatException e) {
-                                                JOptionPane.showMessageDialog(null, "Enter an integer",
-                                                        "Order Form",
-                                                        JOptionPane.ERROR_MESSAGE);
-                                                isNotValidInt = true;
-                                            }
-                                        } while (isNotValidInt);
-                                        String cartQuantity = "Cart," + quantity;
-                                        //5th sending to the ServerSide
-                                        pw.write(cartQuantity + "\n");
-                                        pw.flush();
-                                        //5th receiving from server
-                                        String finalSortOutput = bfr.readLine();
-                                        JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
-                                                JOptionPane.INFORMATION_MESSAGE);
-                                    } else if (actionWithProduct.equals("Leave a Review")) {
-                                        String review = JOptionPane.showInputDialog(null,
-                                                "Add Your Review", "Review Form",
-                                                JOptionPane.QUESTION_MESSAGE);
-                                        //5th sending to the ServerSide
-                                        pw.write("Review," + review + "\n");
-                                        pw.flush();
-                                        //5th receiving from server
-                                        String finalSortOutput = bfr.readLine();
-                                        JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
-                                                JOptionPane.INFORMATION_MESSAGE);
-                                    }
-
-                                } else {
-                                    JOptionPane.showMessageDialog(null,
-                                            "There are no products for you to view", "Explain Message",
-                                            JOptionPane.INFORMATION_MESSAGE);
-                                }
-                                break;
-                            case "View":
-                                boolean refresh = true;
-                                do {
-                                    //1st receiving from the server
-                                    String listingText = bfr.readLine();
-                                    if (!(listingText.equals("There are no products"))) {
-                                        String[] productOptions = listingText.split("/-");
-                                        String productNum = "";
-                                        productNum = "" + ((String) JOptionPane.showInputDialog(null,
-                                                "Here are the products in this marketplace",
-                                                "View Products", JOptionPane.QUESTION_MESSAGE,
-                                                null, productOptions, productOptions[0])).charAt(0);
-                                        if (productNum == null) {
-                                            throw new Exception();
-                                        }
-                                        //2nd sending, which product would the consumer like to look at
-                                        pw.write(productNum + "\n");
-                                        pw.flush();
-                                        //2nd receiving from server
-                                        String productDetails = bfr.readLine();
-                                        productDetails = productDetails.replace("...", "\n");
-                                        //3rd sending to server, useless
-                                        pw.write("" + "\n");
-                                        pw.flush();
-                                        //3rd receiving from server, limit and quantity availble
-                                        String[] limitAndQuantString = bfr.readLine().split("/");
-
-                                        int[] limitAndQuant = new int[2];
-                                        for (int k = 0; k < 2; k++) {
-                                            limitAndQuant[k] = Integer.parseInt(limitAndQuantString[k]);
-                                        }
-                                        JOptionPane.showMessageDialog(null,
-                                                productDetails, "Product Details",
-                                                JOptionPane.INFORMATION_MESSAGE);
-                                        String[] actionsWithProduct = {"Purchase Product", "Add To Shopping Cart", "Leave a Review"};
-                                        String actionWithProduct = (String) JOptionPane.showInputDialog(null,
-                                                "What do you want to do with this product?",
-                                                "Product", JOptionPane.QUESTION_MESSAGE, null,
-                                                actionsWithProduct, actionsWithProduct[0]);
-                                        if (actionWithProduct == null) {
-                                            throw new Exception();
-                                        }
-                                        if (actionWithProduct.equals("Purchase Product")) {
-                                            boolean isNotValidInt = true;
-                                            int quantity = 0;
-                                            do {
-                                                try {
-                                                    String quantityTwo = JOptionPane.showInputDialog(null,
-                                                            "How Much Would You Like To Buy?",
-                                                            "Purchase Form",
-                                                            JOptionPane.QUESTION_MESSAGE);
-                                                    if (quantityTwo == null) {
-                                                        throw new Exception();
-                                                    }
-                                                    quantity = Integer.parseInt(quantityTwo);
-                                                    isNotValidInt = false;
-                                                    if (quantity <= 0) {
-                                                        JOptionPane.showMessageDialog(null,
-                                                                "Enter a number greater than 0",
-                                                                "Purchase Form",
-                                                                JOptionPane.ERROR_MESSAGE);
-                                                        isNotValidInt = true;
-                                                    } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
-                                                        JOptionPane.showMessageDialog(null,
-                                                                "You are attempting to buy more than the limit of " +
-                                                                        limitAndQuant[0] + " units set by the seller",
-                                                                "Purchase Form",
-                                                                JOptionPane.ERROR_MESSAGE);
-                                                        isNotValidInt = true;
-                                                    } else if (quantity > limitAndQuant[1]) {
-                                                        JOptionPane.showMessageDialog(null, "There is only "
-                                                                        + limitAndQuant[1] +
-                                                                        " units left, you are attempting to buy more than what's available",
-                                                                "Purchase Form",
-                                                                JOptionPane.ERROR_MESSAGE);
-                                                        isNotValidInt = true;
-                                                    }
-                                                } catch (NumberFormatException e) {
-                                                    JOptionPane.showMessageDialog(null, "Enter an integer",
-                                                            "Order Form",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                }
-                                            } while (isNotValidInt);
-                                            String purchaseQuantity = "Purchase," + quantity;
-                                            //4th sending to the ServerSide
-                                            pw.write(purchaseQuantity + "\n");
-                                            pw.flush();
-                                            //4th receiving from server
-                                            String finalSortOutput = bfr.readLine();
-                                            JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
-                                                    JOptionPane.INFORMATION_MESSAGE);
-                                        } else if (actionWithProduct.equals("Add To Shopping Cart")) {
-                                            boolean isNotValidInt = true;
-                                            int quantity = 0;
-                                            do {
-                                                try {
-                                                    String quantityTwo = JOptionPane.showInputDialog(null,
-                                                            "How Much Would You Like To Add?", "Add To Cart",
-                                                            JOptionPane.QUESTION_MESSAGE);
-                                                    if (quantityTwo == null) {
-                                                        throw new Exception();
-                                                    }
-                                                    quantity = Integer.parseInt(quantityTwo);
-                                                    isNotValidInt = false;
-                                                    if (quantity <= 0) {
-                                                        JOptionPane.showMessageDialog(null,
-                                                                "Enter a number greater than 0",
-                                                                "Add To Cart",
-                                                                JOptionPane.ERROR_MESSAGE);
-                                                        isNotValidInt = true;
-                                                    } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
-                                                        JOptionPane.showMessageDialog(null,
-                                                                "You are attempting to add more than the limit of " +
-                                                                        limitAndQuant[0] + " units set by the seller",
-                                                                "Add To Cart",
-                                                                JOptionPane.ERROR_MESSAGE);
-                                                        isNotValidInt = true;
-                                                    } else if (quantity > limitAndQuant[1]) {
-                                                        JOptionPane.showMessageDialog(null, "There is only "
-                                                                        + limitAndQuant[1] +
-                                                                        " units left, you are attempting to add more than what's available",
-                                                                "Add To Cart",
-                                                                JOptionPane.ERROR_MESSAGE);
-                                                        isNotValidInt = true;
-                                                    }
-                                                } catch (NumberFormatException e) {
-                                                    JOptionPane.showMessageDialog(null, "Enter an integer",
-                                                            "Order Form",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                }
-                                            } while (isNotValidInt);
-                                            String cartQuantity = "Cart," + quantity;
-                                            //4th sending to the ServerSide
-                                            pw.write(cartQuantity + "\n");
-                                            pw.flush();
-                                            //4th receiving from server
-                                            String finalSortOutput = bfr.readLine();
-                                            JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
-                                                    JOptionPane.INFORMATION_MESSAGE);
-                                        } else if (actionWithProduct.equals("Leave a Review")) {
-                                            String review = JOptionPane.showInputDialog(null,
-                                                    "Add Your Review", "Review Form",
-                                                    JOptionPane.QUESTION_MESSAGE);
-                                            //4th sending to the ServerSide
-                                            pw.write("Review," + review + "\n");
-                                            pw.flush();
-                                            //4th receiving from server
-                                            String finalSortOutput = bfr.readLine();
-                                            JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
-                                                    JOptionPane.INFORMATION_MESSAGE);
-                                        }
-
-                                    } else {
-                                        JOptionPane.showMessageDialog(null,
-                                                "There are no products for you to view", "Explain Message",
-                                                JOptionPane.INFORMATION_MESSAGE);
-                                    }
-                                } while (refresh);
-                                break;
-                            case "Search":
-                                // 1st reception from server, don't really need anything
-                                String uselessSearch = bfr.readLine();
-                                String search = JOptionPane.showInputDialog(
-                                        null,
-                                        "What would you like to search?",
-                                        "Search", JOptionPane.QUESTION_MESSAGE
-                                );
-                                if (search == null) {
-                                    throw new Exception();
-                                }
-
-                                //2nd send to the server class, giving search input
-                                pw.write(search + "\n");
-                                pw.flush();
-                                //2nd reception of server class, gets search results
-                                String searchResult = bfr.readLine();
-                                if (!(searchResult.equals("There are no products that match your search"))) {
-                                    String[] productOptions = searchResult.split("/-");
-                                    String productNum = "";
-                                    productNum = "" + ((String) JOptionPane.showInputDialog(null,
-                                            "Here are the products that match your search",
-                                            "Search Results", JOptionPane.QUESTION_MESSAGE, null,
-                                            productOptions, productOptions[0])).charAt(0);
-                                    if (productNum == null) {
-                                        throw new Exception();
-                                    }
-                                    //3rd sending, which product would the consumer like to look at
-                                    pw.write(productNum + "\n");
-                                    pw.flush();
-                                    //3rd receiving from server
-                                    String productDetails = bfr.readLine();
-                                    productDetails = productDetails.replace("...", "\n");
-
-                                    //4th sending to server, useless
-                                    pw.write("" + "\n");
-                                    pw.flush();
-                                    //4th receiving from server, limit and quantity availble
-                                    String[] limitAndQuantString = bfr.readLine().split("/");
-
-                                    int[] limitAndQuant = new int[2];
-                                    for (int k = 0; k < 2; k++) {
-                                        limitAndQuant[k] = Integer.parseInt(limitAndQuantString[k]);
-                                    }
-                                    JOptionPane.showMessageDialog(null,
-                                            productDetails, "Product Details",
-                                            JOptionPane.INFORMATION_MESSAGE);
-                                    String[] actionsWithProduct = {"Purchase Product", "Add To Shopping Cart", "Leave a Review"};
-                                    String actionWithProduct = (String) JOptionPane.showInputDialog(null,
-                                            "What do you want to do with this product?",
-                                            "Product", JOptionPane.QUESTION_MESSAGE, null, actionsWithProduct,
-                                            actionsWithProduct[0]);
-                                    if (actionWithProduct.equals("Purchase Product")) {
-                                        boolean isNotValidInt = true;
-                                        int quantity = 0;
-                                        do {
-                                            try {
-                                                String quantityTwo = JOptionPane.showInputDialog(null,
-                                                        "How Much Would You Like To Buy?", "Purchase Form",
-                                                        JOptionPane.QUESTION_MESSAGE);
-                                                if (quantityTwo == null) {
-                                                    throw new Exception();
-                                                }
-                                                quantity = Integer.parseInt(quantityTwo);
-                                                isNotValidInt = false;
-                                                if (quantity <= 0) {
-                                                    JOptionPane.showMessageDialog(null,
-                                                            "Enter a number greater than 0",
-                                                            "Purchase Form",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
-                                                    JOptionPane.showMessageDialog(null,
-                                                            "You are attempting to buy more than the limit of " +
-                                                                    limitAndQuant[0] + " units set by the seller",
-                                                            "Purchase Form",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                } else if (quantity > limitAndQuant[1]) {
-                                                    JOptionPane.showMessageDialog(null, "There is only "
-                                                                    + limitAndQuant[1] +
-                                                                    " units left, you are attempting to buy more than what's available",
-                                                            "Purchase Form",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                }
-                                            } catch (NumberFormatException e) {
-                                                JOptionPane.showMessageDialog(null, "Enter an integer", "Order Form",
-                                                        JOptionPane.ERROR_MESSAGE);
-                                                isNotValidInt = true;
-                                            }
-                                        } while (isNotValidInt);
-                                        String purchaseQuantity = "Purchase," + quantity;
-                                        //5th sending to the ServerSide
-                                        pw.write(purchaseQuantity + "\n");
-                                        pw.flush();
-                                        //5th receiving from server
-                                        String finalSortOutput = bfr.readLine();
-                                        JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
-                                                JOptionPane.INFORMATION_MESSAGE);
-                                    } else if (actionWithProduct.equals("Add To Shopping Cart")) {
-                                        boolean isNotValidInt = true;
-                                        int quantity = 0;
-                                        do {
-                                            try {
-                                                String quantityTwo = JOptionPane.showInputDialog(null,
-                                                        "How Much Would You Like To Add?", "Add To Cart",
-                                                        JOptionPane.QUESTION_MESSAGE);
-                                                if (quantityTwo == null) {
-                                                    throw new Exception();
-                                                }
-                                                quantity = Integer.parseInt(quantityTwo);
-                                                isNotValidInt = false;
-                                                if (quantity <= 0) {
-                                                    JOptionPane.showMessageDialog(null,
-                                                            "Enter a number greater than 0",
-                                                            "Add To Cart",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
-                                                    JOptionPane.showMessageDialog(null,
-                                                            "You are attempting to add more than the limit of " +
-                                                                    limitAndQuant[0] + " units set by the seller",
-                                                            "Add To Cart",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                } else if (quantity > limitAndQuant[1]) {
-                                                    JOptionPane.showMessageDialog(null, "There is only "
-                                                                    + limitAndQuant[1] +
-                                                                    " units left, you are attempting to add more than what's available",
-                                                            "Add To Cart",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                }
-                                            } catch (NumberFormatException e) {
-                                                JOptionPane.showMessageDialog(null, "Enter an integer", "Order Form",
-                                                        JOptionPane.ERROR_MESSAGE);
-                                                isNotValidInt = true;
-                                            }
-                                        } while (isNotValidInt);
-                                        String cartQuantity = "Cart," + quantity;
-                                        //5th sending to the ServerSide
-                                        pw.write(cartQuantity + "\n");
-                                        pw.flush();
-                                        //5th receiving from server
-                                        String finalSortOutput = bfr.readLine();
-                                        JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
-                                                JOptionPane.INFORMATION_MESSAGE);
-                                    } else if (actionWithProduct.equals("Leave a Review")) {
-                                        String review = JOptionPane.showInputDialog(null,
-                                                "Add Your Review", "Review Form",
-                                                JOptionPane.QUESTION_MESSAGE);
-                                        if (review == null) {
-                                            throw new Exception();
-                                        }
-                                        //5th sending to the ServerSide
-                                        pw.write("Review," + review + "\n");
-                                        pw.flush();
-                                        //5th receiving from server
-                                        String finalSortOutput = bfr.readLine();
-                                        JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
-                                                JOptionPane.INFORMATION_MESSAGE);
-                                    }
-                                } else {
-                                    JOptionPane.showMessageDialog(null, searchResult, "Search",
-                                            JOptionPane.INFORMATION_MESSAGE,
-                                            null);
-                                }
-                                break;
-                            case "Shopping Cart":
-                                //1st reception from Server, cart contents
-                                String shoppingCart = bfr.readLine();
-                                if (shoppingCart.equals("Your shopping cart is empty")) {
-                                    JOptionPane.showMessageDialog(null, shoppingCart, "Shopping Cart",
-                                            JOptionPane.INFORMATION_MESSAGE, null);
-                                } else {
-                                    String[] cartOptions = {"Remove From Cart", "Checkout Cart"};
-                                    String[] cartProducts = shoppingCart.split("/-");
-                                    shoppingCart = "";
-                                    for (String cProduct : cartProducts) {
-                                        shoppingCart += cProduct + "\n";
-                                    }
-                                    JOptionPane.showMessageDialog(null, shoppingCart, "Shopping Cart",
-                                            JOptionPane.INFORMATION_MESSAGE, null);
-                                    String cartOption = (String) JOptionPane.showInputDialog(null,
-                                            "What would you like to do?", "Shopping Cart",
-                                            JOptionPane.QUESTION_MESSAGE, null, cartOptions, cartOptions[0]);
-                                    if (cartOption == null) {
-                                        throw new Exception();
-                                    }
-                                    if (cartOption.equals("Remove From Cart")) {
-                                        String remove = (String) JOptionPane.showInputDialog(null,
-                                                "Which product would you like to remove?", "Shopping Cart",
-                                                JOptionPane.QUESTION_MESSAGE, null, cartProducts, cartProducts[0]);
-                                        if (remove == null) {
-                                            throw new Exception();
-                                        }
-                                        String removeTwo = remove.replace('.','~');
-                                        String removeNum = removeTwo.split("~")[0];
-                                        //2nd sending to server, what to do with shopping cart
-                                        pw.write(cartOption + "," + removeNum + "\n");
-                                        pw.flush();
-                                        //2nd reception from server, result of everything
-                                        String result = bfr.readLine();
-                                        JOptionPane.showMessageDialog(null, result, "Shopping Cart",
-                                                JOptionPane.INFORMATION_MESSAGE, null);
-                                    } else {
-                                        //2nd sending to server, what to do with shopping cart
-                                        pw.write(cartOption + "," + "0" + "\n");
-                                        pw.flush();
-                                        //2nd reception from server, result of everything
-                                        String result = bfr.readLine();
-                                        JOptionPane.showMessageDialog(null, result, "Shopping Cart",
-                                                JOptionPane.INFORMATION_MESSAGE, null);
-                                    }
-                                }
-                                break;
-                            case "Purchase History":
-                                //1st receiving from sever
-                                String purchaseHistory = bfr.readLine();
-                                if (!(purchaseHistory.equals("You haven't bought anything"))) {
-                                    String[] purchasedProducts = purchaseHistory.split("/-");
-                                    purchaseHistory = "";
-                                    for (String purchasedProduct : purchasedProducts) {
-                                        purchaseHistory += purchasedProduct + "\n";
-                                    }
-                                    JOptionPane.showMessageDialog(null,
-                                            purchaseHistory, "Purchase History",
-                                            JOptionPane.INFORMATION_MESSAGE, null);
-                                    int exportFile = JOptionPane.showConfirmDialog(null,
-                                            "Would you like to export this file?", "Purchase History",
-                                            JOptionPane.YES_NO_OPTION);
-                                    if (exportFile == -1) {
-                                        throw new Exception();
-                                    }
-                                    if (exportFile == 0) {
-                                        String filename = JOptionPane.showInputDialog(
-                                                null,
-                                                "What would you like to name your file? (Don't include the .txt)",
-                                                "Search", JOptionPane.QUESTION_MESSAGE
-                                        );
-                                        if (filename == null) {
-                                            throw new Exception();
-                                        }
-                                        // 2nd sending, yes file and file name
-                                        pw.write("0," + filename + "\n");
-                                        pw.flush();
-                                        //2nd reception from server, confirmation message
-                                        String historyDone = bfr.readLine();
-                                        JOptionPane.showMessageDialog(null, historyDone, "Purchase History",
-                                                JOptionPane.INFORMATION_MESSAGE, null);
-                                    } else {
-                                        // 2nd sending, no file and no file name
-                                        pw.write("1,nope" + "\n");
-                                        pw.flush();
-                                    }
-                                } else {
-                                    JOptionPane.showMessageDialog(null, purchaseHistory, "Purchase History",
-                                            JOptionPane.INFORMATION_MESSAGE, null);
-                                }
-                                break;
-                            case "Dashboard":
-                                //1st weird receptin from server
-                                String uselessThree = bfr.readLine();
-                                String[] viewByOptions = {"Store Sales", "Your Purchases"};
-                                String viewBy = (String) JOptionPane.showInputDialog(null,
-                                        "How would you like to view your dashboard?", "Dashboard",
-                                        JOptionPane.QUESTION_MESSAGE, null, viewByOptions, viewByOptions[0]);
-                                if (viewBy == null) {
-                                    throw new Exception();
-                                }
-                                int sortQuestion = JOptionPane.showConfirmDialog(null,
-                                        "Would you like to sort the results?", "Dashboard", JOptionPane.YES_NO_OPTION);
-                                if (sortQuestion == -1) {
-                                    throw new Exception();
-                                }
-                                String[] sortByOptions = {"Low to High", "High to Low"};
-                                String sortBy  = null;
-                                if (sortQuestion == 0) {
-                                    sortBy = (String) JOptionPane.showInputDialog(null, "How would you like to sort?",
-                                            "Dashboard", JOptionPane.QUESTION_MESSAGE, null, sortByOptions, sortByOptions[0]);
-                                    if (sortBy == null) {
-                                        throw new Exception();
-                                    }
-                                }
-                                String sendToServer = viewBy + "," + sortQuestion + "," + sortBy;
-                                ////2nd send to server, actions
-                                pw.write(sendToServer + "\n");
-                                pw.flush();
-                                if (viewBy.equals("Store Sales")) {
-                                    //2nd receiving from client
-                                    String output = "Sales By Store: \n" +
-                                            bfr.readLine().replace("...", "\n");
-                                    JOptionPane.showMessageDialog(null, output, "Dashboard",
-                                            JOptionPane.INFORMATION_MESSAGE, null);
-                                } else {
-                                    //2nd receiving from client
-                                    String output = "Your Purchases From Stores: \n" +
-                                            bfr.readLine().replace("...", "\n");
-                                    JOptionPane.showMessageDialog(null, output, "Dashboard",
-                                            JOptionPane.INFORMATION_MESSAGE, null);
-                                }
-                                break;
-                            default:
-                                System.out.println("Please enter the correct number!");
-                                checkIndexOption = false;
-                                break;
-                        }
-
-                    }
-
-                } catch (Exception e) {
-                    break outerloop;
-                }
-
-                int finalQuestion = JOptionPane.showConfirmDialog(null, "Do you want to continue logging in?",
-                        "Question",JOptionPane.YES_NO_OPTION);
-                if ( finalQuestion == JOptionPane.YES_OPTION) {
-                    pw.write("continueLoop" + "\n");
-                    pw.flush();
-                } else if ( finalQuestion == JOptionPane.NO_OPTION) {
-                    pw.write("breakLoop" + "\n");
-                    pw.flush();
-                    break;
-                } else if (finalQuestion == -1) {
-                    break outerloop;
+    public static String dashboardCheckSell(boolean yesSort, String sortBy) {
+        ArrayList<Product> allProducts = new ArrayList<>();
+        for (Customer customer : customers) {
+            ArrayList<Product> relativeHistory = customer.purchaseHistory;
+            if (!(relativeHistory.get(0).getName().equals("N/A"))) {
+                for (Product product : relativeHistory) {
+                    allProducts.add(product);
                 }
             }
         }
-        JOptionPane.showMessageDialog(null,"Have a good day","Message",
-                JOptionPane.INFORMATION_MESSAGE);
-    }
-    public boolean checkExistingCustomerUserName(String userName, List<ClientSide.User> Customers) {
-        boolean exists = false;
-        for (int i = 0; i < Customers.size(); i++) {
-            if (Customers.get(i).getUsername().equals(userName)) {
-                exists = true;
-                return exists;
+        ArrayList<String> salesByStore = new ArrayList<>();
+        for (Seller seller : sellers) {
+            for (Store store : seller.getStores()) {
+                String storeName = store.getName();
+                int storeSales = 0;
+                for (Product product : allProducts) {
+                    if (storeName.equals(product.getStoreName())) {
+                        storeSales += product.getQuantAvailable();
+                    }
+                }
+                salesByStore.add(storeName + ": " + storeSales);
             }
         }
-        return exists;
-    }
-
-    public ClientSide.User createCustomer(String username, String password, List<ClientSide.User> Customers) {
-        boolean created = false;
-        // Check if the username already exists
-        if (getCustomerByUsername(username,Customers) == null) {
-            ClientSide.User newUser = new ClientSide.User(username, password);
-            Customers.add(newUser);
-            JOptionPane.showMessageDialog(null, "User " + username + " created successfully.",
-                    "Marketplace", JOptionPane.PLAIN_MESSAGE);
-            return newUser;
-        } else {
-            JOptionPane.showMessageDialog(null, "Username already exists. Please choose a different one.",
-                    "Marketplace", JOptionPane.PLAIN_MESSAGE);
-            return null;
-        }
-    }
-
-    private ClientSide.User getCustomerByUsername(String username, List<ClientSide.User> Customers) {
-        for (ClientSide.User user : Customers) {
-            if (user.getUsername().equals(username)) {
-                return user;
-            }
-        }
-        return null;
-    }
-
-    public boolean loginCustomer(String username, String password, List<ClientSide.User> Customers) {
-        ClientSide.User user = getCustomerByUsername(username, Customers);
-        if (user != null && user.getPassword().equals(password)) {
-            JOptionPane.showMessageDialog(null, "Login successful for " + username,
-                    "Marketplace", JOptionPane.PLAIN_MESSAGE);
-            return true;
-        } else {
-            JOptionPane.showMessageDialog(null, "Login failed. Please check your username and password.",
-                    "Marketplace", JOptionPane.PLAIN_MESSAGE);
-            return false;
-        }
-    }
-
-
-    public boolean checkExistingSellerUserName(String userName, List<ClientSide.User> Sellers) {
-        boolean exists = false;
-        for (int i = 0; i < Sellers.size(); i++) {
-            if (Sellers.get(i).getUsername().equals(userName)) {
-                exists = true;
-                return exists;
-            }
-        }
-        return exists;
-    }
-
-    public ClientSide.User createSeller(String username, String password, List<ClientSide.User> Sellers) {
-        boolean created = false;
-        // Check if the username already exists
-        if (getSellerByUsername(username, Sellers) == null) {
-            ClientSide.User newUser = new ClientSide.User(username, password);
-            JOptionPane.showMessageDialog(null, "User " + username + " created successfully.",
-                    "Marketplace", JOptionPane.PLAIN_MESSAGE);
-            created = true;
-            return newUser;
-        } else {
-            JOptionPane.showMessageDialog(null, "Username already exists. Please choose a different one.",
-                    "Marketplace", JOptionPane.PLAIN_MESSAGE);
-            created = false;
-            return null;
-        }
-    }
-
-    private ClientSide.User getSellerByUsername(String username, List<ClientSide.User> Sellers) {
-        for (ClientSide.User user : Sellers) {
-            if (user.getUsername().equals(username)) {
-                return user;
-            }
-        }
-        return null;
-    }
-
-    public boolean loginSeller(String username, String password, List<ClientSide.User> Sellers) {
-        ClientSide.User user = getSellerByUsername(username, Sellers);
-        if (user != null && user.getPassword().equals(password)) {
-            JOptionPane.showMessageDialog(null, "Login successful for " + username,
-                    "Marketplace", JOptionPane.PLAIN_MESSAGE);
-            return true;
-        } else {
-            JOptionPane.showMessageDialog(null, "Login failed. Please check your username and password.",
-                    "Marketplace", JOptionPane.PLAIN_MESSAGE);
-            return false;
-        }
-    }
-
-
-    public List<Object> LogIn(List<ClientSide.User> Customers, List<ClientSide.User> Sellers) {
-        String password;
-        String username;
-        ClientSide.User newUser = null;
-        String userReturn = new String();
-        String returnExists = null;
-        List<Object> toReturn = new ArrayList<>();
-        JOptionPane.showMessageDialog(null, "Welcome to the marketplace.",
-                "Marketplace", JOptionPane.PLAIN_MESSAGE);
-        String[] SellerCustomer = {"Seller", "Customer"};
-        String response = (String) JOptionPane.showInputDialog(null, "Are you a seller or a customer?",
-                "Marketplace", JOptionPane.QUESTION_MESSAGE, null, SellerCustomer, SellerCustomer[0]);
-        int sc = 0;
-        boolean checkUsername = false;
-        boolean input1 = false;
-        if (response.equals("Seller")) {
-            boolean input = false;
-            do {
-                int yn = JOptionPane.showConfirmDialog(null, "Does the account exist?",
-                        "Marketplace", JOptionPane.YES_NO_OPTION);
-                if (yn == 0) {
-                    do {
-                        do {
-                            username = JOptionPane.showInputDialog(null, "Please enter your username('back' to go back).",
-                                    "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                            checkUsername = checkExistingSellerUserName(username, Sellers);
-                            if (username.equals("back")) {
-                                input = false;
-                                break;
-                            }
-                            if (!checkUsername) {
-                                JOptionPane.showMessageDialog(null, "The username is invalid.",
-                                        "Marketplace", JOptionPane.PLAIN_MESSAGE);
-                                input1 = false;
-                            }
-                        } while (input1);
-                        if (username.equals("back") || !(checkUsername)){
-                            break;
+        if (yesSort) {
+            if (sortBy.equals("Low to High")) {
+                int n = salesByStore.size();
+                for (int i = 0; i < n - 1; i++) {
+                    for (int j = 0; j < n - i - 1; j++) {
+                        int sales1 = Integer.parseInt(salesByStore.get(j).split(": ")[1]);
+                        int sales2 = Integer.parseInt(salesByStore.get(j + 1).split(": ")[1]);
+                        if (sales1 > sales2) {
+                            // Swap if the current entry has greater sales than the next entry
+                            String temp = salesByStore.get(j);
+                            salesByStore.set(j, salesByStore.get(j + 1));
+                            salesByStore.set(j + 1, temp);
                         }
-                        password = JOptionPane.showInputDialog(null, "Please enter your password",
-                                "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                        input = loginSeller(username,password,Sellers);
-                        newUser = new ClientSide.User(username, password);
-                        userReturn = username + "," + password;
-                        returnExists = "false";
-                    } while (!input);
-                    /*toReturn.add(userReturn);
-                    toReturn.add("Seller");
-                    toReturn.add("false");
-                    return toReturn;*/
+                    }
+                }
+            } else if (sortBy.equals("High to Low")) {
+                int n = salesByStore.size();
+                for (int i = 0; i < n - 1; i++) {
+                    for (int j = 0; j < n - i - 1; j++) {
+                        int sales1 = Integer.parseInt(salesByStore.get(j).split(": ")[1]);
+                        int sales2 = Integer.parseInt(salesByStore.get(j + 1).split(": ")[1]);
+                        if (sales1 < sales2) {
+                            // Swap if the current entry has greater sales than the next entry
+                            String temp = salesByStore.get(j);
+                            salesByStore.set(j, salesByStore.get(j + 1));
+                            salesByStore.set(j + 1, temp);
+                        }
+                    }
+                }
+            }
+        }
+        String output = "";
+        for (String store : salesByStore) {
+            output += store + "...";
+        }
+        return output;
+    }
+
+    public static String dashBoardCheckCust(boolean yesSort, String username, String sortBy) {
+        ArrayList<Product> customerPurchasedProducts = new ArrayList<>();
+        for (Customer customer : customers) {
+            if (customer.getCustomerUserName().equals(username)) {
+                ArrayList<Product> relativeHistory = customer.purchaseHistory;
+                for (Product product : relativeHistory) {
+                    customerPurchasedProducts.add(product);
+                }
+            }
+        }
+        ArrayList<String> salesByStore = new ArrayList<>();
+        for (Seller seller : sellers) {
+            for (Store store : seller.getStores()) {
+                String storeName = store.getName();
+                int storeSales = 0;
+                for (Product product : customerPurchasedProducts) {
+                    if (storeName.equals(product.getStoreName())) {
+                        storeSales += product.getQuantAvailable();
+                    }
+                }
+                salesByStore.add(storeName + ": " + storeSales);
+            }
+        }
+        if (yesSort) {
+            if (sortBy.equals("Low to High")) {
+                int n = salesByStore.size();
+                for (int i = 0; i < n - 1; i++) {
+                    for (int j = 0; j < n - i - 1; j++) {
+                        int sales1 = Integer.parseInt(salesByStore.get(j).split(": ")[1]);
+                        int sales2 = Integer.parseInt(salesByStore.get(j + 1).split(": ")[1]);
+                        if (sales1 > sales2) {
+                            // Swap if the current entry has greater sales than the next entry
+                            String temp = salesByStore.get(j);
+                            salesByStore.set(j, salesByStore.get(j + 1));
+                            salesByStore.set(j + 1, temp);
+                        }
+                    }
+                }
+            } else if (sortBy.equals("High to Low")){
+                int n = salesByStore.size();
+                for (int i = 0; i < n - 1; i++) {
+                    for (int j = 0; j < n - i - 1; j++) {
+                        int sales1 = Integer.parseInt(salesByStore.get(j).split(": ")[1]);
+                        int sales2 = Integer.parseInt(salesByStore.get(j + 1).split(": ")[1]);
+                        if (sales1 < sales2) {
+                            // Swap if the current entry has greater sales than the next entry
+                            String temp = salesByStore.get(j);
+                            salesByStore.set(j, salesByStore.get(j + 1));
+                            salesByStore.set(j + 1, temp);
+                        }
+                    }
+                }
+            }
+        }
+        String output = "";
+        for (String store : salesByStore) {
+            output += store + "...";
+        }
+        return output;
+    }
+
+
+    public synchronized static void writeDataSeller() {
+        ArrayList<Seller> sellerData = sellers ;
+        String sellerName;
+        String storeName;
+        String storeSale;
+        String productName;
+        String productDescription;
+        String productQuant;
+        String productPrice;
+        String productLimit;
+        try {
+            PrintWriter pw = new PrintWriter( new FileOutputStream("SellerInfo.txt"));
+            for (int i = 0; i < sellerData.size(); i++) {
+                sellerName = sellerData.get(i).getUserName();
+                ArrayList<Store> stores = sellerData.get(i).getStores();
+                for (int j = 0; j < stores.size(); j++) {
+                    storeName = stores.get(j).getName();
+                    storeSale = String.valueOf(stores.get(j).getSales());
+                    ArrayList<Product> products = stores.get(j).getProducts();
+                    if (products.size() == 0) {
+                        pw.write(String.format("%s/-%s/-%s/-%s/-%s/-%s/-%s/-%s/-",
+                                sellerName, storeName, storeSale, "N/A", "N/A", "0", "0.0", "0" ));
+                        pw.write("\n");
+                    }
+
+                    for (int k = 0; k < products.size(); k++) {
+                        productName = products.get(k).getName();
+                        productDescription = products.get(k).getDescription();
+                        productQuant = String.valueOf(products.get(k).getQuantAvailable());
+                        productPrice = String.valueOf(products.get(k).getPrice());
+                        productLimit = String.valueOf(products.get(k).getLimit());
+                        ArrayList<String> reviews = new ArrayList<>();
+                        for (int o = 0; o < products.get(k).getReviews().size(); o++ ) {
+                            reviews.add(products.get(k).getReviews().get(o));
+                        }
+                        // tri,tri's store,sales,milk,taro flavour,10,5.4,5,review1,review2
+                        String ans = String.format("%s/-%s/-%s/-%s/-%s/-%s/-%s/-%s/-",
+                                sellerName, storeName, storeSale, productName, productDescription,
+                                productQuant, productPrice, productLimit);
+                        pw.write(ans);
+                        for (int l = 0; l < reviews.size(); l++ ) {
+                            pw.write(reviews.get(l) + "/-");
+                        }
+                        pw.write("\n");
+                    }
+                }
+            }
+            pw.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public synchronized static ArrayList<Seller> readDataSeller() {
+        ArrayList<String> tempList = new ArrayList<>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("SellerInfo.txt"));
+            String line = br.readLine();
+            while (line != null) {
+                tempList.add(line);
+                line = br.readLine();
+            }
+            br.close();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        String nameTemp = "";
+        ArrayList<Seller> sellersTemp = new ArrayList<>();
+        Seller seller;
+        int indexSeller = -1;
+        Store store;
+        String storeName = "";
+        double storeSales;
+        int indexStore = -1;
+        Product product;
+        ArrayList<String> reviewsTemp;
+
+        // tri,tri's store,sales,milk,taro flavour,10,5.4,5,review1,review2
+        for (int i = 0; i < tempList.size(); i++) {
+            String[] arr = (tempList.get(i)).split("/-");
+            // Seller
+            if (nameTemp.equals(arr[0])) {  // check if is still the same Seller
+                if (storeName.equals(arr[1])) {  // check if is still in the same Store
+                    // Product
+                    reviewsTemp = new ArrayList<>();
+                    for (int j = 8; j < arr.length; j++) { // create an ArrayList of reviews
+                        reviewsTemp.add(arr[j]);
+                    }
+                    int intQuantAvail = Integer.parseInt(arr[5]);
+                    double doublePrice = Double.parseDouble(arr[6]);
+                    int intLimit = Integer.parseInt(arr[7]);
+                    product = new Product(arr[3],arr[1],arr[4],intQuantAvail, doublePrice);
+                    product.setReviews(reviewsTemp);
+                    product.setLimit(intLimit);
+                    sellersTemp.get(indexSeller).getStores().get(indexStore).addProduct(product);
+
                 } else {
-                    do {
-                        do {
-                            username = JOptionPane.showInputDialog(null, "Please enter your username('back' to go back).",
-                                    "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                            checkUsername = checkExistingSellerUserName(username,Sellers);
-                            if (username.equals("back")) {
-                                input = false;
-                                break;
-                            }
-                            if (checkUsername) {
-                                JOptionPane.showMessageDialog(null, "The username already exists.",
-                                        "Marketplace", JOptionPane.PLAIN_MESSAGE);
-                                input1 = false;
-                            }
-                        } while (input1);
-                        if (username.equals("back") || (checkUsername)){
-                            input = false;
-                            break;
-                        }
-                        password = JOptionPane.showInputDialog(null, "Please enter your password",
-                                "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                        newUser = createSeller(username,password,Sellers);
-                        input = true;
-                        userReturn = username + "," + password;
-                        returnExists = "true";
-                    } while (!input);
-                    /*toReturn.add(userReturn);
-                    toReturn.add("Seller");
-                    toReturn.add("true");
-                    return toReturn;*/
-                }
-            } while (!input);
-            toReturn.add(userReturn);
-            toReturn.add("Seller");
-            toReturn.add(returnExists);
-            return toReturn;
-        } else if (response.equals("Customer")) {
-            boolean input = false;
-            do {
-                int yn = JOptionPane.showConfirmDialog(null, "Does the account exist?",
-                        "Marketplace", JOptionPane.YES_NO_OPTION);
-                if (yn == 0) {
-                    do {
-                        do {
-                            username = JOptionPane.showInputDialog(null, "Please enter your username('back' to go back).",
-                                    "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                            checkUsername = checkExistingCustomerUserName(username, Customers);
-                            if (username.equals("back")) {
-                                input = false;
-                                break;
-                            }
-                            if (!checkUsername) {
-                                JOptionPane.showMessageDialog(null, "The username is invalid.",
-                                        "Marketplace", JOptionPane.PLAIN_MESSAGE);
-                                input1 = false;
-                            }
-                        } while (input1);
-                        if (username.equals("back") || !(checkUsername)){
-                            break;
-                        }
-                        password = JOptionPane.showInputDialog(null, "Please enter your password",
-                                "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                        input = loginCustomer(username,password,Customers);
-                        newUser = new ClientSide.User(username, password);
-                        userReturn = username + "," + password;
-                        returnExists = "false";
-                    } while (!input);
-                    if (input1) {
-                        /*toReturn.add(userReturn);
-                        toReturn.add("Customer");
-                        toReturn.add("false");
-                        return toReturn;*/
+                    // from new Store
+                    indexStore++;
+                    storeName = arr[1];
+                    storeSales = Double.parseDouble(arr[2]); // from new store
+                    store = new Store(null,storeName);
+                    store.setSales(storeSales); // set Sales of store
+                    sellersTemp.get(indexSeller).createStore(store); // add new Store to seller's stores
+                    // Product
+                    reviewsTemp = new ArrayList<>();
+                    for (int j = 8; j < arr.length; j++) { // create an ArrayList of reviews
+                        reviewsTemp.add(arr[j]);
                     }
-                } else {
-                    do {
+                    int intQuantAvail = Integer.parseInt(arr[5]);
+                    double doublePrice = Double.parseDouble(arr[6]);
+                    int intLimit = Integer.parseInt(arr[7]);
+                    product = new Product(arr[3],arr[1],arr[4],intQuantAvail, doublePrice);
+                    product.setReviews(reviewsTemp);
+                    product.setLimit(intLimit);
+                    // intialize an ArrayList<Product>
+                    sellersTemp.get(indexSeller).getStores().get(indexStore).setProducts(new ArrayList<>());
+                    sellersTemp.get(indexSeller).getStores().get(indexStore).addProduct(product); // add Product
 
-                        do {
-                            username = JOptionPane.showInputDialog(null, "Please enter your username('back' to go back).",
-                                    "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                            checkUsername = checkExistingCustomerUserName(username,Customers);
-                            if (username.equals("back")) {
-                                input = false;
-                                break;
-                            }
-                            if (checkUsername) {
-                                JOptionPane.showMessageDialog(null, "The username already exists.",
-                                        "Marketplace", JOptionPane.PLAIN_MESSAGE);
-                                input1 = false;
-                            }
-                        } while (input1);
-                        if (username.equals("back") || (checkUsername)){
-                            input = false;
-                            break;
-                        }
-                        password = JOptionPane.showInputDialog(null, "Please enter your password",
-                                "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                        newUser = createCustomer(username,password,Customers);
-                        input = true;
-                        userReturn = username + "," + password;
-                        returnExists = "true";
-                    } while (!input);
-                    /*toReturn.add(userReturn);
-                    toReturn.add("Customer");
-                    toReturn.add("true");
-                    return toReturn;*/
                 }
-            } while (!input);
-            toReturn.add(userReturn);
-            toReturn.add("Customer");
-            toReturn.add(returnExists);
-            return toReturn;
+            } else {
+                // from new Seller
+                indexSeller++;
+                indexStore = -1;
+                nameTemp = arr[0];
+                seller = new Seller(null, nameTemp);
+                sellersTemp.add(seller); // add new Seller to List of Sellers
+                if (storeName.equals(arr[1])) {  // check if is still in the same Store
+                    // Product
+                    reviewsTemp = new ArrayList<>();
+                    for (int j = 8; j < tempList.size(); j++) { // create an ArrayList of reviews
+                        reviewsTemp.add(arr[j]);
+                    }
+                    int intQuantAvail = Integer.parseInt(arr[5]);
+                    double doublePrice = Double.parseDouble(arr[6]);
+                    int intLimit = Integer.parseInt(arr[7]);
+                    product = new Product(arr[3],arr[1],arr[4],intQuantAvail, doublePrice);
+                    product.setReviews(reviewsTemp);
+                    product.setLimit(intLimit);
+                    sellersTemp.get(indexSeller).getStores().get(indexStore).addProduct(product); // add new product
+                } else {
+                    // Store
+                    indexStore++;
+                    storeName = arr[1];
+                    storeSales = Double.parseDouble(arr[2]); // from new store
+                    store = new Store(null,storeName);
+                    store.setSales(storeSales); // set Sales of store
+                    sellersTemp.get(indexSeller).setStores(new ArrayList<>()); // initialize an ArrayList<Store>
+                    sellersTemp.get(indexSeller).createStore(store); // add new Store to seller's stores
+                    // Product
+                    reviewsTemp = new ArrayList<>();
+                    for (int j = 8; j < arr.length; j++) { // create an ArrayList of reviews
+                        reviewsTemp.add(arr[j]);
+                    }
+                    int intQuantAvail = Integer.parseInt(arr[5]);
+                    double doublePrice = Double.parseDouble(arr[6]);
+                    int intLimit = Integer.parseInt(arr[7]);
+                    product = new Product(arr[3],arr[1],arr[4],intQuantAvail, doublePrice);
+                    product.setReviews(reviewsTemp);
+                    product.setLimit(intLimit);
+                    // initialize an ArrayList<Product>
+                    sellersTemp.get(indexSeller).getStores().get(indexStore).setProducts(new ArrayList<>());
+                    sellersTemp.get(indexSeller).getStores().get(indexStore).addProduct(product); // add new Product
+                }
+            }
         }
-        return null;
+        MarketplaceServer.sellers = sellersTemp;
+        return sellersTemp;
+    }
+    public synchronized static void writeDataCustomer(){
+        ArrayList<Customer> customersData = customers;
+        try {
+            String custName;
+            String productName;
+            String storeName;
+            String productDescription;
+            String productQuant;
+            String productPrice;
+            String productLimit;
+            PrintWriter pw = new PrintWriter(new FileOutputStream("CustomerInfo.txt"));
+            for (int i = 0; i < customersData.size(); i++) {
+                Customer custTemp = customersData.get(i);
+                custName = custTemp.getCustomerUserName();
+                pw.write(custName + "\n");
+                ArrayList<Product> prodShop = custTemp.getShoppingCar();
+                for (int k = 0; k < prodShop.size(); k++) {
+                    productName = prodShop.get(k).getName();
+                    storeName = prodShop.get(k).getStoreName();
+                    productDescription = prodShop.get(k).getDescription();
+                    productQuant = String.valueOf(prodShop.get(k).getQuantAvailable());
+                    productPrice = String.valueOf(prodShop.get(k).getPrice());
+                    productLimit = String.valueOf(prodShop.get(k).getLimit());
+                    ArrayList<String> reviews = new ArrayList<>();
+                    if (!(prodShop.get(k).getReviews() == null)) {
+                        for (int o = 0; o < prodShop.get(k).getReviews().size(); o++ ) {
+                            reviews.add(prodShop.get(k).getReviews().get(o));
+                        }
+                    }
+                    else {
+                        reviews.add("N/A");
+                    }
+                    // tri,tri's store,sales,milk,taro flavour,10,5.4,5,review1,review2
+                    String ans = String.format("%s/-%s/-%s/-%s/-%s/-%s/-",
+                            productName, storeName, productDescription,
+                            productQuant, productPrice, productLimit);
+                    pw.write(ans);
+                    for (int l = 0; l < reviews.size(); l++ ) {
+                        pw.write(reviews.get(l) + "/-");
+                    }
+                    pw.write("\n");
+                }
+                if (prodShop.size() == 0) {
+                    pw.write("N/A/-N/A/-N/A/-0/-0.0/-0/-\n");
+                    pw.write("change/-value\n");
+                }
+                if (prodShop.size() != 0) {
+                    pw.write("change/-value\n");
+                }
+                ArrayList<Product> prodHistory = custTemp.getPurchaseHistory();
+                for (int k = 0; k < prodHistory.size(); k++) {
+                    productName = prodHistory.get(k).getName();
+                    storeName = prodHistory.get(k).getStoreName();
+                    productDescription = prodHistory.get(k).getDescription();
+                    productQuant = String.valueOf(prodHistory.get(k).getQuantAvailable());
+                    productPrice = String.valueOf(prodHistory.get(k).getPrice());
+                    productLimit = String.valueOf(prodHistory.get(k).getLimit());
+                    ArrayList<String> reviews = new ArrayList<>();
+                    if (prodHistory.get(k).getReviews() == null) {
+                        reviews.add("N/A");
+                    } else {
+                        for (int o = 0; o < prodHistory.get(k).getReviews().size(); o++ ) {
+                            reviews.add(prodHistory.get(k).getReviews().get(o));
+                        }
+                    }
+                    // tri,tri's store,sales,milk,taro flavour,10,5.4,5,review1,review2
+                    String ans = String.format("%s/-%s/-%s/-%s/-%s/-%s/-",
+                            productName, storeName, productDescription,
+                            productQuant, productPrice, productLimit);
+                    pw.write(ans);
+                    for (int l = 0; l < reviews.size(); l++ ) {
+                        pw.write(reviews.get(l) + "/-");
+                    }
+                    if (k == (prodHistory.size()-1) && i == (customersData.size()-1)) {
+                        pw.write("");
+                    } else {
+                        pw.write("\n");
+                    }
+                }
+            }
+            pw.flush();
+            pw.close();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public synchronized static ArrayList<Customer> readDataCustomer() {
+        ArrayList<String> tempList = new ArrayList<>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("CustomerInfo.txt"));
+            String line = br.readLine();
+            while (line != null){
+                tempList.add(line);
+                line = br.readLine();
+            }
+            br.close();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        int index = 0;
+        String custName = "";
+        int indexCust = 0;
+        Customer cust ;
+        ArrayList<Customer> customerTemp = new ArrayList<>();
+        while (index < tempList.size()) {
+            // milk,tri's store,taro flavor,10,5.5,7,review1,review2
+            String[] arr = tempList.get(index).split("/-");
+            if (arr.length == 1) {
+                if (!custName.equals(tempList.get(index)) && !custName.equals("")) {
+                    indexCust++;
+                }
+                custName = tempList.get(index);
+                cust = new Customer(new ArrayList<>(), custName);
+                cust.setPurchaseHistory(new ArrayList<>());
+                customerTemp.add(cust);
+                index++;
+            } else {
+                ArrayList<Product> listShop = new ArrayList<>();
+                while (arr.length != 1 && arr.length != 2 && index < tempList.size() ) {
+                    Product prodShop;
+                    ArrayList<String> reviewsTemp = new ArrayList<>();
+                    for (int j = 6; j < arr.length; j++) { // create an ArrayList of reviews
+                        reviewsTemp.add(arr[j]);
+                    }
+                    int intQuantAvail = Integer.parseInt(arr[3]);
+                    double doublePrice = Double.parseDouble(arr[4]);
+                    int intLimit = Integer.parseInt(arr[5]);
+                    prodShop = new Product(arr[0], arr[1], arr[2], intQuantAvail, doublePrice);
+                    prodShop.setReviews(reviewsTemp);
+                    prodShop.setLimit(intLimit);
+                    listShop.add(prodShop);
+                    // continue on the next line
+                    index++;
+                    try {
+                        arr = tempList.get(index).split("/-");
+                    } catch (IndexOutOfBoundsException e) {
+
+                    }
+                }
+
+                if (arr.length != 1 && arr.length == 2) {
+                    index++;
+                    try {
+                        arr = tempList.get(index).split("/-");
+                    } catch (IndexOutOfBoundsException e) {
+                    }
+                }
+
+                ArrayList<Product> listHist = new ArrayList<>();
+                while (arr.length != 1 && index < tempList.size()) {
+                    Product prodHistory;
+                    ArrayList<String> reviewsTemp = new ArrayList<>();
+                    for (int j = 6; j < arr.length; j++) { // create an ArrayList of reviews
+                        reviewsTemp.add(arr[j]);
+                    }
+                    int intQuantAvail = Integer.parseInt(arr[3]);
+                    double doublePrice = Double.parseDouble(arr[4]);
+                    int intLimit = Integer.parseInt(arr[5]);
+                    prodHistory = new Product(arr[0], arr[1], arr[2], intQuantAvail, doublePrice);
+                    prodHistory.setReviews(reviewsTemp);
+                    prodHistory.setLimit(intLimit);
+                    listHist.add(prodHistory);
+                    index++;
+                    try {
+                        arr = tempList.get(index).split("/-");
+                    } catch (IndexOutOfBoundsException e) {
+                    }
+                }
+                customerTemp.get(indexCust).setShoppingCar(listShop);
+                customerTemp.get(indexCust).setPurchaseHistory(listHist);
+                customerTemp.get(indexCust).setCustomerUserName(custName);
+            }
+        }
+        MarketplaceServer.customers = customerTemp;
+        return customerTemp;
     }
 
-    public static class User implements Serializable{
-        private String username;
-        private String password;
-
-        public User(String username, String password) {
-            this.username = username;
-            this.password = password;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-    }
-
-    public List<ClientSide.User> toUser(List<String> toSwitch) {
-        List<ClientSide.User> toReturn = new ArrayList<>();
-        for (int i = 0; i < toSwitch.size(); i++) {
-            String[] array = toSwitch.get(i).split(",");
-            ClientSide.User user = new ClientSide.User(array[0], array[1]);
-            toReturn.add(i,user);
-        }
-        return toReturn;
-    }
 }
