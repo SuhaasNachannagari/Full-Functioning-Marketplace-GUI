@@ -238,27 +238,31 @@ class WorkFlow extends Thread {
                                     i++;
                                 }
                                 //2nd send to customer, listing of products
-                                if (priceListing.equals("")) {
-                                    pw.write("There are no products" + "\n");
-                                    pw.flush();
-                                } else {
-                                    pw.write(priceListing + "\n");
-                                    pw.flush();
+                                if (priceProducts != null) {
+                                    if (priceListing.equals("")) {
+                                        pw.write("There are no products" + "\n");
+                                        pw.flush();
+                                    } else {
+                                        pw.write(priceListing + "\n");
+                                        pw.flush();
+                                    }
                                 }
                                 //3rd receiving, number of product they want to look at
                                 int num = Integer.parseInt(bfr.readLine());
                                 Product product = priceProducts.get(num - 1);
                                 ArrayList<String> reviews = product.getReviews();
 
-                                String reviewsToAdd = "Reviews:\n";
+                                String reviewsToAdd = "Reviews:...";
 
                                 int j = 1;
                                 for (String review : reviews) {
-                                    reviewsToAdd += String.format(j + ") \"" + review + "\"\n");
-                                    j++;
+                                    if (!review.equals("N/A")) {
+                                        reviewsToAdd += String.format(j + ") \"" + review + "\"...");
+                                        j++;
+                                    }
                                 }
-                                String productDetails = String.format("Name: %s\n" + "Store Name: %s\n" + "Price: %.2f\n" +
-                                                "Quantity Available: %d\n" + "Description: %s\n", "Reviews: %s\n",
+                                String productDetails = String.format("Name: %s..." + "Store Name: %s..." + "Price: %.2f..." +
+                                                "Quantity Available: %d..." + "Description: %s..." + "%s...",
                                         product.getName(),
                                         product.getStoreName(),
                                         product.getPrice(),
@@ -266,7 +270,7 @@ class WorkFlow extends Thread {
                                         product.getDescription(),
                                         reviewsToAdd);
                                 //3rd send to client, the product details
-                                pw.write(productDetails);
+                                pw.write(productDetails + "\n");
                                 pw.flush();
 
                                 //4th receiving from client, useless
@@ -306,14 +310,16 @@ class WorkFlow extends Thread {
                                 ArrayList<Product> quantityProducts = MarketplaceServer.sortProducts(sortBy);
                                 String quantityListing = "";
                                 int i = 1;
-                                for (Product product : quantityProducts) {
-                                    String productToAdd = String.format("%d. Store: %s, Name: %s, Quantity: %d/-",
-                                            i,
-                                            product.getStoreName(),
-                                            product.getName(),
-                                            product.getQuantAvailable());
-                                    quantityListing += productToAdd;
-                                    i++;
+                                if (quantityListing != null) {
+                                    for (Product product : quantityProducts) {
+                                        String productToAdd = String.format("%d. Store: %s, Name: %s, Quantity: %d/-",
+                                                i,
+                                                product.getStoreName(),
+                                                product.getName(),
+                                                product.getQuantAvailable());
+                                        quantityListing += productToAdd;
+                                        i++;
+                                    }
                                 }
                                 //2nd send to customer, listing of products
                                 if (quantityListing.equals("")) {
@@ -328,15 +334,17 @@ class WorkFlow extends Thread {
                                 Product product = quantityProducts.get(num - 1);
                                 ArrayList<String> reviews = product.getReviews();
 
-                                String reviewsToAdd = "Reviews:\n";
+                                String reviewsToAdd = "Reviews:...";
 
                                 int j = 1;
                                 for (String review : reviews) {
-                                    reviewsToAdd += String.format(j + ") \"" + review + "\"\n");
-                                    j++;
+                                    if (!review.equals("N/A")) {
+                                        reviewsToAdd += String.format(j + ") \"" + review + "\"...");
+                                        j++;
+                                    }
                                 }
-                                String productDetails = String.format("Name: %s\n" + "Store Name: %s\n" + "Price: %.2f\n" +
-                                                "Quantity Available: %d\n" + "Description: %s\n", "Reviews: %s\n",
+                                String productDetails = String.format("Name: %s..." + "Store Name: %s..." + "Price: %.2f..." +
+                                                "Quantity Available: %d..." + "Description: %s..." + "%s...",
                                         product.getName(),
                                         product.getStoreName(),
                                         product.getPrice(),
@@ -344,7 +352,7 @@ class WorkFlow extends Thread {
                                         product.getDescription(),
                                         reviewsToAdd);
                                 //3rd send to client, the product details
-                                pw.write(productDetails);
+                                pw.write(productDetails + "\n");
                                 pw.flush();
 
                                 //4th receiving from client, useless
@@ -354,7 +362,7 @@ class WorkFlow extends Thread {
                                 int quantAvailable = product.getQuantAvailable();
 
                                 //4th sending to the client
-                                pw.write("" + limit+"/" + quantAvailable + "\n");
+                                pw.write("" + limit + "/" + quantAvailable + "\n");
                                 pw.flush();
 
                                 //5th receiving action, and review/quantity
@@ -385,15 +393,17 @@ class WorkFlow extends Thread {
                             ArrayList<Product> products = MarketplaceServer.viewProducts();
                             String listing = "";
                             int i = 1;
-                            for (Product product : products) {
-                                String productToAdd = String.format("%d. Store: %s, Name: %s, Price: %.2f, Quantity: %d/-",
-                                        i,
-                                        product.getStoreName(),
-                                        product.getName(),
-                                        product.getPrice(),
-                                        product.getQuantAvailable());
-                                listing += productToAdd;
-                                i++;
+                            if (!(products == null)) {
+                                for (Product product : products) {
+                                    String productToAdd = String.format("%d. Store: %s, Name: %s, Price: %.2f, Quantity: %d/-",
+                                            i,
+                                            product.getStoreName(),
+                                            product.getName(),
+                                            product.getPrice(),
+                                            product.getQuantAvailable());
+                                    listing += productToAdd;
+                                    i++;
+                                }
                             }
                             //1st send to customer, listing of products
                             if (listing.equals("")) {
@@ -408,15 +418,17 @@ class WorkFlow extends Thread {
                             Product product = products.get(num - 1);
                             ArrayList<String> reviews = product.getReviews();
 
-                            String reviewsToAdd = "Reviews:\n";
+                            String reviewsToAdd = "Reviews:...";
 
                             int j = 1;
                             for (String review : reviews) {
-                                reviewsToAdd += String.format(j + ") \"" + review + "\"\n");
-                                j++;
+                                if (!review.equals("N/A")) {
+                                    reviewsToAdd += String.format(j + ") \"" + review + "\"...");
+                                    j++;
+                                }
                             }
-                            String productDetails = String.format("Name: %s\n" + "Store Name: %s\n" + "Price: %.2f\n" +
-                                            "Quantity Available: %d\n" + "Description: %s\n", "Reviews: %s\n",
+                            String productDetails = String.format("Name: %s..." + "Store Name: %s..." + "Price: %.2f..." +
+                                            "Quantity Available: %d..." + "Description: %s..." + "%s...",
                                     product.getName(),
                                     product.getStoreName(),
                                     product.getPrice(),
@@ -424,7 +436,7 @@ class WorkFlow extends Thread {
                                     product.getDescription(),
                                     reviewsToAdd);
                             //2nd send to client, the product details
-                            pw.write(productDetails);
+                            pw.write(productDetails + "\n");
                             pw.flush();
 
                             //3rd receiving from client, useless
@@ -469,15 +481,17 @@ class WorkFlow extends Thread {
                             ArrayList<Product> matchedProducts = MarketplaceServer.searchProducts(search);
                             String results = "";
                             int p = 1;
-                            for (Product matchedProduct : matchedProducts) {
-                                String productToAdd = String.format("%d. Store: %s, Name: %s, Price: %.2f, Quantity: %d/-",
-                                        p,
-                                        matchedProduct.getStoreName(),
-                                        matchedProduct.getName(),
-                                        matchedProduct.getPrice(),
-                                        matchedProduct.getQuantAvailable());
-                                results += productToAdd;
-                                p++;
+                            if (!(matchedProducts == null)) {
+                                for (Product matchedProduct : matchedProducts) {
+                                    String productToAdd = String.format("%d. Store: %s, Name: %s, Price: %.2f, Quantity: %d/-",
+                                            p,
+                                            matchedProduct.getStoreName(),
+                                            matchedProduct.getName(),
+                                            matchedProduct.getPrice(),
+                                            matchedProduct.getQuantAvailable());
+                                    results += productToAdd;
+                                    p++;
+                                }
                             }
                             //2nd send to customer, listing of products
                             if (results.equals("")) {
@@ -486,63 +500,66 @@ class WorkFlow extends Thread {
                             } else {
                                 pw.write(results + "\n");
                                 pw.flush();
-                            }
-                            //3rd receiving, number of product they want to look at
-                            int productNum = Integer.parseInt(bfr.readLine());
-                            Product matchedProduct = matchedProducts.get(productNum - 1);
-                            ArrayList<String> searchReviews = matchedProduct.getReviews();
+                                //3rd receiving, number of product they want to look at
+                                int productNum = Integer.parseInt(bfr.readLine());
+                                Product matchedProduct = matchedProducts.get(productNum - 1);
+                                ArrayList<String> searchReviews = matchedProduct.getReviews();
 
-                            String reviewsAdd = "Reviews:\n";
+                                String reviewsAdd = "Reviews:...";
 
-                            int h = 1;
-                            for (String review : searchReviews) {
-                                reviewsAdd += String.format(h + ") \"" + review + "\"\n");
-                                h++;
-                            }
-                            String detailsProduct = String.format("Name: %s\n" + "Store Name: %s\n" + "Price: %.2f\n" +
-                                            "Quantity Available: %d\n" + "Description: %s\n", "Reviews: %s\n",
-                                    matchedProduct.getName(),
-                                    matchedProduct.getStoreName(),
-                                    matchedProduct.getPrice(),
-                                    matchedProduct.getQuantAvailable(),
-                                    matchedProduct.getDescription(),
-                                    reviewsAdd);
-                            //3rd send to client, the product details
-                            pw.write(detailsProduct);
-                            pw.flush();
-
-                            //4th receiving from client, useless
-                            String uselessThree = bfr.readLine();
-
-                            int searchLimit = matchedProduct.getLimit();
-                            int seachQuant = matchedProduct.getQuantAvailable();
-
-                            //4th sending to the client
-                            pw.write("" + searchLimit + "/" + seachQuant + "\n");
-                            pw.flush();
-
-                            //5th receiving action, and review/quantity
-                            String[] input = bfr.readLine().split(",");
-
-                            if (input[0].equals("Purchase")) {
-                                String purchaseOutput = MarketplaceServer.purchaseItem(matchedProducts, username,
-                                        Integer.parseInt(input[1]), productNum);
-                                //5th sending action, basically just item purchased
-                                pw.write(purchaseOutput + "\n");
+                                int h = 1;
+                                for (String review : searchReviews) {
+                                    if (!review.equals("N/A")) {
+                                        reviewsAdd += String.format(h + ") \"" + review + "\"...");
+                                        h++;
+                                    }
+                                }
+                                String detailsProduct = String.format("Name: %s..." + "Store Name: %s..." + "Price: %.2f..." +
+                                                "Quantity Available: %d..." + "Description: %s..." + "%s...",
+                                        matchedProduct.getName(),
+                                        matchedProduct.getStoreName(),
+                                        matchedProduct.getPrice(),
+                                        matchedProduct.getQuantAvailable(),
+                                        matchedProduct.getDescription(),
+                                        reviewsAdd);
+                                //3rd send to client, the product details
+                                pw.write(detailsProduct + "\n");
                                 pw.flush();
-                            } else if (input[0].equals("Cart")) {
-                                String cartOutput = MarketplaceServer.addToShoppingCart(matchedProducts, username,
-                                        Integer.parseInt(input[1]), productNum);
-                                //5th sending action, basically just item added
-                                pw.write(cartOutput + "\n");
+
+                                //4th receiving from client, useless
+                                String uselessThree = bfr.readLine();
+
+                                int searchLimit = matchedProduct.getLimit();
+                                int seachQuant = matchedProduct.getQuantAvailable();
+
+                                //4th sending to the client
+                                pw.write("" + searchLimit + "/" + seachQuant + "\n");
                                 pw.flush();
-                            } else if (input[0].equals("Review")) {
-                                String reviewOutput = MarketplaceServer.addReview(matchedProducts, input[1],
-                                        productNum);
-                                //5th sending action, basically just review added
-                                pw.write(reviewOutput + "\n");
-                                pw.flush();
+
+                                //5th receiving action, and review/quantity
+                                String[] input = bfr.readLine().split(",");
+
+                                if (input[0].equals("Purchase")) {
+                                    String purchaseOutput = MarketplaceServer.purchaseItem(matchedProducts, username,
+                                            Integer.parseInt(input[1]), productNum);
+                                    //5th sending action, basically just item purchased
+                                    pw.write(purchaseOutput + "\n");
+                                    pw.flush();
+                                } else if (input[0].equals("Cart")) {
+                                    String cartOutput = MarketplaceServer.addToShoppingCart(matchedProducts, username,
+                                            Integer.parseInt(input[1]), productNum);
+                                    //5th sending action, basically just item added
+                                    pw.write(cartOutput + "\n");
+                                    pw.flush();
+                                } else if (input[0].equals("Review")) {
+                                    String reviewOutput = MarketplaceServer.addReview(matchedProducts, input[1],
+                                            productNum);
+                                    //5th sending action, basically just review added
+                                    pw.write(reviewOutput + "\n");
+                                    pw.flush();
+                                }
                             }
+
                             break;
                         case "Shopping Cart":
                             ArrayList<Product> shoppingCart = MarketplaceServer.getCustomerShoppingCart(username);
@@ -619,6 +636,37 @@ class WorkFlow extends Thread {
                             }
                             break;
                         case "Dashboard":
+                            //1st useless send, need another input from user
+                            pw.write("\n");
+                            pw.flush();
+                            //2nd reception from client, what to view and to sort it or not
+                            String[] inputDashboard = bfr.readLine().split(",");
+                            if (inputDashboard[0].equals("Store Sales")) {
+                                if (inputDashboard[1].equals("0")) {
+                                    String dashboard = MarketplaceServer.dashboardCheckSell(true);
+                                    //2nd send to client, wresult
+                                    pw.write(dashboard + "\n");
+                                    pw.flush();
+                                } else {
+                                    String dashboard = MarketplaceServer.dashboardCheckSell(false);
+                                    //2nd send to client, wresult
+                                    pw.write(dashboard + "\n");
+                                    pw.flush();
+                                }
+                            } else {
+                                if (inputDashboard[1].equals("0")) {
+                                    String dashboard = MarketplaceServer.dashBoardCheckCust(true, username);
+                                    //2nd send to client, wresult
+                                    pw.write(dashboard + "\n");
+                                    pw.flush();
+                                } else {
+                                    String dashboard = MarketplaceServer.dashBoardCheckCust(false, username);
+                                    //2nd send to client, wresult
+                                    pw.write(dashboard + "\n");
+                                    pw.flush();
+
+                                }
+                            }
                             break;
                     }
                 }
