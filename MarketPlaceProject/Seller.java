@@ -11,7 +11,6 @@ import java.io.Serializable;
 public class Seller {
     private String userName;
     ArrayList<Store> stores = new ArrayList();
-
     //tri: used to create new Seller in main class
     public Seller(ArrayList<Store> stores, String username) {
         this.stores = stores;
