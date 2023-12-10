@@ -26,7 +26,7 @@ public class ClientSide extends Thread {
         try {
             System.out.println("check1");
             InetAddress ia = InetAddress.getByName("localhost");
-            socket = new Socket(ia, 4242);
+            socket = new Socket(ia,  4242);
             bfr = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             pw = new PrintWriter(socket.getOutputStream());
             System.out.println("check2");
@@ -645,13 +645,12 @@ public class ClientSide extends Thread {
                             case "View":
                                 //1st receiving from the server
                                 String listingText = bfr.readLine();
-
                                 if (!(listingText.equals("There are no products"))) {
                                     String[] productOptions = listingText.split("/-");
                                     String productNum = "";
                                     productNum = "" + ((String) JOptionPane.showInputDialog(null,
                                             "Here are the products in this marketplace",
-                                            "Price Sorted Products", JOptionPane.QUESTION_MESSAGE,
+                                            "View Products", JOptionPane.QUESTION_MESSAGE,
                                             null, productOptions, productOptions[0])).charAt(0);
                                     if (productNum == null) {
                                         throw new Exception();
