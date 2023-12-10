@@ -253,7 +253,7 @@ class WorkFlow extends Thread {
                                 if (sortOption[0].equals("Price")) {
                                     sortBy = 1;
                                     ArrayList<Product> priceProducts = MarketplaceServer.sortProducts(sortBy, sortOption[1]);
-                                    String priceListing = "";
+                                    String priceListing = "Refresh Page/-";
                                     int i = 1;
                                     for (Product product : priceProducts) {
                                         String productToAdd = String.format("%d. Store: %s, Name: %s, Price: %.2f/-",
