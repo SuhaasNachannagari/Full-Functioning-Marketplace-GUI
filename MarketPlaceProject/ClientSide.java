@@ -381,7 +381,7 @@ public class ClientSide extends Thread {
                     }
                 }
                 if (checkUser == 0) {
-                    String[] showOptions = {"Sort", "View", "Search", "Shopping Cart", "Purchase History", "Dashboard"};
+                                        String[] showOptions = {"Sort", "View", "Search", "Shopping Cart", "Purchase History", "Dashboard"};
                     String option = (String) (JOptionPane.showInputDialog(null, "What do you want to do?",
                             "Choice", JOptionPane.QUESTION_MESSAGE, null, showOptions, showOptions[0]));
                     if (option == null) {
@@ -394,9 +394,12 @@ public class ClientSide extends Thread {
                         case "Sort":
                             // 1st reception from server, don't really need anything
                             String useless = bfr.readLine();
-                            String[] priceOrQuantity = {"Price", "Quantity"};
+                            String[] priceOrQuantity = {"Price: Low To High", "Price: High To Low", "Quantity: Low To High", "Quantity: High To Low"};
                             String sortOption = (String) JOptionPane.showInputDialog(null, "How do you want to sort?",
                                     "Sort Choice", JOptionPane.QUESTION_MESSAGE, null, priceOrQuantity, priceOrQuantity[0]);
+                            if (sortOption == null) {
+                                throw new Exception();
+                            }
                             //2nd send to server, sends sortoption
                             pw.write(sortOption + "\n");
                             pw.flush();
@@ -411,6 +414,9 @@ public class ClientSide extends Thread {
                                             "Here are your products sorted by price",
                                             "Price Sorted Products", JOptionPane.QUESTION_MESSAGE, null,
                                             productOptions, productOptions[0])).charAt(0);
+                                    if (productNum == null) {
+                                        throw new Exception();
+                                    }
                                     //3rd sending, which product would the consumer like to look at
 
                                     pw.write(productNum + "\n");
@@ -420,6 +426,9 @@ public class ClientSide extends Thread {
                                             "Here are your products sorted by quantity",
                                             "Quantity Sorted Products", JOptionPane.QUESTION_MESSAGE, null,
                                             productOptions, productOptions[0])).charAt(0);
+                                    if (productNum == null) {
+                                        throw new Exception();
+                                    }
                                     //3rd sending, which product would the consumer like to look at
                                     pw.write(productNum + "\n");
                                     pw.flush();
@@ -446,6 +455,9 @@ public class ClientSide extends Thread {
                                         "What do you want to do with this product?",
                                         "Product", JOptionPane.QUESTION_MESSAGE, null,
                                         actionsWithProduct, actionsWithProduct[0]);
+                                if (actionWithProduct == null) {
+                                    throw new Exception();
+                                }
                                 if (actionWithProduct.equals("Purchase Product")) {
                                     boolean isNotValidInt = true;
                                     int quantity = 0;
@@ -577,6 +589,9 @@ public class ClientSide extends Thread {
                                         "Here are the products in this marketplace",
                                         "Price Sorted Products", JOptionPane.QUESTION_MESSAGE,
                                         null, productOptions, productOptions[0])).charAt(0);
+                                if (productNum == null) {
+                                    throw new Exception();
+                                }
                                 //2nd sending, which product would the consumer like to look at
                                 pw.write(productNum + "\n");
                                 pw.flush();
@@ -601,6 +616,9 @@ public class ClientSide extends Thread {
                                         "What do you want to do with this product?",
                                         "Product", JOptionPane.QUESTION_MESSAGE, null,
                                         actionsWithProduct, actionsWithProduct[0]);
+                                if (actionWithProduct == null) {
+                                    throw new Exception();
+                                }
                                 if (actionWithProduct.equals("Purchase Product")) {
                                     boolean isNotValidInt = true;
                                     int quantity = 0;
@@ -743,6 +761,9 @@ public class ClientSide extends Thread {
                                         "Here are the products that match your search",
                                         "Search Results", JOptionPane.QUESTION_MESSAGE, null,
                                         productOptions, productOptions[0])).charAt(0);
+                                if (productNum == null) {
+                                    throw new Exception();
+                                }
                                 //3rd sending, which product would the consumer like to look at
                                 pw.write(productNum + "\n");
                                 pw.flush();
@@ -868,6 +889,9 @@ public class ClientSide extends Thread {
                                     String review = JOptionPane.showInputDialog(null,
                                             "Add Your Review", "Review Form",
                                             JOptionPane.QUESTION_MESSAGE);
+                                    if (review == null) {
+                                        throw new Exception();
+                                    }
                                     //5th sending to the ServerSide
                                     pw.write("Review," + review + "\n");
                                     pw.flush();
@@ -900,10 +924,16 @@ public class ClientSide extends Thread {
                                 String cartOption = (String) JOptionPane.showInputDialog(null,
                                         "What would you like to do?", "Shopping Cart",
                                         JOptionPane.QUESTION_MESSAGE, null, cartOptions, cartOptions[0]);
+                                if (cartOption == null) {
+                                    throw new Exception();
+                                }
                                 if (cartOption.equals("Remove From Cart")) {
                                     String remove = (String) JOptionPane.showInputDialog(null,
                                             "Which product would you like to remove?", "Shopping Cart",
                                             JOptionPane.QUESTION_MESSAGE, null, cartProducts, cartProducts[0]);
+                                    if (remove == null) {
+                                        throw new Exception();
+                                    }
                                     String removeTwo = remove.replace('.','~');
                                     String removeNum = removeTwo.split("~")[0];
                                     //2nd sending to server, what to do with shopping cart
@@ -939,6 +969,9 @@ public class ClientSide extends Thread {
                                 int exportFile = JOptionPane.showConfirmDialog(null,
                                         "Would you like to export this file?", "Purchase History",
                                         JOptionPane.YES_NO_OPTION);
+                                if (exportFile == -1) {
+                                    throw new Exception();
+                                }
                                 if (exportFile == 0) {
                                     String filename = JOptionPane.showInputDialog(
                                             null,
@@ -972,9 +1005,24 @@ public class ClientSide extends Thread {
                             String viewBy = (String) JOptionPane.showInputDialog(null,
                                     "How would you like to view your dashboard?", "Dashboard",
                                     JOptionPane.QUESTION_MESSAGE, null, viewByOptions, viewByOptions[0]);
-                            int sortBy = JOptionPane.showConfirmDialog(null,
+                            if (viewBy == null) {
+                                throw new Exception();
+                            }
+                            int sortQuestion = JOptionPane.showConfirmDialog(null,
                                     "Would you like to sort the results?", "Dashboard", JOptionPane.YES_NO_OPTION);
-                            String sendToServer = viewBy + "," + sortBy;
+                            if (sortQuestion == -1) {
+                                throw new Exception();
+                            }
+                            String[] sortByOptions = {"Low to High", "High to Low"};
+                            String sortBy  = null;
+                            if (sortQuestion == 0) {
+                                sortBy = (String) JOptionPane.showInputDialog(null, "How would you like to sort?",
+                                        "Dashboard", JOptionPane.QUESTION_MESSAGE, null, sortByOptions, sortByOptions[0]);
+                                if (sortBy == null) {
+                                    throw new Exception();
+                                }
+                            }
+                            String sendToServer = viewBy + "," + sortQuestion + "," + sortBy;
                             ////2nd send to server, actions
                             pw.write(sendToServer + "\n");
                             pw.flush();
@@ -998,6 +1046,7 @@ public class ClientSide extends Thread {
                             break;
                     }
                 }
+
             } catch (Exception e) {
                 break;
             }
