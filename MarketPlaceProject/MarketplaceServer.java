@@ -10,6 +10,11 @@ import java.util.Scanner;
 public class MarketplaceServer {
     public static ArrayList<Seller> sellers = new ArrayList<>();
     public static ArrayList<Customer> customers = new ArrayList<>();
+
+    public synchronized static void createCustomer(Customer customer) {
+        customers.add(customer);
+    }
+    
     public static String showStore(String username) {
         Seller seller = null;
         for (Seller sellerTemp: sellers) {
@@ -1006,6 +1011,7 @@ public class MarketplaceServer {
             fileName = fileName.replace(".", "~");
             fileName = fileName.split("~")[0];
         }
+        fileName += ".txt";
         try (FileWriter fw = new FileWriter(fileName)) {
             // write header
             fw.append(username + "'s " + "Purchase history:\n");
@@ -1028,7 +1034,7 @@ public class MarketplaceServer {
         return ("Export successful!");
     }
 
-    public synchronized static String dashboardCheckSell(boolean yesSort) {
+public synchronized static String dashboardCheckSell(boolean yesSort, String sortBy) {
         ArrayList<Product> allProducts = new ArrayList<>();
         for (Customer customer : customers) {
             ArrayList<Product> relativeHistory = customer.purchaseHistory;
@@ -1052,16 +1058,32 @@ public class MarketplaceServer {
             }
         }
         if (yesSort) {
-            int n = salesByStore.size();
-            for (int i = 0; i < n - 1; i++) {
-                for (int j = 0; j < n - i - 1; j++) {
-                    int sales1 = Integer.parseInt(salesByStore.get(j).split(": ")[1]);
-                    int sales2 = Integer.parseInt(salesByStore.get(j + 1).split(": ")[1]);
-                    if (sales1 > sales2) {
-                        // Swap if the current entry has greater sales than the next entry
-                        String temp = salesByStore.get(j);
-                        salesByStore.set(j, salesByStore.get(j + 1));
-                        salesByStore.set(j + 1, temp);
+            if (sortBy.equals("Low to High")) {
+                int n = salesByStore.size();
+                for (int i = 0; i < n - 1; i++) {
+                    for (int j = 0; j < n - i - 1; j++) {
+                        int sales1 = Integer.parseInt(salesByStore.get(j).split(": ")[1]);
+                        int sales2 = Integer.parseInt(salesByStore.get(j + 1).split(": ")[1]);
+                        if (sales1 > sales2) {
+                            // Swap if the current entry has greater sales than the next entry
+                            String temp = salesByStore.get(j);
+                            salesByStore.set(j, salesByStore.get(j + 1));
+                            salesByStore.set(j + 1, temp);
+                        }
+                    }
+                }
+            } else if (sortBy.equals("High to Low")) {
+                int n = salesByStore.size();
+                for (int i = 0; i < n - 1; i++) {
+                    for (int j = 0; j < n - i - 1; j++) {
+                        int sales1 = Integer.parseInt(salesByStore.get(j).split(": ")[1]);
+                        int sales2 = Integer.parseInt(salesByStore.get(j + 1).split(": ")[1]);
+                        if (sales1 < sales2) {
+                            // Swap if the current entry has greater sales than the next entry
+                            String temp = salesByStore.get(j);
+                            salesByStore.set(j, salesByStore.get(j + 1));
+                            salesByStore.set(j + 1, temp);
+                        }
                     }
                 }
             }
@@ -1073,7 +1095,7 @@ public class MarketplaceServer {
         return output;
     }
 
-    public synchronized static String dashBoardCheckCust(boolean yesSort, String username) {
+    public synchronized static String dashBoardCheckCust(boolean yesSort, String username, String sortBy) {
         ArrayList<Product> customerPurchasedProducts = new ArrayList<>();
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
@@ -1097,16 +1119,32 @@ public class MarketplaceServer {
             }
         }
         if (yesSort) {
-            int n = salesByStore.size();
-            for (int i = 0; i < n - 1; i++) {
-                for (int j = 0; j < n - i - 1; j++) {
-                    int sales1 = Integer.parseInt(salesByStore.get(j).split(": ")[1]);
-                    int sales2 = Integer.parseInt(salesByStore.get(j + 1).split(": ")[1]);
-                    if (sales1 > sales2) {
-                        // Swap if the current entry has greater sales than the next entry
-                        String temp = salesByStore.get(j);
-                        salesByStore.set(j, salesByStore.get(j + 1));
-                        salesByStore.set(j + 1, temp);
+            if (sortBy.equals("Low to High")) {
+                int n = salesByStore.size();
+                for (int i = 0; i < n - 1; i++) {
+                    for (int j = 0; j < n - i - 1; j++) {
+                        int sales1 = Integer.parseInt(salesByStore.get(j).split(": ")[1]);
+                        int sales2 = Integer.parseInt(salesByStore.get(j + 1).split(": ")[1]);
+                        if (sales1 > sales2) {
+                            // Swap if the current entry has greater sales than the next entry
+                            String temp = salesByStore.get(j);
+                            salesByStore.set(j, salesByStore.get(j + 1));
+                            salesByStore.set(j + 1, temp);
+                        }
+                    }
+                }
+            } else if (sortBy.equals("High to Low")){
+                int n = salesByStore.size();
+                for (int i = 0; i < n - 1; i++) {
+                    for (int j = 0; j < n - i - 1; j++) {
+                        int sales1 = Integer.parseInt(salesByStore.get(j).split(": ")[1]);
+                        int sales2 = Integer.parseInt(salesByStore.get(j + 1).split(": ")[1]);
+                        if (sales1 < sales2) {
+                            // Swap if the current entry has greater sales than the next entry
+                            String temp = salesByStore.get(j);
+                            salesByStore.set(j, salesByStore.get(j + 1));
+                            salesByStore.set(j + 1, temp);
+                        }
                     }
                 }
             }
