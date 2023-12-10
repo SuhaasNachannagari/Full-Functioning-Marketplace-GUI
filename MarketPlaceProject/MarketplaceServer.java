@@ -10,12 +10,7 @@ import java.util.Scanner;
 public class MarketplaceServer {
     public static ArrayList<Seller> sellers = new ArrayList<>();
     public static ArrayList<Customer> customers = new ArrayList<>();
-
-    public synchronized static void createCustomer(Customer customer) {
-        customers.add(customer);
-    }
-    
-    public static String showStore(String username) {
+    public synchronized static String showStore(String username) {
         Seller seller = null;
         for (Seller sellerTemp: sellers) {
             if (sellerTemp.getUserName().equals(username)) {
@@ -34,7 +29,7 @@ public class MarketplaceServer {
             return showStores;
         }
     }
-    public static String showProducts(String storeName, String username) {
+    public synchronized static String showProducts(String storeName, String username) {
         Seller seller = null;
         for (Seller sellerTemp: sellers) {
             if (sellerTemp.getUserName().equals(username)) {
@@ -54,7 +49,7 @@ public class MarketplaceServer {
         }
         return null;
     }
-    public static String deleteDeleteProduct(String storeChoice, String productName, String username) {
+    public synchronized static String deleteDeleteProduct(String storeChoice, String productName, String username) {
         Seller seller = null;
         int sellerIndex = 0;
         for (int i = 0; i < sellers.size(); i++) {
@@ -93,7 +88,7 @@ public class MarketplaceServer {
             return "Product deleted!";
         }
     }
-    public static String checkNoProductMessage(String storeChoice, String username) {
+    public synchronized static String checkNoProductMessage(String storeChoice, String username) {
         Seller seller = null;
         for (Seller sellerTemp: sellers) {
             if (sellerTemp.getUserName().equals(username)) {
@@ -110,7 +105,7 @@ public class MarketplaceServer {
         }
         return null;
     }
-    public static String editProduct(String storeChoice, String productChoice, String choice, String valueChange, String username) {
+    public synchronized static String editProduct(String storeChoice, String productChoice, String choice, String valueChange, String username) {
         Seller seller = null;
         int sellerIndex = 0;
         for (int i = 0; i < sellers.size(); i++) {
@@ -162,7 +157,7 @@ public class MarketplaceServer {
 
         return "Product Edited";
     }
-    public static String showAllStore(String username) {
+    public synchronized static String showAllStore(String username) {
         Seller seller = null;
         for (Seller sellerTemp: sellers) {
             if (sellerTemp.getUserName().equals(username)) {
@@ -178,7 +173,7 @@ public class MarketplaceServer {
         showStores += ( (seller.getStores().size() + 1) + "." + "Create new store");
         return showStores;
     }
-    public static String createStoreNA(String storeName, String username) {
+    public synchronized static String createStoreNA(String storeName, String username) {
         int sellerIndex = 0;
         for (int i = 0; i < sellers.size(); i++) {
             if (sellers.get(i).getUserName().equals(username)) {
@@ -190,7 +185,7 @@ public class MarketplaceServer {
         sellers.get(sellerIndex).getStores().get(0).setSales(0);
         return ("Store created!");
     }
-    public static String createStore(String storeName, String username) {
+    public synchronized static String createStore(String storeName, String username) {
         Seller seller = null;
         int sellerIndex = 0;
         for (int i = 0; i < sellers.size(); i++) {
@@ -205,7 +200,7 @@ public class MarketplaceServer {
         sellers.get(sellerIndex).getStores().get(storeIndex).setSales(0);
         return ("Store created!");
     }
-    public static boolean checkProductName(String storeChoice, String productName, String username) {
+    public synchronized static boolean checkProductName(String storeChoice, String productName, String username) {
         Seller seller = null;
         for (int i = 0; i < sellers.size(); i++) {
             if (sellers.get(i).getUserName().equals(username)) {
@@ -224,7 +219,7 @@ public class MarketplaceServer {
         }
         return true;
     }
-    public static String createProduct(String storeChoice, String prodName, String prodDes, String prodQuant,
+    public synchronized static String createProduct(String storeChoice, String prodName, String prodDes, String prodQuant,
                                        String prodPrice, String prodLimit, String username ) {
         Seller seller = null;
         int sellerIndex = 0;
@@ -268,7 +263,7 @@ public class MarketplaceServer {
         }
         return null;
     }
-    public static String viewStores(String username) {
+    public synchronized static String viewStores(String username) {
         int sellerIndex = 0;
         for (int i = 0; i < sellers.size(); i++) {
             if (sellers.get(i).getUserName().equals(username)) {
@@ -282,24 +277,24 @@ public class MarketplaceServer {
         } else {
             for (Store store : sellers.get(sellerIndex).getStores()) {
                 salesByStores += store.getName() + ":/-";
-                double totalSale = 0;
+                int totalSale = 0;
                 for (Customer cust : customers) {
                     ArrayList<Product> purchaseTemp = cust.getPurchaseHistory();
                     for (int i = 0; i < purchaseTemp.size(); i++) {
                         if (store.getName().equals(purchaseTemp.get(i).getStoreName())) {
-                            totalSale += purchaseTemp.get(i).getPrice();
+                            totalSale += purchaseTemp.get(i).getQuantAvailable();
                             double revenue = (purchaseTemp.get(i).getPrice() * purchaseTemp.get(i).getQuantAvailable());
                             salesByStores += String.format("Customer name: %s     Product: %s     Revenue: %.2f/-",
                                     cust.getCustomerUserName(), purchaseTemp.get(i).getName(), revenue);
                         }
                     }
                 }
-                salesByStores += "Total Sales: " + totalSale + "/-";
+                salesByStores += "Total Sales: " + totalSale + " product(s)/-";
             }
         }
         return salesByStores;
     }
-    public static String viewShoppingCart(String username) {
+    public synchronized static String viewShoppingCart(String username) {
         int sellerIndex = 0;
         for (int i = 0; i < sellers.size(); i++) {
             if (sellers.get(i).getUserName().equals(username)) {
@@ -328,6 +323,96 @@ public class MarketplaceServer {
             }
         }
         return shoppingCartResult;
+    }
+    public synchronized static String saveToFileProduct(String storeName, String username, String fileName) {
+        for (int i = 0; i < sellers.size(); i++) {
+            if (sellers.get(i).getUserName().equals(username)) {
+                for( int j = 0; j < sellers.get(i).getStores().size(); j++) {
+                    if (sellers.get(i).getStores().get(j).getName().equals(storeName.substring(2))) {
+                        for(int k = 0; k < sellers.get(i).getStores().get(j).getProducts().size(); k++) {
+                            Product product = sellers.get(i).getStores().get(j).getProducts().get(k);
+                            sellers.get(i).saveToFileProduct(product, fileName);
+                        }
+                    }
+                }
+            }
+        }
+        return "Saved to File";
+    }
+    public synchronized static String loadFromFileProduct(String fileName) {
+        ArrayList<String> productData = new ArrayList<>();
+        ArrayList<String> sellerInfo = new ArrayList<>();
+        writeDataSeller();
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName)) ){
+            String line;
+            while ((line = reader.readLine()) != null) {
+                productData.add(line);
+            }
+            if(productData == null || productData.isEmpty()) {
+                return "No data in file!";
+            } else {
+                PrintWriter pwr = new PrintWriter(new FileOutputStream("SellerInfo.txt", true), true);
+                for (int i = 1; i < productData.size(); i++) { //start from one cuz the first line is the title.
+                    String[] parts = productData.get(i).split(",");
+                    String toSellerInfo = "";
+                    for (int j = 0; j < parts.length; j++) {
+                        if (j == 0) {
+                            toSellerInfo += parts[j];
+                        } else if (j == 2) {
+                            toSellerInfo += "/-0.0/-" + parts[j];
+                        } else if (j == (parts.length-1)) {
+                            String[] reviews = parts[j].split("/");
+                            for (String review : reviews) {
+                                toSellerInfo += "/-" + review;
+                            }
+                            toSellerInfo += "/-";
+                        } else {
+                            toSellerInfo += "/-" + parts[j];
+                        }
+                    }
+                    sellerInfo.add(toSellerInfo);
+                }
+                for (String product : sellerInfo) {
+                    pwr.println(product);
+                }
+                pwr.flush();
+                pwr.close();
+                ArrayList<String[]> products = new ArrayList<>();
+                BufferedReader br = new BufferedReader(new FileReader("SellerInfo.txt"));
+                String arrangeLine;
+                while ((arrangeLine = br.readLine()) != null) {
+                    String[] parts = arrangeLine.split("/-");
+                    products.add(parts);
+                }
+                br.close();
+                int n = products.size();
+                for (int i = 0; i < n - 1; i++) {
+                    for (int j = 0; j < n - i - 1; j++) {
+                        String[] current = products.get(j);
+                        String[] next = products.get(j + 1);
+                        if (current[0].compareTo(next[0]) > 0 ||
+                                (current[0].equals(next[0]) && current[1].compareTo(next[1]) > 0)) {
+                            products.set(j, next);
+                            products.set(j + 1, current);
+                        }
+                    }
+                }
+                BufferedWriter bw = new BufferedWriter(new FileWriter("SellerInfo.txt", false));
+                for (String[] product : products) {
+                    bw.write(String.join("/-", product));
+                    bw.newLine();
+                }
+                bw.flush();
+                bw.close();
+                sellers = readDataSeller();
+                System.out.println("File imported success");
+            }
+            return "Imported succeed!";
+
+        } catch (IOException ex) {
+            return "File doesn't exist!";
+        }
+        //System.out.println("User data loaded from " + "filler.txt");
     }
 
     public synchronized static ArrayList<Product> searchProducts(String search) {
@@ -1072,14 +1157,14 @@ public class MarketplaceServer {
         ArrayList<String> salesByStore = new ArrayList<>();
         for (Seller seller : sellers) {
             for (Store store : seller.getStores()) {
-                 String storeName = store.getName();
-                 int storeSales = 0;
-                 for (Product product : allProducts) {
-                     if (storeName.equals(product.getStoreName())) {
-                         storeSales += product.getQuantAvailable();
-                     }
-                 }
-                 salesByStore.add(storeName + ": " + storeSales);
+                String storeName = store.getName();
+                int storeSales = 0;
+                for (Product product : allProducts) {
+                    if (storeName.equals(product.getStoreName())) {
+                        storeSales += product.getQuantAvailable();
+                    }
+                }
+                salesByStore.add(storeName + ": " + storeSales);
             }
         }
         if (yesSort) {
@@ -1180,8 +1265,9 @@ public class MarketplaceServer {
         }
         return output;
     }
-    
-    public static void writeDataSeller() {
+
+
+    public synchronized static void writeDataSeller() {
         ArrayList<Seller> sellerData = sellers ;
         String sellerName;
         String storeName;
@@ -1233,7 +1319,7 @@ public class MarketplaceServer {
             throw new RuntimeException(e);
         }
     }
-    public static ArrayList<Seller> readDataSeller() {
+    public synchronized static ArrayList<Seller> readDataSeller() {
         ArrayList<String> tempList = new ArrayList<>();
         try {
             BufferedReader br = new BufferedReader(new FileReader("SellerInfo.txt"));
