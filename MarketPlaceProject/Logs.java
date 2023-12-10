@@ -10,6 +10,7 @@ public class Logs{
 
     public Logs() {}
 
+
     public void saveToCustomerFile(User user) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("CustomerLoginDetails.txt", true))) {
             String toFile = user.getUsername() + "," + user.getPassword() + "\n";
@@ -19,14 +20,13 @@ public class Logs{
         }
     }
 
-    public List<User> loadFromCustomerFile() {
-        List<User> Customers = new ArrayList<>();
+    public List<String> loadFromCustomerFile() {
+        List<String> Customers = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader("CustomerLoginDetails.txt")) ){
             String line;
             while ((line = reader.readLine()) != null && !(line.isEmpty())) {
-                String[] userdet = line.split(",");
-                User user = new User(userdet[0], userdet[1]);
-                Customers.add(user);
+                String userdet = line;
+                Customers.add(line);
             }
             return Customers;
         } catch (IOException ex) {
@@ -93,14 +93,12 @@ public class Logs{
         }
     }
 
-    public List<User> loadFromSellerFile() {
+    public List<String> loadFromSellerFile() {
         try (BufferedReader reader = new BufferedReader(new FileReader("SellerLoginDetails.txt")) ){
             String line;
-            List<User> Sellers = new ArrayList<>();
+            List<String> Sellers = new ArrayList<>();
             while ((line = reader.readLine()) != null && !(line.isEmpty())) {
-                String[] userdet = line.split(",");
-                User user = new User(userdet[0], userdet[1]);
-                Sellers.add(user);
+                Sellers.add(line);
             }
             return Sellers;
         } catch (IOException ex) {
@@ -304,10 +302,6 @@ public class Logs{
             } while (!input);
         }
         return null;
-    }
-
-    public String getUsername() {
-        return username;
     }
 
     public static void main(String[] args) {}
