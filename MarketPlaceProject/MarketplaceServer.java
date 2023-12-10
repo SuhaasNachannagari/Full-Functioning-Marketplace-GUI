@@ -357,7 +357,7 @@ public class MarketplaceServer {
         return matchingProducts;
     }
 
-    public synchronized static ArrayList<Product> sortProducts(int sortType) {
+    public synchronized static ArrayList<Product> sortProducts(int sortType, String sortBy) {
         ArrayList<Product> quantityListedProducts = new ArrayList<>();
         ArrayList<Product> priceListedProducts = new ArrayList<>();
         //below is sorting by quantity
@@ -370,13 +370,26 @@ public class MarketplaceServer {
                 }
             }
         }
-        for (int i = 1; i < quantityListedProducts.size(); i++) {
-            for (int j = 0; j < i; j++) {
-                if (quantityListedProducts.get(i).getQuantAvailable() <
-                        quantityListedProducts.get(j).getQuantAvailable()) {
-                    Product smallerproduct = quantityListedProducts.get(i);
-                    quantityListedProducts.set(i, quantityListedProducts.get(j));
-                    quantityListedProducts.set(j, smallerproduct);
+        if (sortBy.equals(" Low To High")) {
+            for (int i = 1; i < quantityListedProducts.size(); i++) {
+                for (int j = 0; j < i; j++) {
+                    if (quantityListedProducts.get(i).getQuantAvailable() <
+                            quantityListedProducts.get(j).getQuantAvailable()) {
+                        Product smallerproduct = quantityListedProducts.get(i);
+                        quantityListedProducts.set(i, quantityListedProducts.get(j));
+                        quantityListedProducts.set(j, smallerproduct);
+                    }
+                }
+            }
+        } else {
+            for (int i = 1; i < quantityListedProducts.size(); i++) {
+                for (int j = 0; j < i; j++) {
+                    if (quantityListedProducts.get(i).getQuantAvailable() >
+                            quantityListedProducts.get(j).getQuantAvailable()) {
+                        Product largerProduct = quantityListedProducts.get(i);
+                        quantityListedProducts.set(i, quantityListedProducts.get(j));
+                        quantityListedProducts.set(j, largerProduct);
+                    }
                 }
             }
         }
@@ -390,14 +403,27 @@ public class MarketplaceServer {
                 }
             }
         }
-        for (int i = 1; i < priceListedProducts.size(); i++) {
-            for (int j = 0; j < i; j++) {
-                if (priceListedProducts.get(i).getPrice() < priceListedProducts.get(j).getPrice()) {
-                    Product smallerproduct = priceListedProducts.get(i);
-                    priceListedProducts.set(i, priceListedProducts.get(j));
-                    priceListedProducts.set(j, smallerproduct);
+        if (sortBy.equals(" Low To High")) {
+            for (int i = 1; i < priceListedProducts.size(); i++) {
+                for (int j = 0; j < i; j++) {
+                    if (priceListedProducts.get(i).getPrice() < priceListedProducts.get(j).getPrice()) {
+                        Product smallerproduct = priceListedProducts.get(i);
+                        priceListedProducts.set(i, priceListedProducts.get(j));
+                        priceListedProducts.set(j, smallerproduct);
+                    }
                 }
             }
+        } else {
+            for (int i = 1; i < priceListedProducts.size(); i++) {
+                for (int j = 0; j < i; j++) {
+                    if (priceListedProducts.get(i).getPrice() > priceListedProducts.get(j).getPrice()) {
+                        Product largerProduct = priceListedProducts.get(i);
+                        priceListedProducts.set(i, priceListedProducts.get(j));
+                        priceListedProducts.set(j, largerProduct);
+                    }
+                }
+            }
+
         }
         //below is returning the proper arraylist
         if (sortType == 1) {
@@ -1011,8 +1037,7 @@ public class MarketplaceServer {
             fileName = fileName.replace(".", "~");
             fileName = fileName.split("~")[0];
         }
-        fileName += ".txt";
-        try (FileWriter fw = new FileWriter(fileName)) {
+        try (FileWriter fw = new FileWriter(fileName + ".txt")) {
             // write header
             fw.append(username + "'s " + "Purchase history:\n");
             fw.append("Name/Description/Price/Quantity Bought\n");
@@ -1034,7 +1059,7 @@ public class MarketplaceServer {
         return ("Export successful!");
     }
 
-public synchronized static String dashboardCheckSell(boolean yesSort, String sortBy) {
+    public synchronized static String dashboardCheckSell(boolean yesSort, String sortBy) {
         ArrayList<Product> allProducts = new ArrayList<>();
         for (Customer customer : customers) {
             ArrayList<Product> relativeHistory = customer.purchaseHistory;
@@ -1155,7 +1180,7 @@ public synchronized static String dashboardCheckSell(boolean yesSort, String sor
         }
         return output;
     }
-
+    
     public static void writeDataSeller() {
         ArrayList<Seller> sellerData = sellers ;
         String sellerName;
