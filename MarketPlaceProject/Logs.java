@@ -11,7 +11,7 @@ public class Logs{
     public Logs() {}
 
 
-    public static void saveToCustomerFile(User user) {
+    public synchronized static void saveToCustomerFile(User user) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("CustomerLoginDetails.txt", true))) {
             String toFile = user.getUsername() + "," + user.getPassword() + "\n";
             writer.write(toFile);
@@ -22,7 +22,7 @@ public class Logs{
         }
     }
 
-    public List<String> loadFromCustomerFile() {
+    public synchronized static List<String> loadFromCustomerFile() {
         List<String> Customers = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader("CustomerLoginDetails.txt")) ){
             String line;
@@ -86,7 +86,7 @@ public class Logs{
         }
     }
 
-    public void saveToSellerFile(User user) {
+    public synchronized static void saveToSellerFile(User user) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("SellerLoginDetails.txt", true))) {
             String toFile = user.getUsername() + "," + user.getPassword() + "\n";
             writer.write(toFile);
@@ -95,7 +95,7 @@ public class Logs{
         }
     }
 
-    public List<String> loadFromSellerFile() {
+    public synchronized static List<String> loadFromSellerFile() {
         try (BufferedReader reader = new BufferedReader(new FileReader("SellerLoginDetails.txt")) ){
             String line;
             List<String> Sellers = new ArrayList<>();
