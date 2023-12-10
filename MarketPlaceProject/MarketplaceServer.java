@@ -325,7 +325,7 @@ public class MarketplaceServer {
         return shoppingCartResult;
     }
 
-    public static ArrayList<Product> searchProducts(String search) {
+    public synchronized static ArrayList<Product> searchProducts(String search) {
         ArrayList<Product> listedProducts = new ArrayList<>();
         for (Seller seller : sellers) {
             ArrayList<Store> stores = seller.getStores();
@@ -352,7 +352,7 @@ public class MarketplaceServer {
         return matchingProducts;
     }
 
-    public static ArrayList<Product> sortProducts(int sortType) {
+    public synchronized static ArrayList<Product> sortProducts(int sortType) {
         ArrayList<Product> quantityListedProducts = new ArrayList<>();
         ArrayList<Product> priceListedProducts = new ArrayList<>();
         //below is sorting by quantity
@@ -413,7 +413,7 @@ public class MarketplaceServer {
         } */
     }
 
-    public static ArrayList<Product> viewProducts() {
+    public synchronized static ArrayList<Product> viewProducts() {
         ArrayList<Product> viewProducts = new ArrayList<>();
         //below is sorting by quantity
         for (Seller seller : sellers) {
@@ -430,7 +430,7 @@ public class MarketplaceServer {
         return viewProducts;
     }
 
-    public static String priceAddToShoppingCart(ArrayList<Product> priceListedProducts, String username, int quantity, int num) {
+    public synchronized static String priceAddToShoppingCart(ArrayList<Product> priceListedProducts, String username, int quantity, int num) {
         Product productFromSeller = priceListedProducts.get(num - 1);
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
@@ -456,15 +456,43 @@ public class MarketplaceServer {
                         } else {
                             updatedShoppingCart.add(productToAdd);
                         }
+                    } else {
+                        updatedShoppingCart.add(productToAdd);
                     }
-                    customer.setShoppingCar(updatedShoppingCart);
+                    ArrayList<Product> combinedList = new ArrayList<>();
+                    for (Product currentProduct : updatedShoppingCart) {
+                        boolean found = false;
+                        // Check if the product is already in the combined list
+                        for (Product combinedProduct : combinedList) {
+                            if (currentProduct.getName().equals(combinedProduct.getName()) &&
+                                    currentProduct.getStoreName().equals(combinedProduct.getStoreName()) &&
+                                    currentProduct.getDescription().equals(combinedProduct.getDescription()) &&
+                                    currentProduct.getPrice() == combinedProduct.getPrice()) {
+                                // If found, update the quantity
+                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() + currentProduct.getQuantAvailable());
+                                found = true;
+                                break;
+                            }
+                        }
+                        // If not found, add it to the combined list
+                        if (!found) {
+                            combinedList.add(new Product(
+                                    currentProduct.getName(),
+                                    currentProduct.getStoreName(),
+                                    currentProduct.getDescription(),
+                                    currentProduct.getQuantAvailable(),
+                                    currentProduct.getPrice()
+                            ));
+                        }
+                    }
+                    customer.setShoppingCar(combinedList);
                 }
             }
         }
         return ("Item added!");
     }
 
-    public static String quantityAddToShoppingCart(ArrayList<Product> quantityListedProducts, String username, int quantity, int num) {
+    public synchronized static String quantityAddToShoppingCart(ArrayList<Product> quantityListedProducts, String username, int quantity, int num) {
         Product productFromSeller = quantityListedProducts.get(num - 1);
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
@@ -491,14 +519,42 @@ public class MarketplaceServer {
                         else {
                             updatedShoppingCart.add(productToAdd);
                         }
+                    } else {
+                        updatedShoppingCart.add(productToAdd);
                     }
-                    customer.setShoppingCar(updatedShoppingCart);
+                    ArrayList<Product> combinedList = new ArrayList<>();
+                    for (Product currentProduct : updatedShoppingCart) {
+                        boolean found = false;
+                        // Check if the product is already in the combined list
+                        for (Product combinedProduct : combinedList) {
+                            if (currentProduct.getName().equals(combinedProduct.getName()) &&
+                                    currentProduct.getStoreName().equals(combinedProduct.getStoreName()) &&
+                                    currentProduct.getDescription().equals(combinedProduct.getDescription()) &&
+                                    currentProduct.getPrice() == combinedProduct.getPrice()) {
+                                // If found, update the quantity
+                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() + currentProduct.getQuantAvailable());
+                                found = true;
+                                break;
+                            }
+                        }
+                        // If not found, add it to the combined list
+                        if (!found) {
+                            combinedList.add(new Product(
+                                    currentProduct.getName(),
+                                    currentProduct.getStoreName(),
+                                    currentProduct.getDescription(),
+                                    currentProduct.getQuantAvailable(),
+                                    currentProduct.getPrice()
+                            ));
+                        }
+                    }
+                    customer.setShoppingCar(combinedList);
                 }
             }
         }
         return ("Item added!");
     }
-    public static String addToShoppingCart(ArrayList<Product> listedProducts, String username, int quantity, int num) {
+    public synchronized static String addToShoppingCart(ArrayList<Product> listedProducts, String username, int quantity, int num) {
         Product productFromSeller = listedProducts.get(num - 1);
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
@@ -525,15 +581,43 @@ public class MarketplaceServer {
                         else {
                             updatedShoppingCart.add(productToAdd);
                         }
+                    } else {
+                        updatedShoppingCart.add(productToAdd);
                     }
-                    customer.setShoppingCar(updatedShoppingCart);
+                    ArrayList<Product> combinedList = new ArrayList<>();
+                    for (Product currentProduct : updatedShoppingCart) {
+                        boolean found = false;
+                        // Check if the product is already in the combined list
+                        for (Product combinedProduct : combinedList) {
+                            if (currentProduct.getName().equals(combinedProduct.getName()) &&
+                                    currentProduct.getStoreName().equals(combinedProduct.getStoreName()) &&
+                                    currentProduct.getDescription().equals(combinedProduct.getDescription()) &&
+                                    currentProduct.getPrice() == combinedProduct.getPrice()) {
+                                // If found, update the quantity
+                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() + currentProduct.getQuantAvailable());
+                                found = true;
+                                break;
+                            }
+                        }
+                        // If not found, add it to the combined list
+                        if (!found) {
+                            combinedList.add(new Product(
+                                    currentProduct.getName(),
+                                    currentProduct.getStoreName(),
+                                    currentProduct.getDescription(),
+                                    currentProduct.getQuantAvailable(),
+                                    currentProduct.getPrice()
+                            ));
+                        }
+                    }
+                    customer.setShoppingCar(combinedList);
                 }
             }
         }
         return ("Item added!");
     }
 
-    public static String pricePurchaseItem(ArrayList<Product> priceListedProducts, String username, int quantity, int num) {
+    public synchronized static String pricePurchaseItem(ArrayList<Product> priceListedProducts, String username, int quantity, int num) {
         Product productFromSeller = priceListedProducts.get(num - 1);
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
@@ -555,12 +639,39 @@ public class MarketplaceServer {
                     if (updatedPurchaseHistory != null && updatedPurchaseHistory.size() != 0) {
                         if (updatedPurchaseHistory.get(0).getName().equals("N/A")) {
                             updatedPurchaseHistory.set(0, productToBuy);
-                        }
-                        else {
+                        } else {
                             updatedPurchaseHistory.add(productToBuy);
                         }
+                    } else {
+                        updatedPurchaseHistory.add(productToBuy);
                     }
-                    customer.setPurchaseHistory(updatedPurchaseHistory);
+                    ArrayList<Product> combinedList = new ArrayList<>();
+                    for (Product currentProduct : updatedPurchaseHistory) {
+                        boolean found = false;
+                        // Check if the product is already in the combined list
+                        for (Product combinedProduct : combinedList) {
+                            if (currentProduct.getName().equals(combinedProduct.getName()) &&
+                                    currentProduct.getStoreName().equals(combinedProduct.getStoreName()) &&
+                                    currentProduct.getDescription().equals(combinedProduct.getDescription()) &&
+                                    currentProduct.getPrice() == combinedProduct.getPrice()) {
+                                // If found, update the quantity
+                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() + currentProduct.getQuantAvailable());
+                                found = true;
+                                break;
+                            }
+                        }
+                        // If not found, add it to the combined list
+                        if (!found) {
+                            combinedList.add(new Product(
+                                    currentProduct.getName(),
+                                    currentProduct.getStoreName(),
+                                    currentProduct.getDescription(),
+                                    currentProduct.getQuantAvailable(),
+                                    currentProduct.getPrice()
+                            ));
+                        }
+                    }
+                    customer.setPurchaseHistory(combinedList);
                     Store storeToUpdate = null;
                     for (Seller seller : sellers) {
                         ArrayList<Store> stores = seller.getStores();
@@ -583,7 +694,7 @@ public class MarketplaceServer {
         return ("Item purchased");
     }
 
-    public static String quantityPurchaseItems(ArrayList<Product> quantityListedProducts, String username, int quantity, int num) {
+    public synchronized static String quantityPurchaseItems(ArrayList<Product> quantityListedProducts, String username, int quantity, int num) {
         Product productFromSeller = quantityListedProducts.get(num - 1);
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
@@ -605,12 +716,39 @@ public class MarketplaceServer {
                     if (updatedPurchaseHistory != null && updatedPurchaseHistory.size() != 0) {
                         if (updatedPurchaseHistory.get(0).getName().equals("N/A")) {
                             updatedPurchaseHistory.set(0, productToBuy);
-                        }
-                        else {
+                        } else {
                             updatedPurchaseHistory.add(productToBuy);
                         }
+                    } else {
+                        updatedPurchaseHistory.add(productToBuy);
                     }
-                    customer.setPurchaseHistory(updatedPurchaseHistory);
+                    ArrayList<Product> combinedList = new ArrayList<>();
+                    for (Product currentProduct : updatedPurchaseHistory) {
+                        boolean found = false;
+                        // Check if the product is already in the combined list
+                        for (Product combinedProduct : combinedList) {
+                            if (currentProduct.getName().equals(combinedProduct.getName()) &&
+                                    currentProduct.getStoreName().equals(combinedProduct.getStoreName()) &&
+                                    currentProduct.getDescription().equals(combinedProduct.getDescription()) &&
+                                    currentProduct.getPrice() == combinedProduct.getPrice()) {
+                                // If found, update the quantity
+                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() + currentProduct.getQuantAvailable());
+                                found = true;
+                                break;
+                            }
+                        }
+                        // If not found, add it to the combined list
+                        if (!found) {
+                            combinedList.add(new Product(
+                                    currentProduct.getName(),
+                                    currentProduct.getStoreName(),
+                                    currentProduct.getDescription(),
+                                    currentProduct.getQuantAvailable(),
+                                    currentProduct.getPrice()
+                            ));
+                        }
+                    }
+                    customer.setPurchaseHistory(combinedList);
                     Store storeToUpdate = null;
                     for (Seller seller : sellers) {
                         ArrayList<Store> stores = seller.getStores();
@@ -632,7 +770,7 @@ public class MarketplaceServer {
         }
         return ("Item purchased");
     }
-    public static String purchaseItem(ArrayList<Product> listedProducts, String username, int quantity, int num) {
+    public synchronized static String purchaseItem(ArrayList<Product> listedProducts, String username, int quantity, int num) {
         Product productFromSeller = listedProducts.get(num - 1);
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
@@ -654,12 +792,39 @@ public class MarketplaceServer {
                     if (updatedPurchaseHistory != null && updatedPurchaseHistory.size() != 0) {
                         if (updatedPurchaseHistory.get(0).getName().equals("N/A")) {
                             updatedPurchaseHistory.set(0, productToBuy);
-                        }
-                        else {
+                        } else {
                             updatedPurchaseHistory.add(productToBuy);
                         }
+                    } else {
+                        updatedPurchaseHistory.add(productToBuy);
                     }
-                    customer.setPurchaseHistory(updatedPurchaseHistory);
+                    ArrayList<Product> combinedList = new ArrayList<>();
+                    for (Product currentProduct : updatedPurchaseHistory) {
+                        boolean found = false;
+                        // Check if the product is already in the combined list
+                        for (Product combinedProduct : combinedList) {
+                            if (currentProduct.getName().equals(combinedProduct.getName()) &&
+                                    currentProduct.getStoreName().equals(combinedProduct.getStoreName()) &&
+                                    currentProduct.getDescription().equals(combinedProduct.getDescription()) &&
+                                    currentProduct.getPrice() == combinedProduct.getPrice()) {
+                                // If found, update the quantity
+                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() + currentProduct.getQuantAvailable());
+                                found = true;
+                                break;
+                            }
+                        }
+                        // If not found, add it to the combined list
+                        if (!found) {
+                            combinedList.add(new Product(
+                                    currentProduct.getName(),
+                                    currentProduct.getStoreName(),
+                                    currentProduct.getDescription(),
+                                    currentProduct.getQuantAvailable(),
+                                    currentProduct.getPrice()
+                            ));
+                        }
+                    }
+                    customer.setPurchaseHistory(combinedList);
                     Store storeToUpdate = null;
                     for (Seller seller : sellers) {
                         ArrayList<Store> stores = seller.getStores();
@@ -681,7 +846,7 @@ public class MarketplaceServer {
         }
         return ("Item purchased");
     }
-    public static String addReviewPrice(ArrayList<Product> priceListedProducts, String review, int num) {
+    public synchronized static String addReviewPrice(ArrayList<Product> priceListedProducts, String review, int num) {
         Product productToReview = priceListedProducts.get(num - 1);
         ArrayList<String> updatedReviews = productToReview.getReviews();
         updatedReviews.add(review);
@@ -719,7 +884,7 @@ public class MarketplaceServer {
 
         return "Review added";
     }
-    public static String addReview(ArrayList<Product> listedProducts, String review, int num) {
+    public synchronized static String addReview(ArrayList<Product> listedProducts, String review, int num) {
         Product productToReview = listedProducts.get(num - 1);
         ArrayList<String> updatedReviews = productToReview.getReviews();
         updatedReviews.add(review);
@@ -739,7 +904,7 @@ public class MarketplaceServer {
         return "Review added";
     }
 
-    public static ArrayList<Product> getCustomerShoppingCart(String username) {
+    public synchronized static ArrayList<Product> getCustomerShoppingCart(String username) {
         int customerIndex = 0;
         for (int i = 0; i < customers.size(); i++) {
             if (customers.get(i).getCustomerUserName().equals(username)) {
@@ -748,7 +913,7 @@ public class MarketplaceServer {
             }
         }
         ArrayList<Product> shoppingCartResult = new ArrayList<>();
-        if (customers.get(customerIndex).getShoppingCar().get(0).getName().equals("N/A")) {
+        if (customers.get(customerIndex).getShoppingCar().size() == 0 || customers.get(customerIndex).getShoppingCar().get(0).getName().equals("N/A")) {
             return null;
         } else {
             for (Product product : customers.get(customerIndex).getShoppingCar()) {
@@ -773,10 +938,11 @@ public class MarketplaceServer {
                 break;
             }
         }
+        customers.get(customerIndex).setShoppingCar(shoppingCart);
         return "Removed";
     }
 
-    public static String purchaseItemALL(String username) {
+    public synchronized static String purchaseItemALL(String username) {
         ArrayList<Product> updatedShoppingCart = new ArrayList<>();
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equalsIgnoreCase(username)) {
@@ -818,7 +984,7 @@ public class MarketplaceServer {
         return "All Items Purchased, Your Shopping Cart Is Now Empty";
     }
 
-    public static ArrayList<Product> customerViewHistory(String username) {
+    public synchronized static ArrayList<Product> customerViewHistory(String username) {
         int customerIndex = 0;
         for (int i = 0; i < customers.size(); i++) {
             if (customers.get(i).getCustomerUserName().equals(username)) {
@@ -827,15 +993,22 @@ public class MarketplaceServer {
             }
         }
         Customer historyCustomer = customers.get(customerIndex);
-        if (historyCustomer.getShoppingCar().get(0).getName().equals("N/A")) {
+        if (historyCustomer.getPurchaseHistory().size() == 0 || historyCustomer.getPurchaseHistory().get(0).getName().equals("N/A")) {
             return null;
         }
-        return historyCustomer.getShoppingCar();
+        return historyCustomer.getPurchaseHistory();
     }
-    public static String exportPurchaseHistory(ArrayList<Product> purchaseHistory, String fileName, String username) {
+    public synchronized static String exportPurchaseHistory(ArrayList<Product> purchaseHistory, String fileName, String username) {
+        if (fileName.contains(" ")) {
+            fileName = fileName.replace(" ", "_");
+        }
+        if (fileName.contains(".")) {
+            fileName = fileName.replace(".", "~");
+            fileName = fileName.split("~")[0];
+        }
         try (FileWriter fw = new FileWriter(fileName)) {
             // write header
-            fw.append(username + "'s" + "Purchase history:\n");
+            fw.append(username + "'s " + "Purchase history:\n");
             fw.append("Name/Description/Price/Quantity Bought\n");
 
             //data
@@ -846,14 +1019,103 @@ public class MarketplaceServer {
                 fw.append("/");
                 fw.append(String.valueOf(product.getPrice()));
                 fw.append("/");
-                String reviews = "";
                 fw.append(String.valueOf(product.getQuantAvailable()));
                 fw.append("\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return ("Export succeeded!");
+        return ("Export successful!");
+    }
+
+    public synchronized static String dashboardCheckSell(boolean yesSort) {
+        ArrayList<Product> allProducts = new ArrayList<>();
+        for (Customer customer : customers) {
+            ArrayList<Product> relativeHistory = customer.purchaseHistory;
+            if (!(relativeHistory.get(0).getName().equals("N/A"))) {
+                for (Product product : relativeHistory) {
+                    allProducts.add(product);
+                }
+            }
+        }
+        ArrayList<String> salesByStore = new ArrayList<>();
+        for (Seller seller : sellers) {
+            for (Store store : seller.getStores()) {
+                 String storeName = store.getName();
+                 int storeSales = 0;
+                 for (Product product : allProducts) {
+                     if (storeName.equals(product.getStoreName())) {
+                         storeSales += product.getQuantAvailable();
+                     }
+                 }
+                 salesByStore.add(storeName + ": " + storeSales);
+            }
+        }
+        if (yesSort) {
+            int n = salesByStore.size();
+            for (int i = 0; i < n - 1; i++) {
+                for (int j = 0; j < n - i - 1; j++) {
+                    int sales1 = Integer.parseInt(salesByStore.get(j).split(": ")[1]);
+                    int sales2 = Integer.parseInt(salesByStore.get(j + 1).split(": ")[1]);
+                    if (sales1 > sales2) {
+                        // Swap if the current entry has greater sales than the next entry
+                        String temp = salesByStore.get(j);
+                        salesByStore.set(j, salesByStore.get(j + 1));
+                        salesByStore.set(j + 1, temp);
+                    }
+                }
+            }
+        }
+        String output = "";
+        for (String store : salesByStore) {
+            output += store + "...";
+        }
+        return output;
+    }
+
+    public synchronized static String dashBoardCheckCust(boolean yesSort, String username) {
+        ArrayList<Product> customerPurchasedProducts = new ArrayList<>();
+        for (Customer customer : customers) {
+            if (customer.getCustomerUserName().equals(username)) {
+                ArrayList<Product> relativeHistory = customer.purchaseHistory;
+                for (Product product : relativeHistory) {
+                    customerPurchasedProducts.add(product);
+                }
+            }
+        }
+        ArrayList<String> salesByStore = new ArrayList<>();
+        for (Seller seller : sellers) {
+            for (Store store : seller.getStores()) {
+                String storeName = store.getName();
+                int storeSales = 0;
+                for (Product product : customerPurchasedProducts) {
+                    if (storeName.equals(product.getStoreName())) {
+                        storeSales += product.getQuantAvailable();
+                    }
+                }
+                salesByStore.add(storeName + ": " + storeSales);
+            }
+        }
+        if (yesSort) {
+            int n = salesByStore.size();
+            for (int i = 0; i < n - 1; i++) {
+                for (int j = 0; j < n - i - 1; j++) {
+                    int sales1 = Integer.parseInt(salesByStore.get(j).split(": ")[1]);
+                    int sales2 = Integer.parseInt(salesByStore.get(j + 1).split(": ")[1]);
+                    if (sales1 > sales2) {
+                        // Swap if the current entry has greater sales than the next entry
+                        String temp = salesByStore.get(j);
+                        salesByStore.set(j, salesByStore.get(j + 1));
+                        salesByStore.set(j + 1, temp);
+                    }
+                }
+            }
+        }
+        String output = "";
+        for (String store : salesByStore) {
+            output += store + "...";
+        }
+        return output;
     }
 
     public static void writeDataSeller() {
@@ -1051,8 +1313,13 @@ public class MarketplaceServer {
                     productPrice = String.valueOf(prodShop.get(k).getPrice());
                     productLimit = String.valueOf(prodShop.get(k).getLimit());
                     ArrayList<String> reviews = new ArrayList<>();
-                    for (int o = 0; o < prodShop.get(k).getReviews().size(); o++ ) {
-                        reviews.add(prodShop.get(k).getReviews().get(o));
+                    if (!(prodShop.get(k).getReviews() == null)) {
+                        for (int o = 0; o < prodShop.get(k).getReviews().size(); o++ ) {
+                            reviews.add(prodShop.get(k).getReviews().get(o));
+                        }
+                    }
+                    else {
+                        reviews.add("N/A");
                     }
                     // tri,tri's store,sales,milk,taro flavour,10,5.4,5,review1,review2
                     String ans = String.format("%s/-%s/-%s/-%s/-%s/-%s/-",
@@ -1063,6 +1330,10 @@ public class MarketplaceServer {
                         pw.write(reviews.get(l) + "/-");
                     }
                     pw.write("\n");
+                }
+                if (prodShop.size() == 0) {
+                    pw.write("N/A/-N/A/-N/A/-0/-0.0/-0/-\n");
+                    pw.write("change/-value\n");
                 }
                 if (prodShop.size() != 0) {
                     pw.write("change/-value\n");
@@ -1076,8 +1347,12 @@ public class MarketplaceServer {
                     productPrice = String.valueOf(prodHistory.get(k).getPrice());
                     productLimit = String.valueOf(prodHistory.get(k).getLimit());
                     ArrayList<String> reviews = new ArrayList<>();
-                    for (int o = 0; o < prodHistory.get(k).getReviews().size(); o++ ) {
-                        reviews.add(prodHistory.get(k).getReviews().get(o));
+                    if (prodHistory.get(k).getReviews() == null) {
+                        reviews.add("N/A");
+                    } else {
+                        for (int o = 0; o < prodHistory.get(k).getReviews().size(); o++ ) {
+                            reviews.add(prodHistory.get(k).getReviews().get(o));
+                        }
                     }
                     // tri,tri's store,sales,milk,taro flavour,10,5.4,5,review1,review2
                     String ans = String.format("%s/-%s/-%s/-%s/-%s/-%s/-",
@@ -1087,9 +1362,14 @@ public class MarketplaceServer {
                     for (int l = 0; l < reviews.size(); l++ ) {
                         pw.write(reviews.get(l) + "/-");
                     }
-                    pw.write("\n");
+                    if (k == (prodHistory.size()-1) && i == (customersData.size()-1)) {
+                        pw.write("");
+                    } else {
+                        pw.write("\n");
+                    }
                 }
             }
+            pw.flush();
             pw.close();
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
