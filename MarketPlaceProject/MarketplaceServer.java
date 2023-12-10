@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class MarketplaceServer {
     public static ArrayList<Seller> sellers = new ArrayList<>();
     public static ArrayList<Customer> customers = new ArrayList<>();
-    
+
     public synchronized static void createCustomer(Customer customer) {
         customers.add(customer);
     }
