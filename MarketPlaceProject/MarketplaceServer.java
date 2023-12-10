@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class MarketplaceServer {
     public static ArrayList<Seller> sellers = new ArrayList<>();
     public static ArrayList<Customer> customers = new ArrayList<>();
-    public synchronized static String showStore(String username) {
+    public  static String showStore(String username) {
         Seller seller = null;
         for (Seller sellerTemp: sellers) {
             if (sellerTemp.getUserName().equals(username)) {
@@ -29,7 +29,7 @@ public class MarketplaceServer {
             return showStores;
         }
     }
-    public synchronized static String showProducts(String storeName, String username) {
+    public  static String showProducts(String storeName, String username) {
         Seller seller = null;
         for (Seller sellerTemp: sellers) {
             if (sellerTemp.getUserName().equals(username)) {
@@ -88,7 +88,7 @@ public class MarketplaceServer {
             return "Product deleted!";
         }
     }
-    public synchronized static String checkNoProductMessage(String storeChoice, String username) {
+    public  static String checkNoProductMessage(String storeChoice, String username) {
         Seller seller = null;
         for (Seller sellerTemp: sellers) {
             if (sellerTemp.getUserName().equals(username)) {
@@ -157,7 +157,7 @@ public class MarketplaceServer {
 
         return "Product Edited";
     }
-    public synchronized static String showAllStore(String username) {
+    public static String showAllStore(String username) {
         Seller seller = null;
         for (Seller sellerTemp: sellers) {
             if (sellerTemp.getUserName().equals(username)) {
@@ -200,7 +200,7 @@ public class MarketplaceServer {
         sellers.get(sellerIndex).getStores().get(storeIndex).setSales(0);
         return ("Store created!");
     }
-    public synchronized static boolean checkProductName(String storeChoice, String productName, String username) {
+    public static boolean checkProductName(String storeChoice, String productName, String username) {
         Seller seller = null;
         for (int i = 0; i < sellers.size(); i++) {
             if (sellers.get(i).getUserName().equals(username)) {
@@ -263,7 +263,7 @@ public class MarketplaceServer {
         }
         return null;
     }
-    public synchronized static String viewStores(String username) {
+    public static String viewStores(String username) {
         int sellerIndex = 0;
         for (int i = 0; i < sellers.size(); i++) {
             if (sellers.get(i).getUserName().equals(username)) {
@@ -294,7 +294,7 @@ public class MarketplaceServer {
         }
         return salesByStores;
     }
-    public synchronized static String viewShoppingCart(String username) {
+    public static String viewShoppingCart(String username) {
         int sellerIndex = 0;
         for (int i = 0; i < sellers.size(); i++) {
             if (sellers.get(i).getUserName().equals(username)) {
@@ -324,14 +324,14 @@ public class MarketplaceServer {
         }
         return shoppingCartResult;
     }
-    public synchronized static String saveToFileProduct(String storeName, String username, String fileName) {
+    public static String saveToFileProduct(String storeName, String username, String fileName) {
         for (int i = 0; i < sellers.size(); i++) {
             if (sellers.get(i).getUserName().equals(username)) {
                 for( int j = 0; j < sellers.get(i).getStores().size(); j++) {
                     if (sellers.get(i).getStores().get(j).getName().equals(storeName.substring(2))) {
                         for(int k = 0; k < sellers.get(i).getStores().get(j).getProducts().size(); k++) {
                             Product product = sellers.get(i).getStores().get(j).getProducts().get(k);
-                            sellers.get(i).saveToFileProduct(product, fileName);
+                            sellers.get(i).saveToFileProductSeller(product, fileName);
                         }
                     }
                 }
@@ -415,7 +415,7 @@ public class MarketplaceServer {
         //System.out.println("User data loaded from " + "filler.txt");
     }
 
-    public synchronized static ArrayList<Product> searchProducts(String search) {
+    public static ArrayList<Product> searchProducts(String search) {
         ArrayList<Product> listedProducts = new ArrayList<>();
         for (Seller seller : sellers) {
             ArrayList<Store> stores = seller.getStores();
@@ -442,7 +442,7 @@ public class MarketplaceServer {
         return matchingProducts;
     }
 
-    public synchronized static ArrayList<Product> sortProducts(int sortType, String sortBy) {
+    public static ArrayList<Product> sortProducts(int sortType, String sortBy) {
         ArrayList<Product> quantityListedProducts = new ArrayList<>();
         ArrayList<Product> priceListedProducts = new ArrayList<>();
         //below is sorting by quantity
@@ -529,7 +529,7 @@ public class MarketplaceServer {
         } */
     }
 
-    public synchronized static ArrayList<Product> viewProducts() {
+    public static ArrayList<Product> viewProducts() {
         ArrayList<Product> viewProducts = new ArrayList<>();
         //below is sorting by quantity
         for (Seller seller : sellers) {
@@ -1020,7 +1020,7 @@ public class MarketplaceServer {
         return "Review added";
     }
 
-    public synchronized static ArrayList<Product> getCustomerShoppingCart(String username) {
+    public static ArrayList<Product> getCustomerShoppingCart(String username) {
         int customerIndex = 0;
         for (int i = 0; i < customers.size(); i++) {
             if (customers.get(i).getCustomerUserName().equals(username)) {
@@ -1039,7 +1039,7 @@ public class MarketplaceServer {
         return shoppingCartResult;
     }
 
-    public static String removeItem(String username, ArrayList<Product> shoppingCart, int num) {
+    public synchronized static String removeItem(String username, ArrayList<Product> shoppingCart, int num) {
         int customerIndex = 0;
         Product productToRemove = shoppingCart.get(num-1);
         for (int i = 0; i < customers.size(); i++) {
@@ -1100,7 +1100,7 @@ public class MarketplaceServer {
         return "All Items Purchased, Your Shopping Cart Is Now Empty";
     }
 
-    public synchronized static ArrayList<Product> customerViewHistory(String username) {
+    public static ArrayList<Product> customerViewHistory(String username) {
         int customerIndex = 0;
         for (int i = 0; i < customers.size(); i++) {
             if (customers.get(i).getCustomerUserName().equals(username)) {
@@ -1114,7 +1114,7 @@ public class MarketplaceServer {
         }
         return historyCustomer.getPurchaseHistory();
     }
-    public synchronized static String exportPurchaseHistory(ArrayList<Product> purchaseHistory, String fileName, String username) {
+    public static String exportPurchaseHistory(ArrayList<Product> purchaseHistory, String fileName, String username) {
         if (fileName.contains(" ")) {
             fileName = fileName.replace(" ", "_");
         }
@@ -1144,7 +1144,7 @@ public class MarketplaceServer {
         return ("Export successful!");
     }
 
-    public synchronized static String dashboardCheckSell(boolean yesSort, String sortBy) {
+    public static String dashboardCheckSell(boolean yesSort, String sortBy) {
         ArrayList<Product> allProducts = new ArrayList<>();
         for (Customer customer : customers) {
             ArrayList<Product> relativeHistory = customer.purchaseHistory;
@@ -1205,7 +1205,7 @@ public class MarketplaceServer {
         return output;
     }
 
-    public synchronized static String dashBoardCheckCust(boolean yesSort, String username, String sortBy) {
+    public static String dashBoardCheckCust(boolean yesSort, String username, String sortBy) {
         ArrayList<Product> customerPurchasedProducts = new ArrayList<>();
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
