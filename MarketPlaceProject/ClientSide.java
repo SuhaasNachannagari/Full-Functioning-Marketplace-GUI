@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClientSide extends Thread {
@@ -21,7 +23,8 @@ public class ClientSide extends Thread {
         Socket socket = null;
         BufferedReader bfr;
         PrintWriter pw;
-
+        ObjectOutputStream outputStream;
+        ObjectInputStream inputStream;
 
         try {
             System.out.println("check1");
@@ -29,6 +32,8 @@ public class ClientSide extends Thread {
             socket = new Socket(ia,  4242);
             bfr = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             pw = new PrintWriter(socket.getOutputStream());
+            inputStream = new ObjectInputStream(socket.getInputStream());
+            outputStream = new ObjectOutputStream(socket.getOutputStream());
             System.out.println("check2");
         } catch (IOException e) {
             e.printStackTrace();
@@ -36,18 +41,42 @@ public class ClientSide extends Thread {
         }
         outerloop:
         while (true) {
-            System.out.println("Login here");
-            int checkUser = 0; //Logs.runLogs();
-            username = "Tri"; //Logs.getUsername();
-            //1
-            pw.println(checkUser);
-            pw.flush();
-            //2
-            pw.println(username);
-            pw.flush();
+            List<String> customers = null;
+            try {
+                customers = (List<String>) inputStream.readObject();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            List<String> sellers = null;
+            try {
+                sellers = (List<String>) inputStream.readObject();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            ClientSide client = new ClientSide();
+            List<ClientSide.User> customer = client.toUser(customers);
+            List<ClientSide.User> seller = client.toUser(sellers);
+            List<Object> details = client.LogIn(customer,seller);//0th index is the user, 1st index is seller or customer, 2nd index tells you whether the account already exists.
+            try {
+                outputStream.writeObject(details);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            String switchToUser = (String) details.get(0);
+            String[] array = switchToUser.split(",");
+            ClientSide.User user = new ClientSide.User(array[0], array[1]);
+            System.out.println(details.get(0));
+            boolean exists;
+            exists = !details.get(2).equals("true");
+            String username = user.getUsername();
+            String checkUser = details.get(1).toString();
             while (true) {
                 try {
-                    if (checkUser == 1) {
+                    if (checkUser.equals("Seller")) {
                         String[] showOptions = {"1 - Delete", "2 - Edit", "3 - Create", "4 - View", "5 - Import/Export", "6 - Dashboard"};
                         String option = (String) (JOptionPane.showInputDialog(null, "What do you want to do?",
                                 "Choice", JOptionPane.QUESTION_MESSAGE, null, showOptions, showOptions[0]));
@@ -444,7 +473,7 @@ public class ClientSide extends Thread {
                                 break;
                         }
                     }
-                    if (checkUser == 0) {
+                    if (checkUser.equals("Customer")) {
                         String[] showOptions = {"Sort", "View", "Search", "Shopping Cart", "Purchase History", "Dashboard"};
                         String option = (String) (JOptionPane.showInputDialog(null, "What do you want to do?",
                                 "Choice", JOptionPane.QUESTION_MESSAGE, null, showOptions, showOptions[0]));
@@ -643,162 +672,165 @@ public class ClientSide extends Thread {
                                 }
                                 break;
                             case "View":
-                                //1st receiving from the server
-                                String listingText = bfr.readLine();
-                                if (!(listingText.equals("There are no products"))) {
-                                    String[] productOptions = listingText.split("/-");
-                                    String productNum = "";
-                                    productNum = "" + ((String) JOptionPane.showInputDialog(null,
-                                            "Here are the products in this marketplace",
-                                            "View Products", JOptionPane.QUESTION_MESSAGE,
-                                            null, productOptions, productOptions[0])).charAt(0);
-                                    if (productNum == null) {
-                                        throw new Exception();
-                                    }
-                                    //2nd sending, which product would the consumer like to look at
-                                    pw.write(productNum + "\n");
-                                    pw.flush();
-                                    //2nd receiving from server
-                                    String productDetails = bfr.readLine();
-                                    productDetails = productDetails.replace("...", "\n");
-                                    //3rd sending to server, useless
-                                    pw.write("" + "\n");
-                                    pw.flush();
-                                    //3rd receiving from server, limit and quantity availble
-                                    String[] limitAndQuantString = bfr.readLine().split("/");
+                                boolean refresh = true;
+                                do {
+                                    //1st receiving from the server
+                                    String listingText = bfr.readLine();
+                                    if (!(listingText.equals("There are no products"))) {
+                                        String[] productOptions = listingText.split("/-");
+                                        String productNum = "";
+                                        productNum = "" + ((String) JOptionPane.showInputDialog(null,
+                                                "Here are the products in this marketplace",
+                                                "View Products", JOptionPane.QUESTION_MESSAGE,
+                                                null, productOptions, productOptions[0])).charAt(0);
+                                        if (productNum == null) {
+                                            throw new Exception();
+                                        }
+                                        //2nd sending, which product would the consumer like to look at
+                                        pw.write(productNum + "\n");
+                                        pw.flush();
+                                        //2nd receiving from server
+                                        String productDetails = bfr.readLine();
+                                        productDetails = productDetails.replace("...", "\n");
+                                        //3rd sending to server, useless
+                                        pw.write("" + "\n");
+                                        pw.flush();
+                                        //3rd receiving from server, limit and quantity availble
+                                        String[] limitAndQuantString = bfr.readLine().split("/");
 
-                                    int[] limitAndQuant = new int[2];
-                                    for (int k = 0; k < 2; k++) {
-                                        limitAndQuant[k] = Integer.parseInt(limitAndQuantString[k]);
-                                    }
-                                    JOptionPane.showMessageDialog(null,
-                                            productDetails, "Product Details",
-                                            JOptionPane.INFORMATION_MESSAGE);
-                                    String[] actionsWithProduct = {"Purchase Product", "Add To Shopping Cart", "Leave a Review"};
-                                    String actionWithProduct = (String) JOptionPane.showInputDialog(null,
-                                            "What do you want to do with this product?",
-                                            "Product", JOptionPane.QUESTION_MESSAGE, null,
-                                            actionsWithProduct, actionsWithProduct[0]);
-                                    if (actionWithProduct == null) {
-                                        throw new Exception();
-                                    }
-                                    if (actionWithProduct.equals("Purchase Product")) {
-                                        boolean isNotValidInt = true;
-                                        int quantity = 0;
-                                        do {
-                                            try {
-                                                String quantityTwo = JOptionPane.showInputDialog(null,
-                                                        "How Much Would You Like To Buy?",
-                                                        "Purchase Form",
-                                                        JOptionPane.QUESTION_MESSAGE);
-                                                if (quantityTwo == null) {
-                                                    throw new Exception();
-                                                }
-                                                quantity = Integer.parseInt(quantityTwo);
-                                                isNotValidInt = false;
-                                                if (quantity <= 0) {
-                                                    JOptionPane.showMessageDialog(null,
-                                                            "Enter a number greater than 0",
-                                                            "Purchase Form",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
-                                                    JOptionPane.showMessageDialog(null,
-                                                            "You are attempting to buy more than the limit of " +
-                                                                    limitAndQuant[0] + " units set by the seller",
-                                                            "Purchase Form",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                } else if (quantity > limitAndQuant[1]) {
-                                                    JOptionPane.showMessageDialog(null, "There is only "
-                                                                    + limitAndQuant[1] +
-                                                                    " units left, you are attempting to buy more than what's available",
-                                                            "Purchase Form",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                }
-                                            } catch (NumberFormatException e) {
-                                                JOptionPane.showMessageDialog(null, "Enter an integer",
-                                                        "Order Form",
-                                                        JOptionPane.ERROR_MESSAGE);
-                                                isNotValidInt = true;
-                                            }
-                                        } while (isNotValidInt);
-                                        String purchaseQuantity = "Purchase," + quantity;
-                                        //4th sending to the ServerSide
-                                        pw.write(purchaseQuantity + "\n");
-                                        pw.flush();
-                                        //4th receiving from server
-                                        String finalSortOutput = bfr.readLine();
-                                        JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
+                                        int[] limitAndQuant = new int[2];
+                                        for (int k = 0; k < 2; k++) {
+                                            limitAndQuant[k] = Integer.parseInt(limitAndQuantString[k]);
+                                        }
+                                        JOptionPane.showMessageDialog(null,
+                                                productDetails, "Product Details",
                                                 JOptionPane.INFORMATION_MESSAGE);
-                                    } else if (actionWithProduct.equals("Add To Shopping Cart")) {
-                                        boolean isNotValidInt = true;
-                                        int quantity = 0;
-                                        do {
-                                            try {
-                                                String quantityTwo = JOptionPane.showInputDialog(null,
-                                                        "How Much Would You Like To Add?", "Add To Cart",
-                                                        JOptionPane.QUESTION_MESSAGE);
-                                                if (quantityTwo == null) {
-                                                    throw new Exception();
+                                        String[] actionsWithProduct = {"Purchase Product", "Add To Shopping Cart", "Leave a Review"};
+                                        String actionWithProduct = (String) JOptionPane.showInputDialog(null,
+                                                "What do you want to do with this product?",
+                                                "Product", JOptionPane.QUESTION_MESSAGE, null,
+                                                actionsWithProduct, actionsWithProduct[0]);
+                                        if (actionWithProduct == null) {
+                                            throw new Exception();
+                                        }
+                                        if (actionWithProduct.equals("Purchase Product")) {
+                                            boolean isNotValidInt = true;
+                                            int quantity = 0;
+                                            do {
+                                                try {
+                                                    String quantityTwo = JOptionPane.showInputDialog(null,
+                                                            "How Much Would You Like To Buy?",
+                                                            "Purchase Form",
+                                                            JOptionPane.QUESTION_MESSAGE);
+                                                    if (quantityTwo == null) {
+                                                        throw new Exception();
+                                                    }
+                                                    quantity = Integer.parseInt(quantityTwo);
+                                                    isNotValidInt = false;
+                                                    if (quantity <= 0) {
+                                                        JOptionPane.showMessageDialog(null,
+                                                                "Enter a number greater than 0",
+                                                                "Purchase Form",
+                                                                JOptionPane.ERROR_MESSAGE);
+                                                        isNotValidInt = true;
+                                                    } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
+                                                        JOptionPane.showMessageDialog(null,
+                                                                "You are attempting to buy more than the limit of " +
+                                                                        limitAndQuant[0] + " units set by the seller",
+                                                                "Purchase Form",
+                                                                JOptionPane.ERROR_MESSAGE);
+                                                        isNotValidInt = true;
+                                                    } else if (quantity > limitAndQuant[1]) {
+                                                        JOptionPane.showMessageDialog(null, "There is only "
+                                                                        + limitAndQuant[1] +
+                                                                        " units left, you are attempting to buy more than what's available",
+                                                                "Purchase Form",
+                                                                JOptionPane.ERROR_MESSAGE);
+                                                        isNotValidInt = true;
+                                                    }
+                                                } catch (NumberFormatException e) {
+                                                    JOptionPane.showMessageDialog(null, "Enter an integer",
+                                                            "Order Form",
+                                                            JOptionPane.ERROR_MESSAGE);
+                                                    isNotValidInt = true;
                                                 }
-                                                quantity = Integer.parseInt(quantityTwo);
-                                                isNotValidInt = false;
-                                                if (quantity <= 0) {
-                                                    JOptionPane.showMessageDialog(null,
-                                                            "Enter a number greater than 0",
-                                                            "Add To Cart",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
-                                                    JOptionPane.showMessageDialog(null,
-                                                            "You are attempting to add more than the limit of " +
-                                                                    limitAndQuant[0] + " units set by the seller",
-                                                            "Add To Cart",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                                    isNotValidInt = true;
-                                                } else if (quantity > limitAndQuant[1]) {
-                                                    JOptionPane.showMessageDialog(null, "There is only "
-                                                                    + limitAndQuant[1] +
-                                                                    " units left, you are attempting to add more than what's available",
-                                                            "Add To Cart",
+                                            } while (isNotValidInt);
+                                            String purchaseQuantity = "Purchase," + quantity;
+                                            //4th sending to the ServerSide
+                                            pw.write(purchaseQuantity + "\n");
+                                            pw.flush();
+                                            //4th receiving from server
+                                            String finalSortOutput = bfr.readLine();
+                                            JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
+                                                    JOptionPane.INFORMATION_MESSAGE);
+                                        } else if (actionWithProduct.equals("Add To Shopping Cart")) {
+                                            boolean isNotValidInt = true;
+                                            int quantity = 0;
+                                            do {
+                                                try {
+                                                    String quantityTwo = JOptionPane.showInputDialog(null,
+                                                            "How Much Would You Like To Add?", "Add To Cart",
+                                                            JOptionPane.QUESTION_MESSAGE);
+                                                    if (quantityTwo == null) {
+                                                        throw new Exception();
+                                                    }
+                                                    quantity = Integer.parseInt(quantityTwo);
+                                                    isNotValidInt = false;
+                                                    if (quantity <= 0) {
+                                                        JOptionPane.showMessageDialog(null,
+                                                                "Enter a number greater than 0",
+                                                                "Add To Cart",
+                                                                JOptionPane.ERROR_MESSAGE);
+                                                        isNotValidInt = true;
+                                                    } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
+                                                        JOptionPane.showMessageDialog(null,
+                                                                "You are attempting to add more than the limit of " +
+                                                                        limitAndQuant[0] + " units set by the seller",
+                                                                "Add To Cart",
+                                                                JOptionPane.ERROR_MESSAGE);
+                                                        isNotValidInt = true;
+                                                    } else if (quantity > limitAndQuant[1]) {
+                                                        JOptionPane.showMessageDialog(null, "There is only "
+                                                                        + limitAndQuant[1] +
+                                                                        " units left, you are attempting to add more than what's available",
+                                                                "Add To Cart",
+                                                                JOptionPane.ERROR_MESSAGE);
+                                                        isNotValidInt = true;
+                                                    }
+                                                } catch (NumberFormatException e) {
+                                                    JOptionPane.showMessageDialog(null, "Enter an integer",
+                                                            "Order Form",
                                                             JOptionPane.ERROR_MESSAGE);
                                                     isNotValidInt = true;
                                                 }
-                                            } catch (NumberFormatException e) {
-                                                JOptionPane.showMessageDialog(null, "Enter an integer",
-                                                        "Order Form",
-                                                        JOptionPane.ERROR_MESSAGE);
-                                                isNotValidInt = true;
-                                            }
-                                        } while (isNotValidInt);
-                                        String cartQuantity = "Cart," + quantity;
-                                        //4th sending to the ServerSide
-                                        pw.write(cartQuantity + "\n");
-                                        pw.flush();
-                                        //4th receiving from server
-                                        String finalSortOutput = bfr.readLine();
-                                        JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
-                                                JOptionPane.INFORMATION_MESSAGE);
-                                    } else if (actionWithProduct.equals("Leave a Review")) {
-                                        String review = JOptionPane.showInputDialog(null,
-                                                "Add Your Review", "Review Form",
-                                                JOptionPane.QUESTION_MESSAGE);
-                                        //4th sending to the ServerSide
-                                        pw.write("Review," + review + "\n");
-                                        pw.flush();
-                                        //4th receiving from server
-                                        String finalSortOutput = bfr.readLine();
-                                        JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
-                                                JOptionPane.INFORMATION_MESSAGE);
-                                    }
+                                            } while (isNotValidInt);
+                                            String cartQuantity = "Cart," + quantity;
+                                            //4th sending to the ServerSide
+                                            pw.write(cartQuantity + "\n");
+                                            pw.flush();
+                                            //4th receiving from server
+                                            String finalSortOutput = bfr.readLine();
+                                            JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
+                                                    JOptionPane.INFORMATION_MESSAGE);
+                                        } else if (actionWithProduct.equals("Leave a Review")) {
+                                            String review = JOptionPane.showInputDialog(null,
+                                                    "Add Your Review", "Review Form",
+                                                    JOptionPane.QUESTION_MESSAGE);
+                                            //4th sending to the ServerSide
+                                            pw.write("Review," + review + "\n");
+                                            pw.flush();
+                                            //4th receiving from server
+                                            String finalSortOutput = bfr.readLine();
+                                            JOptionPane.showMessageDialog(null, finalSortOutput, "Review Form",
+                                                    JOptionPane.INFORMATION_MESSAGE);
+                                        }
 
-                                } else {
-                                    JOptionPane.showMessageDialog(null,
-                                            "There are no products for you to view", "Explain Message",
-                                            JOptionPane.INFORMATION_MESSAGE);
-                                }
+                                    } else {
+                                        JOptionPane.showMessageDialog(null,
+                                                "There are no products for you to view", "Explain Message",
+                                                JOptionPane.INFORMATION_MESSAGE);
+                                    }
+                                } while (refresh);
                                 break;
                             case "Search":
                                 // 1st reception from server, don't really need anything
@@ -1131,5 +1163,299 @@ public class ClientSide extends Thread {
         }
         JOptionPane.showMessageDialog(null,"Have a good day","Message",
                 JOptionPane.INFORMATION_MESSAGE);
+    }
+    public boolean checkExistingCustomerUserName(String userName, List<ClientSide.User> Customers) {
+        boolean exists = false;
+        for (int i = 0; i < Customers.size(); i++) {
+            if (Customers.get(i).getUsername().equals(userName)) {
+                exists = true;
+                return exists;
+            }
+        }
+        return exists;
+    }
+
+    public ClientSide.User createCustomer(String username, String password, List<ClientSide.User> Customers) {
+        boolean created = false;
+        // Check if the username already exists
+        if (getCustomerByUsername(username,Customers) == null) {
+            ClientSide.User newUser = new ClientSide.User(username, password);
+            Customers.add(newUser);
+            JOptionPane.showMessageDialog(null, "User " + username + " created successfully.",
+                    "Marketplace", JOptionPane.PLAIN_MESSAGE);
+            return newUser;
+        } else {
+            JOptionPane.showMessageDialog(null, "Username already exists. Please choose a different one.",
+                    "Marketplace", JOptionPane.PLAIN_MESSAGE);
+            return null;
+        }
+    }
+
+    private ClientSide.User getCustomerByUsername(String username, List<ClientSide.User> Customers) {
+        for (ClientSide.User user : Customers) {
+            if (user.getUsername().equals(username)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    public boolean loginCustomer(String username, String password, List<ClientSide.User> Customers) {
+        ClientSide.User user = getCustomerByUsername(username, Customers);
+        if (user != null && user.getPassword().equals(password)) {
+            JOptionPane.showMessageDialog(null, "Login successful for " + username,
+                    "Marketplace", JOptionPane.PLAIN_MESSAGE);
+            return true;
+        } else {
+            JOptionPane.showMessageDialog(null, "Login failed. Please check your username and password.",
+                    "Marketplace", JOptionPane.PLAIN_MESSAGE);
+            return false;
+        }
+    }
+
+
+    public boolean checkExistingSellerUserName(String userName, List<ClientSide.User> Sellers) {
+        boolean exists = false;
+        for (int i = 0; i < Sellers.size(); i++) {
+            if (Sellers.get(i).getUsername().equals(userName)) {
+                exists = true;
+                return exists;
+            }
+        }
+        return exists;
+    }
+
+    public ClientSide.User createSeller(String username, String password, List<ClientSide.User> Sellers) {
+        boolean created = false;
+        // Check if the username already exists
+        if (getSellerByUsername(username, Sellers) == null) {
+            ClientSide.User newUser = new ClientSide.User(username, password);
+            JOptionPane.showMessageDialog(null, "User " + username + " created successfully.",
+                    "Marketplace", JOptionPane.PLAIN_MESSAGE);
+            created = true;
+            return newUser;
+        } else {
+            JOptionPane.showMessageDialog(null, "Username already exists. Please choose a different one.",
+                    "Marketplace", JOptionPane.PLAIN_MESSAGE);
+            created = false;
+            return null;
+        }
+    }
+
+    private ClientSide.User getSellerByUsername(String username, List<ClientSide.User> Sellers) {
+        for (ClientSide.User user : Sellers) {
+            if (user.getUsername().equals(username)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    public boolean loginSeller(String username, String password, List<ClientSide.User> Sellers) {
+        ClientSide.User user = getSellerByUsername(username, Sellers);
+        if (user != null && user.getPassword().equals(password)) {
+            JOptionPane.showMessageDialog(null, "Login successful for " + username,
+                    "Marketplace", JOptionPane.PLAIN_MESSAGE);
+            return true;
+        } else {
+            JOptionPane.showMessageDialog(null, "Login failed. Please check your username and password.",
+                    "Marketplace", JOptionPane.PLAIN_MESSAGE);
+            return false;
+        }
+    }
+
+
+    public List<Object> LogIn(List<ClientSide.User> Customers, List<ClientSide.User> Sellers) {
+        String password;
+        String username;
+        ClientSide.User newUser = null;
+        String userReturn = new String();
+        String returnExists = null;
+        List<Object> toReturn = new ArrayList<>();
+        JOptionPane.showMessageDialog(null, "Welcome to the marketplace.",
+                "Marketplace", JOptionPane.PLAIN_MESSAGE);
+        String[] SellerCustomer = {"Seller", "Customer"};
+        String response = (String) JOptionPane.showInputDialog(null, "Are you a seller or a customer?",
+                "Marketplace", JOptionPane.QUESTION_MESSAGE, null, SellerCustomer, SellerCustomer[0]);
+        int sc = 0;
+        boolean checkUsername = false;
+        boolean input1 = false;
+        if (response.equals("Seller")) {
+            boolean input = false;
+            do {
+                int yn = JOptionPane.showConfirmDialog(null, "Does the account exist?",
+                        "Marketplace", JOptionPane.YES_NO_OPTION);
+                if (yn == 0) {
+                    do {
+                        do {
+                            username = JOptionPane.showInputDialog(null, "Please enter your username('back' to go back).",
+                                    "Marketplace", JOptionPane.QUESTION_MESSAGE);
+                            checkUsername = checkExistingSellerUserName(username, Sellers);
+                            if (username.equals("back")) {
+                                input = false;
+                                break;
+                            }
+                            if (!checkUsername) {
+                                JOptionPane.showMessageDialog(null, "The username is invalid.",
+                                        "Marketplace", JOptionPane.PLAIN_MESSAGE);
+                                input1 = false;
+                            }
+                        } while (input1);
+                        if (username.equals("back") || !(checkUsername)){
+                            break;
+                        }
+                        password = JOptionPane.showInputDialog(null, "Please enter your password",
+                                "Marketplace", JOptionPane.QUESTION_MESSAGE);
+                        input = loginSeller(username,password,Sellers);
+                        newUser = new ClientSide.User(username, password);
+                        userReturn = username + "," + password;
+                        returnExists = "false";
+                    } while (!input);
+                    /*toReturn.add(userReturn);
+                    toReturn.add("Seller");
+                    toReturn.add("false");
+                    return toReturn;*/
+                } else {
+                    do {
+                        do {
+                            username = JOptionPane.showInputDialog(null, "Please enter your username('back' to go back).",
+                                    "Marketplace", JOptionPane.QUESTION_MESSAGE);
+                            checkUsername = checkExistingSellerUserName(username,Sellers);
+                            if (username.equals("back")) {
+                                input = false;
+                                break;
+                            }
+                            if (checkUsername) {
+                                JOptionPane.showMessageDialog(null, "The username already exists.",
+                                        "Marketplace", JOptionPane.PLAIN_MESSAGE);
+                                input1 = false;
+                            }
+                        } while (input1);
+                        if (username.equals("back") || (checkUsername)){
+                            input = false;
+                            break;
+                        }
+                        password = JOptionPane.showInputDialog(null, "Please enter your password",
+                                "Marketplace", JOptionPane.QUESTION_MESSAGE);
+                        newUser = createSeller(username,password,Sellers);
+                        input = true;
+                        userReturn = username + "," + password;
+                        returnExists = "true";
+                    } while (!input);
+                    /*toReturn.add(userReturn);
+                    toReturn.add("Seller");
+                    toReturn.add("true");
+                    return toReturn;*/
+                }
+            } while (!input);
+            toReturn.add(userReturn);
+            toReturn.add("Seller");
+            toReturn.add(returnExists);
+            return toReturn;
+        } else if (response.equals("Customer")) {
+            boolean input = false;
+            do {
+                int yn = JOptionPane.showConfirmDialog(null, "Does the account exist?",
+                        "Marketplace", JOptionPane.YES_NO_OPTION);
+                if (yn == 0) {
+                    do {
+                        do {
+                            username = JOptionPane.showInputDialog(null, "Please enter your username('back' to go back).",
+                                    "Marketplace", JOptionPane.QUESTION_MESSAGE);
+                            checkUsername = checkExistingCustomerUserName(username, Customers);
+                            if (username.equals("back")) {
+                                input = false;
+                                break;
+                            }
+                            if (!checkUsername) {
+                                JOptionPane.showMessageDialog(null, "The username is invalid.",
+                                        "Marketplace", JOptionPane.PLAIN_MESSAGE);
+                                input1 = false;
+                            }
+                        } while (input1);
+                        if (username.equals("back") || !(checkUsername)){
+                            break;
+                        }
+                        password = JOptionPane.showInputDialog(null, "Please enter your password",
+                                "Marketplace", JOptionPane.QUESTION_MESSAGE);
+                        input = loginCustomer(username,password,Customers);
+                        newUser = new ClientSide.User(username, password);
+                        userReturn = username + "," + password;
+                        returnExists = "false";
+                    } while (!input);
+                    if (input1) {
+                        /*toReturn.add(userReturn);
+                        toReturn.add("Customer");
+                        toReturn.add("false");
+                        return toReturn;*/
+                    }
+                } else {
+                    do {
+
+                        do {
+                            username = JOptionPane.showInputDialog(null, "Please enter your username('back' to go back).",
+                                    "Marketplace", JOptionPane.QUESTION_MESSAGE);
+                            checkUsername = checkExistingCustomerUserName(username,Customers);
+                            if (username.equals("back")) {
+                                input = false;
+                                break;
+                            }
+                            if (checkUsername) {
+                                JOptionPane.showMessageDialog(null, "The username already exists.",
+                                        "Marketplace", JOptionPane.PLAIN_MESSAGE);
+                                input1 = false;
+                            }
+                        } while (input1);
+                        if (username.equals("back") || (checkUsername)){
+                            input = false;
+                            break;
+                        }
+                        password = JOptionPane.showInputDialog(null, "Please enter your password",
+                                "Marketplace", JOptionPane.QUESTION_MESSAGE);
+                        newUser = createCustomer(username,password,Customers);
+                        input = true;
+                        userReturn = username + "," + password;
+                        returnExists = "true";
+                    } while (!input);
+                    /*toReturn.add(userReturn);
+                    toReturn.add("Customer");
+                    toReturn.add("true");
+                    return toReturn;*/
+                }
+            } while (!input);
+            toReturn.add(userReturn);
+            toReturn.add("Customer");
+            toReturn.add(returnExists);
+            return toReturn;
+        }
+        return null;
+    }
+
+    public static class User implements Serializable{
+        private String username;
+        private String password;
+
+        public User(String username, String password) {
+            this.username = username;
+            this.password = password;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+    }
+
+    public List<ClientSide.User> toUser(List<String> toSwitch) {
+        List<ClientSide.User> toReturn = new ArrayList<>();
+        for (int i = 0; i < toSwitch.size(); i++) {
+            String[] array = toSwitch.get(i).split(",");
+            ClientSide.User user = new ClientSide.User(array[0], array[1]);
+            toReturn.add(i,user);
+        }
+        return toReturn;
     }
 }
