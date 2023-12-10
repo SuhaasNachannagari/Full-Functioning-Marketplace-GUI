@@ -1289,7 +1289,7 @@ public class MarketplaceServer {
         MarketplaceServer.sellers = sellersTemp;
         return sellersTemp;
     }
-    public static void writeDataCustomer(){
+    public synchronized static void writeDataCustomer(){
         ArrayList<Customer> customersData = customers;
         try {
             String custName;
@@ -1375,7 +1375,7 @@ public class MarketplaceServer {
             throw new RuntimeException(e);
         }
     }
-    public static ArrayList<Customer> readDataCustomer() {
+    public synchronized static ArrayList<Customer> readDataCustomer() {
         ArrayList<String> tempList = new ArrayList<>();
         try {
             BufferedReader br = new BufferedReader(new FileReader("CustomerInfo.txt"));
