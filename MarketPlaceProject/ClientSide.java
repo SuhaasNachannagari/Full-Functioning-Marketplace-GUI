@@ -381,7 +381,7 @@ public class ClientSide extends Thread {
                     }
                 }
                 if (checkUser == 0) {
-                    String[] showOptions = {"Sort", "View", "Search", "Shoppping Cart", "Purchase History", "6 - Dashboard"};
+                    String[] showOptions = {"Sort", "View", "Search", "Shopping Cart", "Purchase History", "Dashboard"};
                     String option = (String) (JOptionPane.showInputDialog(null, "What do you want to do?",
                             "Choice", JOptionPane.QUESTION_MESSAGE, null, showOptions, showOptions[0]));
                     if (option == null) {
@@ -407,18 +407,27 @@ public class ClientSide extends Thread {
                                 String[] productOptions = productListingText.split("/-");
                                 String productNum = "";
                                 if (sortOption.equals("Price")) {
-                                    productNum = "" + ((String) JOptionPane.showInputDialog(null, "Here are your products sorted by price",
-                                            "Price Sorted Products", JOptionPane.QUESTION_MESSAGE, null, productOptions, productOptions[0])).charAt(0);
+                                    productNum = "" + ((String) JOptionPane.showInputDialog(null,
+                                            "Here are your products sorted by price",
+                                            "Price Sorted Products", JOptionPane.QUESTION_MESSAGE, null,
+                                            productOptions, productOptions[0])).charAt(0);
+                                    //3rd sending, which product would the consumer like to look at
+
+                                    pw.write(productNum + "\n");
+                                    pw.flush();
                                 } else {
-                                    productNum = "" + ((String) JOptionPane.showInputDialog(null, "Here are your products sorted by quantity",
-                                            "Quantity Sorted Products", JOptionPane.QUESTION_MESSAGE, null, productOptions, productOptions[0])).charAt(0);
+                                    productNum = "" + ((String) JOptionPane.showInputDialog(null,
+                                            "Here are your products sorted by quantity",
+                                            "Quantity Sorted Products", JOptionPane.QUESTION_MESSAGE, null,
+                                            productOptions, productOptions[0])).charAt(0);
+                                    //3rd sending, which product would the consumer like to look at
+                                    pw.write(productNum + "\n");
+                                    pw.flush();
                                 }
-                                //3rd sending, which product would the consumer like to look at
-                                pw.write(productNum + "\n");
-                                pw.flush();
+
                                 //3rd receiving from server
                                 String productDetails = bfr.readLine();
-
+                                productDetails = productDetails.replace("...", "\n");
                                 //4th sending to server, useless
                                 pw.write("" + "\n");
                                 pw.flush();
@@ -433,18 +442,25 @@ public class ClientSide extends Thread {
                                         productDetails, "Product Details",
                                         JOptionPane.INFORMATION_MESSAGE);
                                 String[] actionsWithProduct = {"Purchase Product", "Add To Shopping Cart", "Leave a Review"};
-                                String actionWithProduct = (String) JOptionPane.showInputDialog(null, "What do you want to do with this product?",
-                                        "Product", JOptionPane.QUESTION_MESSAGE, null, actionsWithProduct, actionsWithProduct[0]);
+                                String actionWithProduct = (String) JOptionPane.showInputDialog(null,
+                                        "What do you want to do with this product?",
+                                        "Product", JOptionPane.QUESTION_MESSAGE, null,
+                                        actionsWithProduct, actionsWithProduct[0]);
                                 if (actionWithProduct.equals("Purchase Product")) {
                                     boolean isNotValidInt = true;
                                     int quantity = 0;
                                     do {
                                         try {
-                                            quantity = Integer.parseInt(JOptionPane.showInputDialog(null,
+                                            String quantityTwo = JOptionPane.showInputDialog(null,
                                                     "How Much Would You Like To Buy?", "Purchase Form",
-                                                    JOptionPane.QUESTION_MESSAGE));
+                                                    JOptionPane.QUESTION_MESSAGE);
+                                            if (quantityTwo == null) {
+                                                throw new Exception();
+                                            }
+                                            quantity = Integer.parseInt(quantityTwo);
                                             isNotValidInt = false;
-                                            if (quantity <= 0) {
+
+                                           if (quantity <= 0) {
                                                 JOptionPane.showMessageDialog(null,
                                                         "Enter a number greater than 0",
                                                         "Purchase Form",
@@ -457,16 +473,18 @@ public class ClientSide extends Thread {
                                                         "Purchase Form",
                                                         JOptionPane.ERROR_MESSAGE);
                                                 isNotValidInt = true;
-                                            } else if (quantity > limitAndQuant[0]) {
+                                            } else if (quantity > limitAndQuant[1]) {
                                                 JOptionPane.showMessageDialog(null, "There is only "
                                                                 + limitAndQuant[1] +
-                                                                " units left, you are attempting to buy above that limit",
+                                                                " units left, you are attempting to buy more than what's available",
                                                         "Purchase Form",
                                                         JOptionPane.ERROR_MESSAGE);
                                                 isNotValidInt = true;
                                             }
                                         } catch (NumberFormatException e) {
-                                            JOptionPane.showMessageDialog(null, "Enter an integer", "Order Form",
+                                            JOptionPane.showMessageDialog(null,
+                                                    "Enter an integer",
+                                                    "Order Form",
                                                     JOptionPane.ERROR_MESSAGE);
                                             isNotValidInt = true;
                                         }
@@ -484,10 +502,15 @@ public class ClientSide extends Thread {
                                     int quantity = 0;
                                     do {
                                         try {
-                                            quantity = Integer.parseInt(JOptionPane.showInputDialog(null,
+                                            String quantityTwo = JOptionPane.showInputDialog(null,
                                                     "How Much Would You Like To Add?", "Add To Cart",
-                                                    JOptionPane.QUESTION_MESSAGE));
+                                                    JOptionPane.QUESTION_MESSAGE);
+                                            if (quantityTwo == null) {
+                                                throw new Exception();
+                                            }
+                                            quantity = Integer.parseInt(quantityTwo);
                                             isNotValidInt = false;
+
                                             if (quantity <= 0) {
                                                 JOptionPane.showMessageDialog(null,
                                                         "Enter a number greater than 0",
@@ -501,16 +524,17 @@ public class ClientSide extends Thread {
                                                         "Add To Cart",
                                                         JOptionPane.ERROR_MESSAGE);
                                                 isNotValidInt = true;
-                                            } else if (quantity > limitAndQuant[0]) {
+                                            } else if (quantity > limitAndQuant[1]) {
                                                 JOptionPane.showMessageDialog(null, "There is only "
                                                                 + limitAndQuant[1] +
-                                                                " units left, you are attempting to add above that limit",
+                                                                " units left, you are attempting to add more than what's available",
                                                         "Add To Cart",
                                                         JOptionPane.ERROR_MESSAGE);
                                                 isNotValidInt = true;
                                             }
                                         } catch (NumberFormatException e) {
-                                            JOptionPane.showMessageDialog(null, "Enter an integer", "Order Form",
+                                            JOptionPane.showMessageDialog(null, "Enter an integer",
+                                                    "Order Form",
                                                     JOptionPane.ERROR_MESSAGE);
                                             isNotValidInt = true;
                                         }
@@ -549,14 +573,16 @@ public class ClientSide extends Thread {
                             if (!(listingText.equals("There are no products"))) {
                                 String[] productOptions = listingText.split("/-");
                                 String productNum = "";
-                                productNum = "" + ((String) JOptionPane.showInputDialog(null, "Here are the products in this marketplace",
-                                        "Price Sorted Products", JOptionPane.QUESTION_MESSAGE, null, productOptions, productOptions[0])).charAt(0);
+                                productNum = "" + ((String) JOptionPane.showInputDialog(null,
+                                        "Here are the products in this marketplace",
+                                        "Price Sorted Products", JOptionPane.QUESTION_MESSAGE,
+                                        null, productOptions, productOptions[0])).charAt(0);
                                 //2nd sending, which product would the consumer like to look at
                                 pw.write(productNum + "\n");
                                 pw.flush();
                                 //2nd receiving from server
                                 String productDetails = bfr.readLine();
-
+                                productDetails = productDetails.replace("...", "\n");
                                 //3rd sending to server, useless
                                 pw.write("" + "\n");
                                 pw.flush();
@@ -571,16 +597,23 @@ public class ClientSide extends Thread {
                                         productDetails, "Product Details",
                                         JOptionPane.INFORMATION_MESSAGE);
                                 String[] actionsWithProduct = {"Purchase Product", "Add To Shopping Cart", "Leave a Review"};
-                                String actionWithProduct = (String) JOptionPane.showInputDialog(null, "What do you want to do with this product?",
-                                        "Product", JOptionPane.QUESTION_MESSAGE, null, actionsWithProduct, actionsWithProduct[0]);
+                                String actionWithProduct = (String) JOptionPane.showInputDialog(null,
+                                        "What do you want to do with this product?",
+                                        "Product", JOptionPane.QUESTION_MESSAGE, null,
+                                        actionsWithProduct, actionsWithProduct[0]);
                                 if (actionWithProduct.equals("Purchase Product")) {
                                     boolean isNotValidInt = true;
                                     int quantity = 0;
                                     do {
                                         try {
-                                            quantity = Integer.parseInt(JOptionPane.showInputDialog(null,
-                                                    "How Much Would You Like To Buy?", "Purchase Form",
-                                                    JOptionPane.QUESTION_MESSAGE));
+                                            String quantityTwo = JOptionPane.showInputDialog(null,
+                                                    "How Much Would You Like To Buy?",
+                                                    "Purchase Form",
+                                                    JOptionPane.QUESTION_MESSAGE);
+                                            if (quantityTwo == null) {
+                                                throw new Exception();
+                                            }
+                                            quantity = Integer.parseInt(quantityTwo);
                                             isNotValidInt = false;
                                             if (quantity <= 0) {
                                                 JOptionPane.showMessageDialog(null,
@@ -595,16 +628,17 @@ public class ClientSide extends Thread {
                                                         "Purchase Form",
                                                         JOptionPane.ERROR_MESSAGE);
                                                 isNotValidInt = true;
-                                            } else if (quantity > limitAndQuant[0]) {
+                                            } else if (quantity > limitAndQuant[1]) {
                                                 JOptionPane.showMessageDialog(null, "There is only "
                                                                 + limitAndQuant[1] +
-                                                                " units left, you are attempting to buy above that limit",
+                                                                " units left, you are attempting to buy more than what's available",
                                                         "Purchase Form",
                                                         JOptionPane.ERROR_MESSAGE);
                                                 isNotValidInt = true;
                                             }
                                         } catch (NumberFormatException e) {
-                                            JOptionPane.showMessageDialog(null, "Enter an integer", "Order Form",
+                                            JOptionPane.showMessageDialog(null, "Enter an integer",
+                                                    "Order Form",
                                                     JOptionPane.ERROR_MESSAGE);
                                             isNotValidInt = true;
                                         }
@@ -622,9 +656,13 @@ public class ClientSide extends Thread {
                                     int quantity = 0;
                                     do {
                                         try {
-                                            quantity = Integer.parseInt(JOptionPane.showInputDialog(null,
+                                            String quantityTwo = JOptionPane.showInputDialog(null,
                                                     "How Much Would You Like To Add?", "Add To Cart",
-                                                    JOptionPane.QUESTION_MESSAGE));
+                                                    JOptionPane.QUESTION_MESSAGE);
+                                            if (quantityTwo == null) {
+                                                throw new Exception();
+                                            }
+                                            quantity = Integer.parseInt(quantityTwo);
                                             isNotValidInt = false;
                                             if (quantity <= 0) {
                                                 JOptionPane.showMessageDialog(null,
@@ -639,16 +677,17 @@ public class ClientSide extends Thread {
                                                         "Add To Cart",
                                                         JOptionPane.ERROR_MESSAGE);
                                                 isNotValidInt = true;
-                                            } else if (quantity > limitAndQuant[0]) {
+                                            } else if (quantity > limitAndQuant[1]) {
                                                 JOptionPane.showMessageDialog(null, "There is only "
                                                                 + limitAndQuant[1] +
-                                                                " units left, you are attempting to add above that limit",
+                                                                " units left, you are attempting to add more than what's available",
                                                         "Add To Cart",
                                                         JOptionPane.ERROR_MESSAGE);
                                                 isNotValidInt = true;
                                             }
                                         } catch (NumberFormatException e) {
-                                            JOptionPane.showMessageDialog(null, "Enter an integer", "Order Form",
+                                            JOptionPane.showMessageDialog(null, "Enter an integer",
+                                                    "Order Form",
                                                     JOptionPane.ERROR_MESSAGE);
                                             isNotValidInt = true;
                                         }
@@ -688,6 +727,10 @@ public class ClientSide extends Thread {
                                     "What would you like to search?",
                                     "Search", JOptionPane.QUESTION_MESSAGE
                             );
+                            if (search == null) {
+                                throw new Exception();
+                            }
+
                             //2nd send to the server class, giving search input
                             pw.write(search + "\n");
                             pw.flush();
@@ -705,6 +748,7 @@ public class ClientSide extends Thread {
                                 pw.flush();
                                 //3rd receiving from server
                                 String productDetails = bfr.readLine();
+                                productDetails = productDetails.replace("...", "\n");
 
                                 //4th sending to server, useless
                                 pw.write("" + "\n");
@@ -720,16 +764,22 @@ public class ClientSide extends Thread {
                                         productDetails, "Product Details",
                                         JOptionPane.INFORMATION_MESSAGE);
                                 String[] actionsWithProduct = {"Purchase Product", "Add To Shopping Cart", "Leave a Review"};
-                                String actionWithProduct = (String) JOptionPane.showInputDialog(null, "What do you want to do with this product?",
-                                        "Product", JOptionPane.QUESTION_MESSAGE, null, actionsWithProduct, actionsWithProduct[0]);
+                                String actionWithProduct = (String) JOptionPane.showInputDialog(null,
+                                        "What do you want to do with this product?",
+                                        "Product", JOptionPane.QUESTION_MESSAGE, null, actionsWithProduct,
+                                        actionsWithProduct[0]);
                                 if (actionWithProduct.equals("Purchase Product")) {
                                     boolean isNotValidInt = true;
                                     int quantity = 0;
                                     do {
                                         try {
-                                            quantity = Integer.parseInt(JOptionPane.showInputDialog(null,
+                                            String quantityTwo = JOptionPane.showInputDialog(null,
                                                     "How Much Would You Like To Buy?", "Purchase Form",
-                                                    JOptionPane.QUESTION_MESSAGE));
+                                                    JOptionPane.QUESTION_MESSAGE);
+                                            if (quantityTwo == null) {
+                                                throw new Exception();
+                                            }
+                                            quantity = Integer.parseInt(quantityTwo);
                                             isNotValidInt = false;
                                             if (quantity <= 0) {
                                                 JOptionPane.showMessageDialog(null,
@@ -744,10 +794,10 @@ public class ClientSide extends Thread {
                                                         "Purchase Form",
                                                         JOptionPane.ERROR_MESSAGE);
                                                 isNotValidInt = true;
-                                            } else if (quantity > limitAndQuant[0]) {
+                                            } else if (quantity > limitAndQuant[1]) {
                                                 JOptionPane.showMessageDialog(null, "There is only "
                                                                 + limitAndQuant[1] +
-                                                                " units left, you are attempting to buy above that limit",
+                                                                " units left, you are attempting to buy more than what's available",
                                                         "Purchase Form",
                                                         JOptionPane.ERROR_MESSAGE);
                                                 isNotValidInt = true;
@@ -771,9 +821,13 @@ public class ClientSide extends Thread {
                                     int quantity = 0;
                                     do {
                                         try {
-                                            quantity = Integer.parseInt(JOptionPane.showInputDialog(null,
+                                            String quantityTwo = JOptionPane.showInputDialog(null,
                                                     "How Much Would You Like To Add?", "Add To Cart",
-                                                    JOptionPane.QUESTION_MESSAGE));
+                                                    JOptionPane.QUESTION_MESSAGE);
+                                            if (quantityTwo == null) {
+                                                throw new Exception();
+                                            }
+                                            quantity = Integer.parseInt(quantityTwo);
                                             isNotValidInt = false;
                                             if (quantity <= 0) {
                                                 JOptionPane.showMessageDialog(null,
@@ -788,10 +842,10 @@ public class ClientSide extends Thread {
                                                         "Add To Cart",
                                                         JOptionPane.ERROR_MESSAGE);
                                                 isNotValidInt = true;
-                                            } else if (quantity > limitAndQuant[0]) {
+                                            } else if (quantity > limitAndQuant[1]) {
                                                 JOptionPane.showMessageDialog(null, "There is only "
                                                                 + limitAndQuant[1] +
-                                                                " units left, you are attempting to add above that limit",
+                                                                " units left, you are attempting to add more than what's available",
                                                         "Add To Cart",
                                                         JOptionPane.ERROR_MESSAGE);
                                                 isNotValidInt = true;
@@ -841,7 +895,8 @@ public class ClientSide extends Thread {
                                 for (String cProduct : cartProducts) {
                                     shoppingCart += cProduct + "\n";
                                 }
-                                JOptionPane.showMessageDialog(null, shoppingCart, "Shopping Cart", JOptionPane.INFORMATION_MESSAGE, null);
+                                JOptionPane.showMessageDialog(null, shoppingCart, "Shopping Cart",
+                                        JOptionPane.INFORMATION_MESSAGE, null);
                                 String cartOption = (String) JOptionPane.showInputDialog(null,
                                         "What would you like to do?", "Shopping Cart",
                                         JOptionPane.QUESTION_MESSAGE, null, cartOptions, cartOptions[0]);
@@ -849,7 +904,8 @@ public class ClientSide extends Thread {
                                     String remove = (String) JOptionPane.showInputDialog(null,
                                             "Which product would you like to remove?", "Shopping Cart",
                                             JOptionPane.QUESTION_MESSAGE, null, cartProducts, cartProducts[0]);
-                                    String removeNum = remove.split(".")[0];
+                                    String removeTwo = remove.replace('.','~');
+                                    String removeNum = removeTwo.split("~")[0];
                                     //2nd sending to server, what to do with shopping cart
                                     pw.write(cartOption + "," + removeNum + "\n");
                                     pw.flush();
@@ -857,7 +913,6 @@ public class ClientSide extends Thread {
                                     String result = bfr.readLine();
                                     JOptionPane.showMessageDialog(null, result, "Shopping Cart",
                                             JOptionPane.INFORMATION_MESSAGE, null);
-
                                 } else {
                                     //2nd sending to server, what to do with shopping cart
                                     pw.write(cartOption + "," + "0" + "\n");
@@ -876,7 +931,7 @@ public class ClientSide extends Thread {
                                 String[] purchasedProducts = purchaseHistory.split("/-");
                                 purchaseHistory = "";
                                 for (String purchasedProduct : purchasedProducts) {
-                                    purchaseHistory += purchasedProduct;
+                                    purchaseHistory += purchasedProduct + "\n";
                                 }
                                 JOptionPane.showMessageDialog(null,
                                         purchaseHistory, "Purchase History",
@@ -890,6 +945,9 @@ public class ClientSide extends Thread {
                                             "What would you like to name your file? (Don't include the .txt)",
                                             "Search", JOptionPane.QUESTION_MESSAGE
                                     );
+                                    if (filename == null) {
+                                        throw new Exception();
+                                    }
                                     // 2nd sending, yes file and file name
                                     pw.write("0," + filename + "\n");
                                     pw.flush();
@@ -908,15 +966,38 @@ public class ClientSide extends Thread {
                             }
                             break;
                         case "Dashboard":
+                            //1st weird receptin from server
+                            String uselessThree = bfr.readLine();
+                            String[] viewByOptions = {"Store Sales", "Your Purchases"};
+                            String viewBy = (String) JOptionPane.showInputDialog(null,
+                                    "How would you like to view your dashboard?", "Dashboard",
+                                    JOptionPane.QUESTION_MESSAGE, null, viewByOptions, viewByOptions[0]);
+                            int sortBy = JOptionPane.showConfirmDialog(null,
+                                    "Would you like to sort the results?", "Dashboard", JOptionPane.YES_NO_OPTION);
+                            String sendToServer = viewBy + "," + sortBy;
+                            ////2nd send to server, actions
+                            pw.write(sendToServer + "\n");
+                            pw.flush();
+                            if (viewBy.equals("Store Sales")) {
+                                //2nd receiving from client
+                                String output = "Sales By Store: \n" +
+                                        bfr.readLine().replace("...", "\n");
+                                JOptionPane.showMessageDialog(null, output, "Dashboard",
+                                        JOptionPane.INFORMATION_MESSAGE, null);
+                            } else {
+                                //2nd receiving from client
+                                String output = "Your Purchases From Stores: \n" +
+                                        bfr.readLine().replace("...", "\n");
+                                JOptionPane.showMessageDialog(null, output, "Dashboard",
+                                        JOptionPane.INFORMATION_MESSAGE, null);
+                            }
                             break;
                         default:
                             System.out.println("Please enter the correct number!");
                             checkIndexOption = false;
                             break;
                     }
-
                 }
-
             } catch (Exception e) {
                 break;
             }
