@@ -45,15 +45,55 @@ class WorkFlow extends Thread {
         try {
             BufferedReader bfr = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter pw = new PrintWriter(socket.getOutputStream());
+            ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
             outerloop:
             while (true) {
-                //1
-                String checkUser = bfr.readLine();
-                //2
-                String username = bfr.readLine();
+                Logs login = new Logs();
+                List<String> customers = login.loadFromCustomerFile();
+                List<String> sellers = login.loadFromSellerFile();
+                // create an object output stream from the output stream so we can send an object through it
+                outputStream.writeObject(customers);
+                outputStream.writeObject(sellers);
+                List<Object> details = null;
+                try {
+                    details = (List<Object>) inputStream.readObject();
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                String checker = details.get(2).toString();
+                System.out.println(details.get(0));
+                boolean exists;
+                exists = !checker.equals("true");
+                String checkUser = details.get(1).toString();
+                String switchToUser = (String) details.get(0);
+                String[] array = switchToUser.split(",");
+                User user = new User(array[0], array[1]);
+                String username = array[0];
+                if (!exists) {
+                    if (checkUser.equals("Seller")) {
+                        Logs.saveToSellerFile(user);
+                        System.out.println("check");
+                        //create new Seller
+                    } else {
+                        Logs.saveToCustomerFile(user);
+                        Product product = new Product("N/A", "N/A", "N/A", 0, 0.0);
+                        product.setLimit(0);
+                        ArrayList<String> reviews = new ArrayList<>();
+                        product.setReviews(reviews);
+                        ArrayList<Product> shoppingCart = new ArrayList<>();
+                        ArrayList<Product> purchaseHistory = new ArrayList<>();
+                        shoppingCart.add(product);
+                        purchaseHistory.add(product);
+                        Customer newCustomer = new Customer(shoppingCart, username);
+                        newCustomer.setPurchaseHistory(purchaseHistory);
+                        MarketplaceServer.createCustomer(newCustomer);
+                        System.out.println("check2");
+                    }
+                }
 
                 while (true) {
-                    if (checkUser.equals("1")) {
+                    if (checkUser.equals("Seller")) {
                         //1s
                         String option = bfr.readLine();
                         switch (option) {
@@ -239,9 +279,10 @@ class WorkFlow extends Thread {
                                 break;
                         }
                     }
-                    if (checkUser.equals("0")) {
+                    if (checkUser.equals("Customer")) {
                         //1st received from customer client
                         String option = bfr.readLine();
+                        System.out.println(username);
                         switch (option) {
                             case "Sort":
                                 //1st sent to customer client, uselss
