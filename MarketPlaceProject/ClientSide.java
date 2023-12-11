@@ -10,6 +10,10 @@ import java.util.List;
  *Project 5 ClientSide
  *
  *This class allows the client to independently connect to the server and displays the GUI functionality of this project.
+ * @author a
+ * <p>Purdue University -- CS18000 -- Fall 2023</p>
+ *
+ * @version December 11th, 2023
  */
 
 public class ClientSide extends Thread {
