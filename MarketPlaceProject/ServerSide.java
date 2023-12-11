@@ -49,8 +49,9 @@ class WorkFlow extends Thread {
             ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
             outerloop:
             while (true) {
-                List<String> customers = Logs.loadFromCustomerFile();
-                List<String> sellers = Logs.loadFromSellerFile();
+                Logs login = new Logs();
+                List<String> customers = login.loadFromCustomerFile();
+                List<String> sellers = login.loadFromSellerFile();
                 // create an object output stream from the output stream so we can send an object through it
                 outputStream.writeObject(customers);
                 outputStream.writeObject(sellers);
@@ -74,14 +75,6 @@ class WorkFlow extends Thread {
                         Logs.saveToSellerFile(user);
                         System.out.println("check");
                         //create new Seller
-                        Product prodTemp = new Product("N/A","N/A","N/A",0,0.0);
-                        prodTemp.setLimit(0);
-                        prodTemp.setReviews(new ArrayList<>());
-                        ArrayList products = new ArrayList<>(); products.add(prodTemp);
-                        Store storeTemp = new Store(products,"N/A");
-                        ArrayList stores = new ArrayList<>(); stores.add(storeTemp);
-                        Seller seller = new Seller(stores,username);
-                        MarketplaceServer.createSeller(seller);
                     } else {
                         Logs.saveToCustomerFile(user);
                         Product product = new Product("N/A", "N/A", "N/A", 0, 0.0);
