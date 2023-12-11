@@ -6,6 +6,10 @@ import java.util.Scanner;
  * Project 5 - Customer
  *
  * This class represents a customer.
+  * @author a
+ * <p>Purdue University -- CS18000 -- Fall 2023</p>
+ *
+ * @version December 11th, 2023
  */
 
 public class Customer {
