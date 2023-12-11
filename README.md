@@ -1,27 +1,16 @@
 # Project4CSGOld
-To run and Compile our project, you must run the main method of the program, which serves as the marketplace for the project. After the project compiles, it prompts you to input whether the user is a seller or a customer. The control flow for the program is shown below.
+To run and Compile our project, you must run both the server, and the client side of the program from any device, which serves as the marketplace for the project. After the project compiles, it shows a GUI that prompts the user, asking them whether they are a seller or a customer. The control flow for the program is shown below.
 ![image](https://github.com/SuhaasNachannagari/Project4CSGOld/assets/143854535/2f61bb32-a6c5-44c7-ad02-e91005411eac)
 After the customer/seller signs into their account they are prompted with all the different actions they can perform.
+
+Note: To run the program using any port other than localhost, you must change the port you are connecting the server and client to. On the ClientSide class, on lines 31 and 32, you have to change the port for the socket to whatever you wish.
+Note: To exit the GUI hit the cancel button or close the GUI pop up on the screen.
 
 Raghav - Submitted report on Brightspace  
 Tri - Submitted the code on Vocareum
 
 Classes:  
-  CustomerLogin - Login for customers:  
-    Once the user says they are a customer,   
-    ask them whether they have an existing account or not.   
-      If: The account exists, check if the username exists and return an error if it doesn't.  
-      Ask for the password and if its correct go into the rest of the code.   
-      If: The account doesn't exist, ask them for a username and return an error if the username already exists.  
-      Ask them for a password.  
-      
-  SellerLogin -  Login for sellers:   
-      Once the user says they are a seller,  
-      ask them whether they have an existing account or not.  
-      If: The account exists, check if the username exists and return an error if it doesn't.   
-      Ask for the password and if its correct go into the rest of the code.   
-      If: The account doesn't exist, ask them for a username and return an error if the username already exists.   
-      ask them for a password.  
+  Logs - Allows for easy login and writing to .txt files to save the login information of users. The logic and methods developed in this are used in ClientSide for implementing the GUIs for logging in.
  
   User - This class helps implement the login features of the code by allowing easy storage of username and passwords. 
     
