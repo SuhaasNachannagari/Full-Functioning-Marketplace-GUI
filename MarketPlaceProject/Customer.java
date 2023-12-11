@@ -115,7 +115,7 @@ public class Customer {
             System.out.println("Review: ");
             int ind = 1;
             for (int j = 0; j < shoppingCart.get(i).getReviews().size(); j++) {
-                System.out.println(ind + ") \"" +shoppingCart.get(i).getReviews().get(j)+ "\"");
+                System.out.println(ind + ") \"" + shoppingCart.get(i).getReviews().get(j) + "\"");
                 ind++;
             }
             System.out.println();
@@ -131,7 +131,7 @@ public class Customer {
                     purchaseHistory.get(i).getDescription());
             System.out.print("Review: ");
             for (int j = 0; j < purchaseHistory.get(i).getReviews().size(); j++) {
-                System.out.print(purchaseHistory.get(i).getReviews().get(j)+ "\t\t");
+                System.out.print(purchaseHistory.get(i).getReviews().get(j) + "\t\t");
             }
             System.out.println();
         }
