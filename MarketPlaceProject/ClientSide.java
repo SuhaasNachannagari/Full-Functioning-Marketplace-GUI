@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
-*Project 5 ClientSide
-*
-*This class allows the client to independently connect to the server and displays the GUI functionality of this project.
-*/
+ *Project 5 ClientSide
+ *
+ *This class allows the client to independently connect to the server and displays the GUI functionality of this project.
+ */
 
 public class ClientSide extends Thread {
     private static int ind1 = 0;
@@ -81,7 +81,6 @@ public class ClientSide extends Thread {
                 ClientSide.User user = new ClientSide.User(array[0], array[1]);
                 boolean exists;
                 exists = !details.get(2).equals("true");
-                String username = user.getUsername();
                 checkUser = details.get(1).toString();
             } catch (Exception e) {
                 break outerloop;
@@ -90,7 +89,8 @@ public class ClientSide extends Thread {
             while (true) {
                 try {
                     if (checkUser.equals("Seller")) {
-                        String[] showOptions = {"1 - Delete", "2 - Edit", "3 - Create", "4 - View", "5 - Import/Export",
+                        String[] showOptions = {"1 - Delete", "2 - Edit", "3 - Create", "4 - View",
+                                "5 - Import/Export",
                                 "6 - Dashboard"};
                         String option = (String) (JOptionPane.showInputDialog(null, "What " +
                                         "do you want to do?", "Choice", JOptionPane.QUESTION_MESSAGE,
@@ -622,7 +622,8 @@ public class ClientSide extends Thread {
                                                             "Purchase Form",
                                                             JOptionPane.ERROR_MESSAGE);
                                                     isNotValidInt = true;
-                                                } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
+                                                } else if ((limitAndQuant[0] != -1) 
+                                                        && (quantity > limitAndQuant[0])) {
                                                     JOptionPane.showMessageDialog(null,
                                                             "You are attempting to buy more than the " +
                                                                     "limit of " +
@@ -677,7 +678,8 @@ public class ClientSide extends Thread {
                                                             "Add To Cart",
                                                             JOptionPane.ERROR_MESSAGE);
                                                     isNotValidInt = true;
-                                                } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
+                                                } else if ((limitAndQuant[0] != -1) 
+                                                        && (quantity > limitAndQuant[0])) {
                                                     JOptionPane.showMessageDialog(null,
                                                             "You are attempting to add more than the" +
                                                                     " limit of " +
@@ -766,7 +768,8 @@ public class ClientSide extends Thread {
                                             JOptionPane.INFORMATION_MESSAGE);
                                     String[] actionsWithProduct = {"Purchase Product", "Add To Shopping Cart",
                                             "Leave a Review"};
-                                    String actionWithProduct = (String) JOptionPane.showInputDialog(null,
+                                    String actionWithProduct = (String) JOptionPane.showInputDialog(
+                                            null,
                                             "What do you want to do with this product?",
                                             "Product", JOptionPane.QUESTION_MESSAGE, null,
                                             actionsWithProduct, actionsWithProduct[0]);
@@ -793,7 +796,8 @@ public class ClientSide extends Thread {
                                                             "Purchase Form",
                                                             JOptionPane.ERROR_MESSAGE);
                                                     isNotValidInt = true;
-                                                } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
+                                                } else if ((limitAndQuant[0] != -1)
+                                                        && (quantity > limitAndQuant[0])) {
                                                     JOptionPane.showMessageDialog(null,
                                                             "You are attempting to buy more than the " +
                                                                     "limit of " +
@@ -812,7 +816,8 @@ public class ClientSide extends Thread {
                                                     isNotValidInt = true;
                                                 }
                                             } catch (NumberFormatException e) {
-                                                JOptionPane.showMessageDialog(null, "Enter " +
+                                                JOptionPane.showMessageDialog(null, 
+                                                        "Enter " +
                                                                 "an integer",
                                                         "Order Form",
                                                         JOptionPane.ERROR_MESSAGE);
@@ -834,7 +839,8 @@ public class ClientSide extends Thread {
                                         do {
                                             try {
                                                 String quantityTwo = JOptionPane.showInputDialog(null,
-                                                        "How Much Would You Like To Add?", "Add To Cart",
+                                                        "How Much Would You Like To Add?",
+                                                        "Add To Cart",
                                                         JOptionPane.QUESTION_MESSAGE);
                                                 if (quantityTwo == null) {
                                                     throw new Exception();
@@ -847,9 +853,11 @@ public class ClientSide extends Thread {
                                                             "Add To Cart",
                                                             JOptionPane.ERROR_MESSAGE);
                                                     isNotValidInt = true;
-                                                } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
+                                                } else if ((limitAndQuant[0] != -1) 
+                                                        && (quantity > limitAndQuant[0])) {
                                                     JOptionPane.showMessageDialog(null,
-                                                            "You are attempting to add more than the limit " +
+                                                            "You are attempting to add " +
+                                                                    "more than the limit " +
                                                                     "of " +
                                                                     limitAndQuant[0] + " units set by the seller",
                                                             "Add To Cart",
@@ -978,7 +986,8 @@ public class ClientSide extends Thread {
                                                             "Purchase Form",
                                                             JOptionPane.ERROR_MESSAGE);
                                                     isNotValidInt = true;
-                                                } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
+                                                } else if ((limitAndQuant[0] != -1) 
+                                                        && (quantity > limitAndQuant[0])) {
                                                     JOptionPane.showMessageDialog(null,
                                                             "You are attempting to buy more than " +
                                                                     "the limit of " +
@@ -1031,7 +1040,8 @@ public class ClientSide extends Thread {
                                                             "Add To Cart",
                                                             JOptionPane.ERROR_MESSAGE);
                                                     isNotValidInt = true;
-                                                } else if ((limitAndQuant[0] != -1) && (quantity > limitAndQuant[0])) {
+                                                } else if ((limitAndQuant[0] != -1) 
+                                                        && (quantity > limitAndQuant[0])) {
                                                     JOptionPane.showMessageDialog(null,
                                                             "You are attempting to add more than " +
                                                                     "the limit of " +
@@ -1114,7 +1124,8 @@ public class ClientSide extends Thread {
                                         String remove = (String) JOptionPane.showInputDialog(null,
                                                 "Which product would you like to remove?",
                                                 "Shopping Cart",
-                                                JOptionPane.QUESTION_MESSAGE, null, cartProducts, cartProducts[0]);
+                                                JOptionPane.QUESTION_MESSAGE, 
+                                                null, cartProducts, cartProducts[0]);
                                         if (remove == null) {
                                             throw new Exception();
                                         }
@@ -1267,10 +1278,10 @@ public class ClientSide extends Thread {
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public boolean checkExistingCustomerUserName(String userName, List<ClientSide.User> Customers) {
+    public boolean checkExistingCustomerUserName(String userName, List<ClientSide.User> customersInput) {
         boolean exists = false;
-        for (int i = 0; i < Customers.size(); i++) {
-            if (Customers.get(i).getUsername().equals(userName)) {
+        for (int i = 0; i < customersInput.size(); i++) {
+            if (customersInput.get(i).getUsername().equals(userName)) {
                 exists = true;
                 return exists;
             }
@@ -1278,12 +1289,12 @@ public class ClientSide extends Thread {
         return exists;
     }
 
-    public ClientSide.User createCustomer(String username, String password, List<ClientSide.User> Customers) {
+    public ClientSide.User createCustomer(String username, String password, List<ClientSide.User> customersInput) {
         boolean created = false;
         // Check if the username already exists
-        if (getCustomerByUsername(username, Customers) == null) {
+        if (getCustomerByUsername(username, customersInput) == null) {
             ClientSide.User newUser = new ClientSide.User(username, password);
-            Customers.add(newUser);
+            customersInput.add(newUser);
             JOptionPane.showMessageDialog(null, "User " + username + " created " +
                             "successfully.",
                     "Marketplace", JOptionPane.PLAIN_MESSAGE);
@@ -1296,8 +1307,8 @@ public class ClientSide extends Thread {
         }
     }
 
-    private ClientSide.User getCustomerByUsername(String username, List<ClientSide.User> Customers) {
-        for (ClientSide.User user : Customers) {
+    private ClientSide.User getCustomerByUsername(String username, List<ClientSide.User> customersInput) {
+        for (ClientSide.User user : customersInput) {
             if (user.getUsername().equals(username)) {
                 return user;
             }
@@ -1305,8 +1316,8 @@ public class ClientSide extends Thread {
         return null;
     }
 
-    public boolean loginCustomer(String username, String password, List<ClientSide.User> Customers) {
-        ClientSide.User user = getCustomerByUsername(username, Customers);
+    public boolean loginCustomer(String username, String password, List<ClientSide.User> customersInput) {
+        ClientSide.User user = getCustomerByUsername(username, customersInput);
         if (user != null && user.getPassword().equals(password)) {
             JOptionPane.showMessageDialog(null, "Login successful for " + username,
                     "Marketplace", JOptionPane.PLAIN_MESSAGE);
@@ -1320,10 +1331,10 @@ public class ClientSide extends Thread {
     }
 
 
-    public boolean checkExistingSellerUserName(String userName, List<ClientSide.User> Sellers) {
+    public boolean checkExistingSellerUserName(String userName, List<ClientSide.User> sellersInput) {
         boolean exists = false;
-        for (int i = 0; i < Sellers.size(); i++) {
-            if (Sellers.get(i).getUsername().equals(userName)) {
+        for (int i = 0; i < sellersInput.size(); i++) {
+            if (sellersInput.get(i).getUsername().equals(userName)) {
                 exists = true;
                 return exists;
             }
@@ -1331,10 +1342,10 @@ public class ClientSide extends Thread {
         return exists;
     }
 
-    public ClientSide.User createSeller(String username, String password, List<ClientSide.User> Sellers) {
+    public ClientSide.User createSeller(String username, String password, List<ClientSide.User> sellersInput) {
         boolean created = false;
         // Check if the username already exists
-        if (getSellerByUsername(username, Sellers) == null) {
+        if (getSellerByUsername(username, sellersInput) == null) {
             ClientSide.User newUser = new ClientSide.User(username, password);
             JOptionPane.showMessageDialog(null, "User " + username + " created successfully.",
                     "Marketplace", JOptionPane.PLAIN_MESSAGE);
@@ -1349,8 +1360,8 @@ public class ClientSide extends Thread {
         }
     }
 
-    private ClientSide.User getSellerByUsername(String username, List<ClientSide.User> Sellers) {
-        for (ClientSide.User user : Sellers) {
+    private ClientSide.User getSellerByUsername(String username, List<ClientSide.User> sellersInput) {
+        for (ClientSide.User user : sellersInput) {
             if (user.getUsername().equals(username)) {
                 return user;
             }
@@ -1358,8 +1369,8 @@ public class ClientSide extends Thread {
         return null;
     }
 
-    public boolean loginSeller(String username, String password, List<ClientSide.User> Sellers) {
-        ClientSide.User user = getSellerByUsername(username, Sellers);
+    public boolean loginSeller(String username, String password, List<ClientSide.User> sellersInput) {
+        ClientSide.User user = getSellerByUsername(username, sellersInput);
         if (user != null && user.getPassword().equals(password)) {
             JOptionPane.showMessageDialog(null, "Login successful for " + username,
                     "Marketplace", JOptionPane.PLAIN_MESSAGE);
@@ -1373,7 +1384,7 @@ public class ClientSide extends Thread {
     }
 
 
-    public List<Object> LogIn(List<ClientSide.User> Customers, List<ClientSide.User> Sellers) {
+    public List<Object> LogIn(List<ClientSide.User> customersInput, List<ClientSide.User> sellersInput) {
         String password;
         String username;
         ClientSide.User newUser = null;
@@ -1400,13 +1411,14 @@ public class ClientSide extends Thread {
                             username = JOptionPane.showInputDialog(null,
                                     "Please enter your username('back' to go back).",
                                     "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                            checkUsername = checkExistingSellerUserName(username, Sellers);
+                            checkUsername = checkExistingSellerUserName(username, sellersInput);
                             if (username.equals("back")) {
                                 input = false;
                                 break;
                             }
                             if (!checkUsername) {
-                                JOptionPane.showMessageDialog(null, "The username is invalid.",
+                                JOptionPane.showMessageDialog(null,
+                                        "The username is invalid.",
                                         "Marketplace", JOptionPane.PLAIN_MESSAGE);
                                 input1 = false;
                             }
@@ -1417,7 +1429,7 @@ public class ClientSide extends Thread {
                         password = JOptionPane.showInputDialog(null, "Please" +
                                         " enter your password",
                                 "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                        input = loginSeller(username, password, Sellers);
+                        input = loginSeller(username, password, sellersInput);
                         newUser = new ClientSide.User(username, password);
                         userReturn = username + "," + password;
                         returnExists = "false";
@@ -1432,7 +1444,7 @@ public class ClientSide extends Thread {
                             username = JOptionPane.showInputDialog(null,
                                     "Please enter your username('back' to go back).",
                                     "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                            checkUsername = checkExistingSellerUserName(username, Sellers);
+                            checkUsername = checkExistingSellerUserName(username, sellersInput);
                             if (username.equals("back")) {
                                 input = false;
                                 break;
@@ -1451,7 +1463,7 @@ public class ClientSide extends Thread {
                         password = JOptionPane.showInputDialog(null,
                                 "Please enter your password",
                                 "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                        newUser = createSeller(username, password, Sellers);
+                        newUser = createSeller(username, password, sellersInput);
                         input = true;
                         userReturn = username + "," + password;
                         returnExists = "true";
@@ -1477,7 +1489,7 @@ public class ClientSide extends Thread {
                             username = JOptionPane.showInputDialog(null,
                                     "Please enter your username('back' to go back).",
                                     "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                            checkUsername = checkExistingCustomerUserName(username, Customers);
+                            checkUsername = checkExistingCustomerUserName(username, customersInput);
                             if (username.equals("back")) {
                                 input = false;
                                 break;
@@ -1495,7 +1507,7 @@ public class ClientSide extends Thread {
                         password = JOptionPane.showInputDialog(null,
                                 "Please enter your password",
                                 "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                        input = loginCustomer(username, password, Customers);
+                        input = loginCustomer(username, password, customersInput);
                         newUser = new ClientSide.User(username, password);
                         userReturn = username + "," + password;
                         returnExists = "false";
@@ -1513,7 +1525,7 @@ public class ClientSide extends Thread {
                             username = JOptionPane.showInputDialog(null,
                                     "Please enter your username('back' to go back).",
                                     "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                            checkUsername = checkExistingCustomerUserName(username, Customers);
+                            checkUsername = checkExistingCustomerUserName(username, customersInput);
                             if (username.equals("back")) {
                                 input = false;
                                 break;
@@ -1532,7 +1544,7 @@ public class ClientSide extends Thread {
                         password = JOptionPane.showInputDialog(null,
                                 "Please enter your password",
                                 "Marketplace", JOptionPane.QUESTION_MESSAGE);
-                        newUser = createCustomer(username, password, Customers);
+                        newUser = createCustomer(username, password, customersInput);
                         input = true;
                         userReturn = username + "," + password;
                         returnExists = "true";
