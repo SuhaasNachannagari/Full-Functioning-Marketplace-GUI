@@ -4,6 +4,10 @@ import java.util.Scanner;
  * Project 5 - Dashboard for Seller
  * <p>
  * This class will be used to display dashboard.
+  * @author a
+ * <p>Purdue University -- CS18000 -- Fall 2023</p>
+ *
+ * @version December 11th, 2023
  */
 public class Dashboard extends main {
     private Seller seller;
