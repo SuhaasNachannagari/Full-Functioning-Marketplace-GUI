@@ -4,6 +4,13 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Project 5 - ServerSide
+ *
+ * Establishes multiple connections with clients and recieves and sends information
+ * to and from the client and calls methods depending on the data supplied.
+ */
+
 public class ServerSide {
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = new ServerSocket(4242);
