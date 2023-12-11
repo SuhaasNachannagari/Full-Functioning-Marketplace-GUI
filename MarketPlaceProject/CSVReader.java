@@ -6,6 +6,10 @@ import java.io.IOException;
 *Project 5 CSVReader
 *
 *this class reades CSV file and also prints it
+* @author a
+ * <p>Purdue University -- CS18000 -- Fall 2023</p>
+ *
+ * @version November 13, 2023
 */
 public class CSVReader {
     public static void readCSV(String s) {
