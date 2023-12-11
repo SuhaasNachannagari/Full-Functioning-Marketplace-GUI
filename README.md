@@ -24,8 +24,7 @@ Classes:
   
   CSVReader -  The class reads a CSV file from the user.
   
-  Dashboard(Seller) -  
-   A Class that extends main in order to display and enact the code that runs whenever the seller chooses to view a dashboard.  
+  Dashboard(Seller) - A Class that extends main in order to display and enact the code that runs whenever the seller chooses to view a dashboard.  
     
   Customer -  This class represents a customer.  
   
@@ -42,3 +41,11 @@ Classes:
   Sort - A Class that extends main in order to display and enact the code that runs whenever the customer chooses to "search" in the main method. Includes methods that sort the products by quantity or price, display the products, and allow the user to write a review, buy the product, or add it to their shopping cart
     
   View - A class that extends main in order to display and enact the code that runs whenever the customer chooses to "sort" in the main method. Includes methods that display the products and allow the user to write a review, buy the product, or add it to their shopping cart
+
+  MarketplaceServer -
+
+  DashboardIO - 
+
+  ServerSide -
+
+  ClientSide -
