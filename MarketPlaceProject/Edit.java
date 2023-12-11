@@ -6,6 +6,10 @@ import java.util.Scanner;
  * Project 5 - Edit
  * <p>
  * This class will be used to edit products.
+  * @author a
+ * <p>Purdue University -- CS18000 -- Fall 2023</p>
+ *
+ * @version December 11th, 2023
  */
 
 public class Edit extends main {
