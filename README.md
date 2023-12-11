@@ -44,7 +44,7 @@ Classes:
 
   MarketplaceServer -
 
-  DashboardIO - 
+  DashboardIO -  This class will be used to display dashboard.
 
   ServerSide -
 
