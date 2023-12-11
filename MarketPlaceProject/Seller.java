@@ -6,6 +6,10 @@ import java.io.Serializable;
  * Project 5 - Seller
  *
  * This class represents a single seller.
+  * @author a
+ * <p>Purdue University -- CS18000 -- Fall 2023</p>
+ *
+ * @version December 11th, 2023
  */
 
 public class Seller {
