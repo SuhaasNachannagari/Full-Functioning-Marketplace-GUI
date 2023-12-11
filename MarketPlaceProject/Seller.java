@@ -49,7 +49,8 @@ public class Seller {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
             BufferedReader bfr = new BufferedReader(new BufferedReader(new FileReader(fileName)));
             String firstLine = bfr.readLine();
-            if (firstLine == null || !firstLine.equals("product_name,store_name,description,quantity_available,price")) {
+            if (firstLine == null
+                    || !firstLine.equals("product_name,store_name,description,quantity_available,price")) {
                 writer.write("product_name,store_name,description,quantity_available,price\n");
             }
             String toFile = product.getName() + "," + product.getStoreName() + "," + product.getDescription() + "," +
