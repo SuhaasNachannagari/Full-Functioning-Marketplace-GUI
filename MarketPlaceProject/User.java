@@ -2,6 +2,10 @@
  * Project 5 - User
  *
  * This class helps implement the login features of the code by allowing easy storage of username and passwords.
+  * @author a
+ * <p>Purdue University -- CS18000 -- Fall 2023</p>
+ *
+ * @version December 11th, 2023
  */
 
 
