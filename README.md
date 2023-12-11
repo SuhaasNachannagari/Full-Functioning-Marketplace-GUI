@@ -48,4 +48,4 @@ Classes:
 
   ServerSide -
 
-  ClientSide -
+  ClientSide -  This class allows the client to independently connect to the server and displays the GUI functionality of this project.
