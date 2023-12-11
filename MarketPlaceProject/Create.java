@@ -5,6 +5,11 @@ import java.util.Scanner;
  * Project 5 - Create
  *
  * This class creates new product for a choosen store
+ *
+ * @author a
+ * <p>Purdue University -- CS18000 -- Fall 2023</p>
+ *
+ * @version December 11th, 2023
  */
 public class Create extends main {
     private Seller seller;
