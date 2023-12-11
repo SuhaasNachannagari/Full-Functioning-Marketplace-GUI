@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 /**
- * Project 4 - CustomerDashboard
+ * Project 5 - CustomerDashboard
  *
  * A Class that extends main in order to display and enact the code that runs whenever 
  * the customer chooses to view a dashboard.
