@@ -17,7 +17,7 @@ public class MarketplaceServer {
     public synchronized static void createSeller(Seller seller) {
         sellers.add(seller);
     }
-    public  static String showStore(String username) {
+    public synchronized static String showStore(String username) {
         Seller seller = null;
         for (Seller sellerTemp: sellers) {
             if (sellerTemp.getUserName().equals(username)) {
@@ -36,7 +36,7 @@ public class MarketplaceServer {
             return showStores;
         }
     }
-    public static String showProducts(String storeName, String username) {
+    public synchronized static String showProducts(String storeName, String username) {
         Seller seller = null;
         for (Seller sellerTemp: sellers) {
             if (sellerTemp.getUserName().equals(username)) {
@@ -95,7 +95,7 @@ public class MarketplaceServer {
             return "Product deleted!";
         }
     }
-    public  static String checkNoProductMessage(String storeChoice, String username) {
+    public synchronized static String checkNoProductMessage(String storeChoice, String username) {
         Seller seller = null;
         for (Seller sellerTemp: sellers) {
             if (sellerTemp.getUserName().equals(username)) {
@@ -164,7 +164,7 @@ public class MarketplaceServer {
 
         return "Product Edited";
     }
-    public static String showAllStore(String username) {
+    public synchronized static String showAllStore(String username) {
         Seller seller = null;
         for (Seller sellerTemp: sellers) {
             if (sellerTemp.getUserName().equals(username)) {
@@ -189,7 +189,7 @@ public class MarketplaceServer {
             }
         }
         sellers.get(sellerIndex).getStores().get(0).setName(storeName);
-        sellers.get(sellerIndex).getStores().get(0).setSales(0);
+        sellers.get(sellerIndex).getStores().get(0).setSales(0.0);
         return ("Store created!");
     }
     public synchronized static String createStore(String storeName, String username) {
@@ -207,7 +207,7 @@ public class MarketplaceServer {
         sellers.get(sellerIndex).getStores().get(storeIndex).setSales(0);
         return ("Store created!");
     }
-    public static boolean checkProductName(String storeChoice, String productName, String username) {
+    public synchronized static boolean checkProductName(String storeChoice, String productName, String username) {
         Seller seller = null;
         for (int i = 0; i < sellers.size(); i++) {
             if (sellers.get(i).getUserName().equals(username)) {
@@ -227,7 +227,7 @@ public class MarketplaceServer {
         return true;
     }
     public synchronized static String createProduct(String storeChoice, String prodName, String prodDes, String prodQuant,
-                                       String prodPrice, String prodLimit, String username ) {
+                                                    String prodPrice, String prodLimit, String username ) {
         Seller seller = null;
         int sellerIndex = 0;
         for (int i = 0; i < sellers.size(); i++) {
@@ -270,7 +270,7 @@ public class MarketplaceServer {
         }
         return null;
     }
-    public static String viewStores(String username) {
+    public synchronized static String viewStores(String username) {
         int sellerIndex = 0;
         for (int i = 0; i < sellers.size(); i++) {
             if (sellers.get(i).getUserName().equals(username)) {
@@ -301,7 +301,7 @@ public class MarketplaceServer {
         }
         return salesByStores;
     }
-    public static String viewShoppingCart(String username) {
+    public synchronized static String viewShoppingCart(String username) {
         int sellerIndex = 0;
         for (int i = 0; i < sellers.size(); i++) {
             if (sellers.get(i).getUserName().equals(username)) {
@@ -311,7 +311,6 @@ public class MarketplaceServer {
         }
         String shoppingCartResult = "";
         if (sellers.get(sellerIndex).getStores().get(0).getName().equals("N/A")) {
-            System.out.println("This user has no stores, please add some!");
             return "No stores";
         } else {
             for (Store store : sellers.get(sellerIndex).getStores()) {
@@ -331,7 +330,7 @@ public class MarketplaceServer {
         }
         return shoppingCartResult;
     }
-    public static String saveToFileProduct(String storeName, String username, String fileName) {
+    public synchronized static String saveToFileProduct(String storeName, String username, String fileName) {
         for (int i = 0; i < sellers.size(); i++) {
             if (sellers.get(i).getUserName().equals(username)) {
                 for( int j = 0; j < sellers.get(i).getStores().size(); j++) {
@@ -458,7 +457,7 @@ public class MarketplaceServer {
             for (Store store : stores) {
                 ArrayList<Product> products = store.getProducts();
                 for (Product product : products) {
-                    quantityListedProducts.add(product);
+                    if (!product.getName().equals("N/A")) { quantityListedProducts.add(product); }
                 }
             }
         }
@@ -491,7 +490,7 @@ public class MarketplaceServer {
             for (Store store : stores) {
                 ArrayList<Product> products = store.getProducts();
                 for (Product product : products) {
-                    priceListedProducts.add(product);
+                    if (!product.getName().equals("N/A")) { priceListedProducts.add(product); }
                 }
             }
         }
@@ -544,7 +543,7 @@ public class MarketplaceServer {
             for (Store store : stores) {
                 ArrayList<Product> products = store.getProducts();
                 for (Product product : products) {
-                    viewProducts.add(product);
+                    if (!product.getName().equals("N/A")) { viewProducts.add(product); }
                 }
             }
         }
@@ -1207,7 +1206,7 @@ public class MarketplaceServer {
         }
         String output = "";
         for (String store : salesByStore) {
-            output += store + "...";
+            if (!store.substring(0,3).equals("N/A")) { output += store + "..."; }
         }
         return output;
     }
@@ -1268,7 +1267,7 @@ public class MarketplaceServer {
         }
         String output = "";
         for (String store : salesByStore) {
-            output += store + "...";
+            if (!store.substring(0,3).equals("N/A")) { output += store + "..."; }
         }
         return output;
     }
