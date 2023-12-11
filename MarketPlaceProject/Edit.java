@@ -3,7 +3,7 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
- * Project 4 - Edit
+ * Project 5 - Edit
  * <p>
  * This class will be used to edit products.
  */
