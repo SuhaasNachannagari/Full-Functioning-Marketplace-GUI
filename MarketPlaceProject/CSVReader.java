@@ -3,7 +3,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 /**
-*project 4 CSVReader
+*Project 5 CSVReader
 *
 *this class reades CSV file and also prints it
 */
