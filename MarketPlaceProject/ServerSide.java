@@ -9,6 +9,10 @@ import java.util.List;
  *
  * Establishes multiple connections with clients and recieves and sends information
  * to and from the client and calls methods depending on the data supplied.
+  * @author a
+ * <p>Purdue University -- CS18000 -- Fall 2023</p>
+ *
+ * @version December 11th, 2023
  */
 
 public class ServerSide {
