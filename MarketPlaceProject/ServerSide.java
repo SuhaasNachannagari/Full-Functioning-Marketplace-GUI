@@ -16,7 +16,6 @@ public class ServerSide {
                 // 1
                 Thread workFlow = new WorkFlow(socket);
                 workFlow.start();
-                workFlow.join();
                 Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                     public void run() {
                         System.out.println("Data saved");
@@ -62,7 +61,6 @@ class WorkFlow extends Thread {
                     throw new RuntimeException(e);
                 }
                 String checker = details.get(2).toString();
-                System.out.println(details.get(0));
                 boolean exists;
                 exists = !checker.equals("true");
                 String checkUser = details.get(1).toString();
@@ -73,8 +71,16 @@ class WorkFlow extends Thread {
                 if (!exists) {
                     if (checkUser.equals("Seller")) {
                         Logs.saveToSellerFile(user);
-                        System.out.println("check");
                         //create new Seller
+                        Product prodTemp = new Product("N/A","N/A","N/A",0,0.0);
+                        prodTemp.setLimit(0);
+                        prodTemp.setReviews(new ArrayList<>());
+                        ArrayList products = new ArrayList<>(); products.add(prodTemp);
+                        Store storeTemp = new Store(products,"N/A");
+                        storeTemp.setSales(0.0);
+                        ArrayList stores = new ArrayList<>(); stores.add(storeTemp);
+                        Seller newSeller = new Seller(stores,username);
+                        MarketplaceServer.createSeller(newSeller);
                     } else {
                         Logs.saveToCustomerFile(user);
                         Product product = new Product("N/A", "N/A", "N/A", 0, 0.0);
@@ -88,7 +94,6 @@ class WorkFlow extends Thread {
                         Customer newCustomer = new Customer(shoppingCart, username);
                         newCustomer.setPurchaseHistory(purchaseHistory);
                         MarketplaceServer.createCustomer(newCustomer);
-                        System.out.println("check2");
                     }
                 }
 
@@ -166,7 +171,7 @@ class WorkFlow extends Thread {
                                 //2cre - storeChoice
                                 String storeChoice3 = bfr.readLine();
                                 String[] storesCheck = storeNames3.split("/-"); //check Create store
-                                if (storeChoice3.equals("1. N/A")) {
+                                if (storeChoice3.equals("1.N/A")) {
                                     //3cre - Name to create new store
                                     String storeName = bfr.readLine();
                                     String createResult = MarketplaceServer.createStoreNA(storeName, username);
@@ -244,7 +249,6 @@ class WorkFlow extends Thread {
                                     String fileName = bfr.readLine();
                                     String result = MarketplaceServer.saveToFileProduct(storeName, username, fileName);
                                     //4inEx - Export: result
-                                    System.out.println("4inEx");
                                     pw.write(result + "\n");
                                     pw.flush();
                                 }
@@ -282,7 +286,6 @@ class WorkFlow extends Thread {
                     if (checkUser.equals("Customer")) {
                         //1st received from customer client
                         String option = bfr.readLine();
-                        System.out.println(username);
                         switch (option) {
                             case "Sort":
                                 //1st sent to customer client, uselss
@@ -294,16 +297,16 @@ class WorkFlow extends Thread {
                                 if (sortOption[0].equals("Price")) {
                                     sortBy = 1;
                                     ArrayList<Product> priceProducts = MarketplaceServer.sortProducts(sortBy, sortOption[1]);
-                                    String priceListing = "Refresh Page/-";
+                                    String priceListing = ""; // = "Refresh Page/-";
                                     int i = 1;
                                     for (Product product : priceProducts) {
-                                        String productToAdd = String.format("%d. Store: %s, Name: %s, Price: %.2f/-",
-                                                i,
-                                                product.getStoreName(),
-                                                product.getName(),
-                                                product.getPrice());
-                                        priceListing += productToAdd;
-                                        i++;
+                                            String productToAdd = String.format("%d. Store: %s, Name: %s, Price: %.2f/-",
+                                                    i,
+                                                    product.getStoreName(),
+                                                    product.getName(),
+                                                    product.getPrice());
+                                            priceListing += productToAdd;
+                                            i++;
                                     }
                                     //2nd send to customer, listing of products
                                     if (priceProducts != null) {
@@ -741,13 +744,15 @@ class WorkFlow extends Thread {
                     // final read-write
                     String checkDoAgain = bfr.readLine();
                     if (checkDoAgain.equals("continueLoop")) {
-                    } else {
-                        break;
+                    } else if (checkDoAgain.equals("breakLoop")) {
+                        break ;
+                    } else if (checkDoAgain.equals("breakOuterLoop")) {
+                        break outerloop;
                     }
                 } // of main loop
             } // of outerloop
-        } catch(IOException e){
-            throw new RuntimeException(e);
+        } catch(Exception e){
+            //throw new RuntimeException(e);
         }
     }
 }
