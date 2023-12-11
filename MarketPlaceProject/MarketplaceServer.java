@@ -14,12 +14,14 @@ public class MarketplaceServer {
     public synchronized static void createCustomer(Customer customer) {
         customers.add(customer);
     }
+
     public synchronized static void createSeller(Seller seller) {
         sellers.add(seller);
     }
+
     public synchronized static String showStore(String username) {
         Seller seller = null;
-        for (Seller sellerTemp: sellers) {
+        for (Seller sellerTemp : sellers) {
             if (sellerTemp.getUserName().equals(username)) {
                 seller = sellerTemp;
             }
@@ -36,18 +38,19 @@ public class MarketplaceServer {
             return showStores;
         }
     }
+
     public synchronized static String showProducts(String storeName, String username) {
         Seller seller = null;
-        for (Seller sellerTemp: sellers) {
+        for (Seller sellerTemp : sellers) {
             if (sellerTemp.getUserName().equals(username)) {
                 seller = sellerTemp;
             }
         }
-        for (Store store: seller.getStores()) {
+        for (Store store : seller.getStores()) {
             String productNames = "";
             if (store.getName().equals(storeName.substring(2))) {
                 int j = 0;
-                for (Product prod: store.getProducts()) {
+                for (Product prod : store.getProducts()) {
                     j++;
                     productNames += j + "." + prod.getName() + "/-";
                 }
@@ -56,6 +59,7 @@ public class MarketplaceServer {
         }
         return null;
     }
+
     public synchronized static String deleteDeleteProduct(String storeChoice, String productName, String username) {
         Seller seller = null;
         int sellerIndex = 0;
@@ -68,7 +72,7 @@ public class MarketplaceServer {
         }
         int storeIndex = 0;
         int productIndex = 0;
-        for (int i = 0; i < seller.getStores().size(); i++ ) {
+        for (int i = 0; i < seller.getStores().size(); i++) {
             if (seller.getStores().get(i).getName().equals(storeChoice.substring(2))) {
                 storeIndex = i;
                 for (int j = 0; j < seller.getStores().get(i).getProducts().size(); j++) {
@@ -80,14 +84,15 @@ public class MarketplaceServer {
             }
         }
 
-        if ( sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).getName().equals("N/A") ) {
+        if (sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).getName().equals("N/A")) {
             sellers.get(sellerIndex).getStores().remove(storeIndex);
             return "Store removed!";
         } else {
             sellers.get(sellerIndex).getStores().get(storeIndex).deleteProduct(productIndex);
             // when the last product is deleted, add a dummy product named "N/A"
             if (sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().size() == 0) {
-                Product prodNull = new Product("N/A","N/A","N/A",0,0.0);
+                Product prodNull = new Product("N/A", "N/A", "N/A",
+                        0, 0.0);
                 prodNull.setReviews(new ArrayList<>());
                 prodNull.setLimit(0);
                 sellers.get(sellerIndex).getStores().get(storeIndex).addProduct(prodNull);
@@ -95,14 +100,16 @@ public class MarketplaceServer {
             return "Product deleted!";
         }
     }
+
     public synchronized static String checkNoProductMessage(String storeChoice, String username) {
         Seller seller = null;
-        for (Seller sellerTemp: sellers) {
+        for (Seller sellerTemp : sellers) {
             if (sellerTemp.getUserName().equals(username)) {
-                seller = sellerTemp;    break;
+                seller = sellerTemp;
+                break;
             }
         }
-        for (Store store: seller.getStores()) {
+        for (Store store : seller.getStores()) {
             if (store.getName().equals(storeChoice.substring(2))) {
                 if (store.getProducts().get(0).getName().equals("N/A")) {
                     return "No Products";
@@ -112,7 +119,9 @@ public class MarketplaceServer {
         }
         return null;
     }
-    public synchronized static String editProduct(String storeChoice, String productChoice, String choice, String valueChange, String username) {
+
+    public synchronized static String editProduct(String storeChoice, String productChoice,
+                                                  String choice, String valueChange, String username) {
         Seller seller = null;
         int sellerIndex = 0;
         for (int i = 0; i < sellers.size(); i++) {
@@ -125,11 +134,12 @@ public class MarketplaceServer {
         int storeIndex = 0;
         int productIndex = 0;
         int newStoreIndex = 0;
-        for (int i = 0; i < seller.getStores().size(); i++ ) {
+        for (int i = 0; i < seller.getStores().size(); i++) {
             if (seller.getStores().get(i).getName().equals(storeChoice.substring(2))) {
                 storeIndex = i;
                 for (int j = 0; j < seller.getStores().get(i).getProducts().size(); j++) {
-                    if (seller.getStores().get(i).getProducts().get(j).getName().equals(productChoice.substring(2))) {
+                    String a = productChoice.substring(2);
+                    if (seller.getStores().get(i).getProducts().get(j).getName().equals(a)) {
                         productIndex = j;
                         break;
                     }
@@ -138,7 +148,7 @@ public class MarketplaceServer {
         }
 
         if (choice.equals("2.Store Name")) {
-            for (int i = 0; i < seller.getStores().size(); i++ ) {
+            for (int i = 0; i < seller.getStores().size(); i++) {
                 if (seller.getStores().get(i).getName().equals(valueChange.substring(2))) {
                     newStoreIndex = i;
                 }
@@ -146,8 +156,8 @@ public class MarketplaceServer {
 
             String storeName = sellers.get(sellerIndex).getStores().get(newStoreIndex).getName();
             Product oldProduct = sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(productIndex);
-            Product newProduct = new Product(oldProduct.getName(),storeName, oldProduct.getDescription(),
-                    oldProduct.getQuantAvailable(),oldProduct.getPrice());
+            Product newProduct = new Product(oldProduct.getName(), storeName, oldProduct.getDescription(),
+                    oldProduct.getQuantAvailable(), oldProduct.getPrice());
             newProduct.setLimit(oldProduct.getLimit());
             newProduct.setReviews(oldProduct.getReviews());
             sellers.get(sellerIndex).getStores().get(newStoreIndex).addProduct(newProduct);
@@ -155,20 +165,33 @@ public class MarketplaceServer {
         } else {
             String name = seller.getStores().get(storeIndex).getProducts().get(productIndex).getName();
             int indexChange = 0;
-            if (choice.equals("1.Name")) { indexChange = 1; }
-            if (choice.equals("3.Description")) { indexChange = 3; }
-            if (choice.equals("4.Quantity Available")) { indexChange = 4; }
-            if (choice.equals("5.Price")) { indexChange = 5; } if (choice.equals("6.Limit")) { indexChange = 6; }
-            boolean checkOption = sellers.get(sellerIndex).getStores().get(storeIndex).editProduct(name, indexChange, valueChange);
+            if (choice.equals("1.Name")) {
+                indexChange = 1;
+            }
+            if (choice.equals("3.Description")) {
+                indexChange = 3;
+            }
+            if (choice.equals("4.Quantity Available")) {
+                indexChange = 4;
+            }
+            if (choice.equals("5.Price")) {
+                indexChange = 5;
+            }
+            if (choice.equals("6.Limit")) {
+                indexChange = 6;
+            }
+            sellers.get(sellerIndex).getStores().get(storeIndex).editProduct(name, indexChange, valueChange);
         }
 
         return "Product Edited";
     }
+
     public synchronized static String showAllStore(String username) {
         Seller seller = null;
-        for (Seller sellerTemp: sellers) {
+        for (Seller sellerTemp : sellers) {
             if (sellerTemp.getUserName().equals(username)) {
-                seller = sellerTemp; break;
+                seller = sellerTemp;
+                break;
             }
         }
         String showStores = "";
@@ -177,9 +200,10 @@ public class MarketplaceServer {
             j++;
             showStores += j + "." + store.getName() + "/-";
         }
-        showStores += ( (seller.getStores().size() + 1) + "." + "Create new store");
+        showStores += ((seller.getStores().size() + 1) + "." + "Create new store");
         return showStores;
     }
+
     public synchronized static String createStoreNA(String storeName, String username) {
         int sellerIndex = 0;
         for (int i = 0; i < sellers.size(); i++) {
@@ -192,6 +216,7 @@ public class MarketplaceServer {
         sellers.get(sellerIndex).getStores().get(0).setSales(0.0);
         return ("Store created!");
     }
+
     public synchronized static String createStore(String storeName, String username) {
         Seller seller = null;
         int sellerIndex = 0;
@@ -203,10 +228,11 @@ public class MarketplaceServer {
             }
         }
         int storeIndex = seller.getStores().size();
-        sellers.get(sellerIndex).getStores().add( new Store(new ArrayList<>(),storeName));
+        sellers.get(sellerIndex).getStores().add(new Store(new ArrayList<>(), storeName));
         sellers.get(sellerIndex).getStores().get(storeIndex).setSales(0);
         return ("Store created!");
     }
+
     public synchronized static boolean checkProductName(String storeChoice, String productName, String username) {
         Seller seller = null;
         for (int i = 0; i < sellers.size(); i++) {
@@ -217,7 +243,7 @@ public class MarketplaceServer {
         }
         for (int i = 0; i < seller.getStores().size(); i++) {
             if (seller.getStores().get(i).getName().equals(storeChoice.substring(2))) {
-                for (Product prod: seller.getStores().get(i).getProducts()) {
+                for (Product prod : seller.getStores().get(i).getProducts()) {
                     if (prod.getName().equals(productName)) {
                         return false;
                     }
@@ -226,8 +252,10 @@ public class MarketplaceServer {
         }
         return true;
     }
-    public synchronized static String createProduct(String storeChoice, String prodName, String prodDes, String prodQuant,
-                                                    String prodPrice, String prodLimit, String username ) {
+
+    public synchronized static String createProduct(String storeChoice, String prodName, String prodDes,
+                                                    String prodQuant,
+                                                    String prodPrice, String prodLimit, String username) {
         Seller seller = null;
         int sellerIndex = 0;
         for (int i = 0; i < sellers.size(); i++) {
@@ -241,20 +269,28 @@ public class MarketplaceServer {
         for (int i = 0; i < seller.getStores().size(); i++) {
             if (seller.getStores().get(i).getName().equals(storeChoice.substring(2))) {
                 storeIndex = i;
-                Product product = new Product(prodName,storeChoice.substring(2),prodDes,
-                        Integer.parseInt(prodQuant),Double.parseDouble(prodPrice));
+                Product product = new Product(prodName, storeChoice.substring(2), prodDes,
+                        Integer.parseInt(prodQuant), Double.parseDouble(prodPrice));
                 product.setLimit(Integer.parseInt(prodLimit));
                 product.setReviews(new ArrayList<>());
                 try {
-                    if (sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).getName().equals("N/A")) {
+                    String a = "N/A";
+                    if (sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).getName().equals(a)){
                         // if the store hasn't contained any product yet
-                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setName(product.getName());
-                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setStoreName(product.getStoreName());
-                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setDescription(product.getDescription());
-                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setPrice(product.getPrice());
-                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setQuantAvailable(product.getQuantAvailable());
-                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setLimit(product.getLimit());
-                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setReviews(product.getReviews());
+                        String b = product.getName();
+                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setName(b);
+                        String c = product.getStoreName();
+                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setStoreName(c);
+                        String d = product.getDescription();
+                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setDescription(d);
+                        double e = product.getPrice();
+                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setPrice(e);
+                        int f = product.getQuantAvailable();
+                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setQuantAvailable(f);
+                        int g = product.getLimit();
+                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setLimit(g);
+                        ArrayList<String> h = product.getReviews();
+                        sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).setReviews(h);
                         return ("This will be the first product of the store!");
                     } else {
                         // if the store already has at least 1 product existed.
@@ -270,6 +306,7 @@ public class MarketplaceServer {
         }
         return null;
     }
+
     public synchronized static String viewStores(String username) {
         int sellerIndex = 0;
         for (int i = 0; i < sellers.size(); i++) {
@@ -301,6 +338,7 @@ public class MarketplaceServer {
         }
         return salesByStores;
     }
+
     public synchronized static String viewShoppingCart(String username) {
         int sellerIndex = 0;
         for (int i = 0; i < sellers.size(); i++) {
@@ -319,8 +357,10 @@ public class MarketplaceServer {
                     ArrayList<Product> cartTemp = cust.getPurchaseHistory();
                     for (Product prod : cartTemp) {
                         if (store.getName().equals(prod.getStoreName())) {
-                            shoppingCartResult += (String.format("Customer name: %s     Product: %s     Description: %s" +
-                                            "   Quantity: %d/-", cust.getCustomerUserName(), prod.getName(), prod.getDescription()
+                            shoppingCartResult += (String.format("Customer name: %s     Product: %s    " +
+                                            " Description: %s" +
+                                            "   Quantity: %d/-", cust.getCustomerUserName(), prod.getName(),
+                                    prod.getDescription()
                                     , prod.getQuantAvailable()));
                         }
                     }
@@ -330,12 +370,13 @@ public class MarketplaceServer {
         }
         return shoppingCartResult;
     }
+
     public synchronized static String saveToFileProduct(String storeName, String username, String fileName) {
         for (int i = 0; i < sellers.size(); i++) {
             if (sellers.get(i).getUserName().equals(username)) {
-                for( int j = 0; j < sellers.get(i).getStores().size(); j++) {
+                for (int j = 0; j < sellers.get(i).getStores().size(); j++) {
                     if (sellers.get(i).getStores().get(j).getName().equals(storeName.substring(2))) {
-                        for(int k = 0; k < sellers.get(i).getStores().get(j).getProducts().size(); k++) {
+                        for (int k = 0; k < sellers.get(i).getStores().get(j).getProducts().size(); k++) {
                             Product product = sellers.get(i).getStores().get(j).getProducts().get(k);
                             sellers.get(i).saveToFileProductSeller(product, fileName);
                         }
@@ -345,19 +386,21 @@ public class MarketplaceServer {
         }
         return "Saved to File";
     }
+
     public synchronized static String loadFromFileProduct(String fileName) {
         ArrayList<String> productData = new ArrayList<>();
         ArrayList<String> sellerInfo = new ArrayList<>();
         writeDataSeller();
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName)) ){
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 productData.add(line);
             }
-            if(productData == null || productData.isEmpty()) {
+            if (productData == null || productData.isEmpty()) {
                 return "No data in file!";
             } else {
-                PrintWriter pwr = new PrintWriter(new FileOutputStream("SellerInfo.txt", true), true);
+                PrintWriter pwr = new PrintWriter(new FileOutputStream("SellerInfo.txt", true),
+                        true);
                 for (int i = 1; i < productData.size(); i++) { //start from one cuz the first line is the title.
                     String[] parts = productData.get(i).split(",");
                     String toSellerInfo = "";
@@ -366,7 +409,7 @@ public class MarketplaceServer {
                             toSellerInfo += parts[j];
                         } else if (j == 2) {
                             toSellerInfo += "/-0.0/-" + parts[j];
-                        } else if (j == (parts.length-1)) {
+                        } else if (j == (parts.length - 1)) {
                             String[] reviews = parts[j].split("/");
                             for (String review : reviews) {
                                 toSellerInfo += "/-" + review;
@@ -457,7 +500,9 @@ public class MarketplaceServer {
             for (Store store : stores) {
                 ArrayList<Product> products = store.getProducts();
                 for (Product product : products) {
-                    if (!product.getName().equals("N/A")) { quantityListedProducts.add(product); }
+                    if (!product.getName().equals("N/A")) {
+                        quantityListedProducts.add(product);
+                    }
                 }
             }
         }
@@ -490,7 +535,9 @@ public class MarketplaceServer {
             for (Store store : stores) {
                 ArrayList<Product> products = store.getProducts();
                 for (Product product : products) {
-                    if (!product.getName().equals("N/A")) { priceListedProducts.add(product); }
+                    if (!product.getName().equals("N/A")) {
+                        priceListedProducts.add(product);
+                    }
                 }
             }
         }
@@ -543,7 +590,9 @@ public class MarketplaceServer {
             for (Store store : stores) {
                 ArrayList<Product> products = store.getProducts();
                 for (Product product : products) {
-                    if (!product.getName().equals("N/A")) { viewProducts.add(product); }
+                    if (!product.getName().equals("N/A")) {
+                        viewProducts.add(product);
+                    }
                 }
             }
         }
@@ -552,7 +601,8 @@ public class MarketplaceServer {
         return viewProducts;
     }
 
-    public synchronized static String priceAddToShoppingCart(ArrayList<Product> priceListedProducts, String username, int quantity, int num) {
+    public synchronized static String priceAddToShoppingCart(ArrayList<Product> priceListedProducts,
+                                                             String username, int quantity, int num) {
         Product productFromSeller = priceListedProducts.get(num - 1);
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
@@ -591,7 +641,8 @@ public class MarketplaceServer {
                                     currentProduct.getDescription().equals(combinedProduct.getDescription()) &&
                                     currentProduct.getPrice() == combinedProduct.getPrice()) {
                                 // If found, update the quantity
-                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() + currentProduct.getQuantAvailable());
+                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() +
+                                        currentProduct.getQuantAvailable());
                                 found = true;
                                 break;
                             }
@@ -614,7 +665,8 @@ public class MarketplaceServer {
         return ("Item added!");
     }
 
-    public synchronized static String quantityAddToShoppingCart(ArrayList<Product> quantityListedProducts, String username, int quantity, int num) {
+    public synchronized static String quantityAddToShoppingCart(ArrayList<Product> quantityListedProducts,
+                                                                String username, int quantity, int num) {
         Product productFromSeller = quantityListedProducts.get(num - 1);
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
@@ -637,8 +689,7 @@ public class MarketplaceServer {
                     if (updatedShoppingCart != null && updatedShoppingCart.size() != 0) {
                         if (updatedShoppingCart.get(0).getName().equals("N/A")) {
                             updatedShoppingCart.set(0, productToAdd);
-                        }
-                        else {
+                        } else {
                             updatedShoppingCart.add(productToAdd);
                         }
                     } else {
@@ -654,7 +705,8 @@ public class MarketplaceServer {
                                     currentProduct.getDescription().equals(combinedProduct.getDescription()) &&
                                     currentProduct.getPrice() == combinedProduct.getPrice()) {
                                 // If found, update the quantity
-                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() + currentProduct.getQuantAvailable());
+                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() +
+                                        currentProduct.getQuantAvailable());
                                 found = true;
                                 break;
                             }
@@ -676,7 +728,9 @@ public class MarketplaceServer {
         }
         return ("Item added!");
     }
-    public synchronized static String addToShoppingCart(ArrayList<Product> listedProducts, String username, int quantity, int num) {
+
+    public synchronized static String addToShoppingCart(ArrayList<Product> listedProducts, String username,
+                                                        int quantity, int num) {
         Product productFromSeller = listedProducts.get(num - 1);
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
@@ -699,8 +753,7 @@ public class MarketplaceServer {
                     if (updatedShoppingCart != null && updatedShoppingCart.size() != 0) {
                         if (updatedShoppingCart.get(0).getName().equals("N/A")) {
                             updatedShoppingCart.set(0, productToAdd);
-                        }
-                        else {
+                        } else {
                             updatedShoppingCart.add(productToAdd);
                         }
                     } else {
@@ -716,7 +769,8 @@ public class MarketplaceServer {
                                     currentProduct.getDescription().equals(combinedProduct.getDescription()) &&
                                     currentProduct.getPrice() == combinedProduct.getPrice()) {
                                 // If found, update the quantity
-                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() + currentProduct.getQuantAvailable());
+                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() +
+                                        currentProduct.getQuantAvailable());
                                 found = true;
                                 break;
                             }
@@ -739,7 +793,8 @@ public class MarketplaceServer {
         return ("Item added!");
     }
 
-    public synchronized static String pricePurchaseItem(ArrayList<Product> priceListedProducts, String username, int quantity, int num) {
+    public synchronized static String pricePurchaseItem(ArrayList<Product> priceListedProducts,
+                                                        String username, int quantity, int num) {
         Product productFromSeller = priceListedProducts.get(num - 1);
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
@@ -777,7 +832,8 @@ public class MarketplaceServer {
                                     currentProduct.getDescription().equals(combinedProduct.getDescription()) &&
                                     currentProduct.getPrice() == combinedProduct.getPrice()) {
                                 // If found, update the quantity
-                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() + currentProduct.getQuantAvailable());
+                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() +
+                                        currentProduct.getQuantAvailable());
                                 found = true;
                                 break;
                             }
@@ -816,7 +872,8 @@ public class MarketplaceServer {
         return ("Item purchased");
     }
 
-    public synchronized static String quantityPurchaseItems(ArrayList<Product> quantityListedProducts, String username, int quantity, int num) {
+    public synchronized static String quantityPurchaseItems(ArrayList<Product> quantityListedProducts,
+                                                            String username, int quantity, int num) {
         Product productFromSeller = quantityListedProducts.get(num - 1);
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
@@ -854,7 +911,8 @@ public class MarketplaceServer {
                                     currentProduct.getDescription().equals(combinedProduct.getDescription()) &&
                                     currentProduct.getPrice() == combinedProduct.getPrice()) {
                                 // If found, update the quantity
-                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() + currentProduct.getQuantAvailable());
+                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() +
+                                        currentProduct.getQuantAvailable());
                                 found = true;
                                 break;
                             }
@@ -892,7 +950,9 @@ public class MarketplaceServer {
         }
         return ("Item purchased");
     }
-    public synchronized static String purchaseItem(ArrayList<Product> listedProducts, String username, int quantity, int num) {
+
+    public synchronized static String purchaseItem(ArrayList<Product> listedProducts, String username,
+                                                   int quantity, int num) {
         Product productFromSeller = listedProducts.get(num - 1);
         for (Customer customer : customers) {
             if (customer.getCustomerUserName().equals(username)) {
@@ -930,7 +990,8 @@ public class MarketplaceServer {
                                     currentProduct.getDescription().equals(combinedProduct.getDescription()) &&
                                     currentProduct.getPrice() == combinedProduct.getPrice()) {
                                 // If found, update the quantity
-                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() + currentProduct.getQuantAvailable());
+                                combinedProduct.setQuantAvailable(combinedProduct.getQuantAvailable() +
+                                        currentProduct.getQuantAvailable());
                                 found = true;
                                 break;
                             }
@@ -968,6 +1029,7 @@ public class MarketplaceServer {
         }
         return ("Item purchased");
     }
+
     public synchronized static String addReviewPrice(ArrayList<Product> priceListedProducts, String review, int num) {
         Product productToReview = priceListedProducts.get(num - 1);
         ArrayList<String> updatedReviews = productToReview.getReviews();
@@ -995,7 +1057,7 @@ public class MarketplaceServer {
 
         for (Seller seller : sellers) {
             for (Store store : seller.getStores()) {
-                for ( Product product : store.getProducts()) {
+                for (Product product : store.getProducts()) {
                     if (product.getName().equals(productToReview.getName()) &&
                             product.getStoreName().equals(productToReview.getStoreName())) {
                         product.setReviews(productToReview.getReviews());
@@ -1006,6 +1068,7 @@ public class MarketplaceServer {
 
         return "Review added";
     }
+
     public synchronized static String addReview(ArrayList<Product> listedProducts, String review, int num) {
         Product productToReview = listedProducts.get(num - 1);
         ArrayList<String> updatedReviews = productToReview.getReviews();
@@ -1014,7 +1077,7 @@ public class MarketplaceServer {
 
         for (Seller seller : sellers) {
             for (Store store : seller.getStores()) {
-                for ( Product product : store.getProducts()) {
+                for (Product product : store.getProducts()) {
                     if (product.getName().equals(productToReview.getName()) &&
                             product.getStoreName().equals(productToReview.getStoreName())) {
                         product.setReviews(productToReview.getReviews());
@@ -1035,7 +1098,8 @@ public class MarketplaceServer {
             }
         }
         ArrayList<Product> shoppingCartResult = new ArrayList<>();
-        if (customers.get(customerIndex).getShoppingCar().size() == 0 || customers.get(customerIndex).getShoppingCar().get(0).getName().equals("N/A")) {
+        if (customers.get(customerIndex).getShoppingCar().size() == 0 ||
+                customers.get(customerIndex).getShoppingCar().get(0).getName().equals("N/A")) {
             return null;
         } else {
             for (Product product : customers.get(customerIndex).getShoppingCar()) {
@@ -1047,7 +1111,7 @@ public class MarketplaceServer {
 
     public synchronized static String removeItem(String username, ArrayList<Product> shoppingCart, int num) {
         int customerIndex = 0;
-        Product productToRemove = shoppingCart.get(num-1);
+        Product productToRemove = shoppingCart.get(num - 1);
         for (int i = 0; i < customers.size(); i++) {
             if (customers.get(i).getCustomerUserName().equals(username)) {
                 customerIndex = i;
@@ -1081,13 +1145,14 @@ public class MarketplaceServer {
                                 if (product.getName().equals(productFromSeller.getName()) &&
                                         product.getStoreName().equals(productFromSeller.getStoreName())) {
                                     storeToUpdate = store;
-                                    if (productFromSeller.getQuantAvailable() - product.getQuantAvailable() < 0 ) {
+                                    if (productFromSeller.getQuantAvailable() - product.getQuantAvailable() < 0) {
                                         return ("Not enough stocks for item number " + index + "\nHave only " +
                                                 productFromSeller.getQuantAvailable() +
                                                 " left, but your order requires " + product.getQuantAvailable()
                                                 + "\n return to shopping cart and remove this item");
                                     } else {
-                                        storeToUpdate.editProduct(product.getName(), 4, ("" + (productFromSeller.getQuantAvailable() - product.getQuantAvailable())));
+                                        storeToUpdate.editProduct(product.getName(), 4, ("" +
+                                                (productFromSeller.getQuantAvailable() - product.getQuantAvailable())));
                                         store = storeToUpdate;
                                         ArrayList<Product> updatedPurchaseHist = customer.getPurchaseHistory();
                                         updatedPurchaseHist.add(product);
@@ -1115,11 +1180,13 @@ public class MarketplaceServer {
             }
         }
         Customer historyCustomer = customers.get(customerIndex);
-        if (historyCustomer.getPurchaseHistory().size() == 0 || historyCustomer.getPurchaseHistory().get(0).getName().equals("N/A")) {
+        if (historyCustomer.getPurchaseHistory().size() == 0
+                || historyCustomer.getPurchaseHistory().get(0).getName().equals("N/A")) {
             return null;
         }
         return historyCustomer.getPurchaseHistory();
     }
+
     public static String exportPurchaseHistory(ArrayList<Product> purchaseHistory, String fileName, String username) {
         if (fileName.contains(" ")) {
             fileName = fileName.replace(" ", "_");
@@ -1206,7 +1273,9 @@ public class MarketplaceServer {
         }
         String output = "";
         for (String store : salesByStore) {
-            if (!store.substring(0,3).equals("N/A")) { output += store + "..."; }
+            if (!store.substring(0, 3).equals("N/A")) {
+                output += store + "...";
+            }
         }
         return output;
     }
@@ -1249,7 +1318,7 @@ public class MarketplaceServer {
                         }
                     }
                 }
-            } else if (sortBy.equals("High to Low")){
+            } else if (sortBy.equals("High to Low")) {
                 int n = salesByStore.size();
                 for (int i = 0; i < n - 1; i++) {
                     for (int j = 0; j < n - i - 1; j++) {
@@ -1267,14 +1336,16 @@ public class MarketplaceServer {
         }
         String output = "";
         for (String store : salesByStore) {
-            if (!store.substring(0,3).equals("N/A")) { output += store + "..."; }
+            if (!store.substring(0, 3).equals("N/A")) {
+                output += store + "...";
+            }
         }
         return output;
     }
 
 
     public synchronized static void writeDataSeller() {
-        ArrayList<Seller> sellerData = sellers ;
+        ArrayList<Seller> sellerData = sellers;
         String sellerName;
         String storeName;
         String storeSale;
@@ -1284,7 +1355,7 @@ public class MarketplaceServer {
         String productPrice;
         String productLimit;
         try {
-            PrintWriter pw = new PrintWriter( new FileOutputStream("SellerInfo.txt"));
+            PrintWriter pw = new PrintWriter(new FileOutputStream("SellerInfo.txt"));
             for (int i = 0; i < sellerData.size(); i++) {
                 sellerName = sellerData.get(i).getUserName();
                 ArrayList<Store> stores = sellerData.get(i).getStores();
@@ -1294,7 +1365,7 @@ public class MarketplaceServer {
                     ArrayList<Product> products = stores.get(j).getProducts();
                     if (products.size() == 0) {
                         pw.write(String.format("%s/-%s/-%s/-%s/-%s/-%s/-%s/-%s/-",
-                                sellerName, storeName, storeSale, "N/A", "N/A", "0", "0.0", "0" ));
+                                sellerName, storeName, storeSale, "N/A", "N/A", "0", "0.0", "0"));
                         pw.write("\n");
                     }
 
@@ -1305,7 +1376,7 @@ public class MarketplaceServer {
                         productPrice = String.valueOf(products.get(k).getPrice());
                         productLimit = String.valueOf(products.get(k).getLimit());
                         ArrayList<String> reviews = new ArrayList<>();
-                        for (int o = 0; o < products.get(k).getReviews().size(); o++ ) {
+                        for (int o = 0; o < products.get(k).getReviews().size(); o++) {
                             reviews.add(products.get(k).getReviews().get(o));
                         }
                         // tri,tri's store,sales,milk,taro flavour,10,5.4,5,review1,review2
@@ -1313,7 +1384,7 @@ public class MarketplaceServer {
                                 sellerName, storeName, storeSale, productName, productDescription,
                                 productQuant, productPrice, productLimit);
                         pw.write(ans);
-                        for (int l = 0; l < reviews.size(); l++ ) {
+                        for (int l = 0; l < reviews.size(); l++) {
                             pw.write(reviews.get(l) + "/-");
                         }
                         pw.write("\n");
@@ -1325,6 +1396,7 @@ public class MarketplaceServer {
             throw new RuntimeException(e);
         }
     }
+
     public synchronized static ArrayList<Seller> readDataSeller() {
         ArrayList<String> tempList = new ArrayList<>();
         try {
@@ -1366,7 +1438,7 @@ public class MarketplaceServer {
                     int intQuantAvail = Integer.parseInt(arr[5]);
                     double doublePrice = Double.parseDouble(arr[6]);
                     int intLimit = Integer.parseInt(arr[7]);
-                    product = new Product(arr[3],arr[1],arr[4],intQuantAvail, doublePrice);
+                    product = new Product(arr[3], arr[1], arr[4], intQuantAvail, doublePrice);
                     product.setReviews(reviewsTemp);
                     product.setLimit(intLimit);
                     sellersTemp.get(indexSeller).getStores().get(indexStore).addProduct(product);
@@ -1376,7 +1448,7 @@ public class MarketplaceServer {
                     indexStore++;
                     storeName = arr[1];
                     storeSales = Double.parseDouble(arr[2]); // from new store
-                    store = new Store(null,storeName);
+                    store = new Store(null, storeName);
                     store.setSales(storeSales); // set Sales of store
                     sellersTemp.get(indexSeller).createStore(store); // add new Store to seller's stores
                     // Product
@@ -1387,7 +1459,7 @@ public class MarketplaceServer {
                     int intQuantAvail = Integer.parseInt(arr[5]);
                     double doublePrice = Double.parseDouble(arr[6]);
                     int intLimit = Integer.parseInt(arr[7]);
-                    product = new Product(arr[3],arr[1],arr[4],intQuantAvail, doublePrice);
+                    product = new Product(arr[3], arr[1], arr[4], intQuantAvail, doublePrice);
                     product.setReviews(reviewsTemp);
                     product.setLimit(intLimit);
                     // intialize an ArrayList<Product>
@@ -1411,7 +1483,7 @@ public class MarketplaceServer {
                     int intQuantAvail = Integer.parseInt(arr[5]);
                     double doublePrice = Double.parseDouble(arr[6]);
                     int intLimit = Integer.parseInt(arr[7]);
-                    product = new Product(arr[3],arr[1],arr[4],intQuantAvail, doublePrice);
+                    product = new Product(arr[3], arr[1], arr[4], intQuantAvail, doublePrice);
                     product.setReviews(reviewsTemp);
                     product.setLimit(intLimit);
                     sellersTemp.get(indexSeller).getStores().get(indexStore).addProduct(product); // add new product
@@ -1420,7 +1492,7 @@ public class MarketplaceServer {
                     indexStore++;
                     storeName = arr[1];
                     storeSales = Double.parseDouble(arr[2]); // from new store
-                    store = new Store(null,storeName);
+                    store = new Store(null, storeName);
                     store.setSales(storeSales); // set Sales of store
                     sellersTemp.get(indexSeller).setStores(new ArrayList<>()); // initialize an ArrayList<Store>
                     sellersTemp.get(indexSeller).createStore(store); // add new Store to seller's stores
@@ -1432,7 +1504,7 @@ public class MarketplaceServer {
                     int intQuantAvail = Integer.parseInt(arr[5]);
                     double doublePrice = Double.parseDouble(arr[6]);
                     int intLimit = Integer.parseInt(arr[7]);
-                    product = new Product(arr[3],arr[1],arr[4],intQuantAvail, doublePrice);
+                    product = new Product(arr[3], arr[1], arr[4], intQuantAvail, doublePrice);
                     product.setReviews(reviewsTemp);
                     product.setLimit(intLimit);
                     // initialize an ArrayList<Product>
@@ -1444,7 +1516,8 @@ public class MarketplaceServer {
         MarketplaceServer.sellers = sellersTemp;
         return sellersTemp;
     }
-    public synchronized static void writeDataCustomer(){
+
+    public synchronized static void writeDataCustomer() {
         ArrayList<Customer> customersData = customers;
         try {
             String custName;
@@ -1469,11 +1542,10 @@ public class MarketplaceServer {
                     productLimit = String.valueOf(prodShop.get(k).getLimit());
                     ArrayList<String> reviews = new ArrayList<>();
                     if (!(prodShop.get(k).getReviews() == null)) {
-                        for (int o = 0; o < prodShop.get(k).getReviews().size(); o++ ) {
+                        for (int o = 0; o < prodShop.get(k).getReviews().size(); o++) {
                             reviews.add(prodShop.get(k).getReviews().get(o));
                         }
-                    }
-                    else {
+                    } else {
                         reviews.add("N/A");
                     }
                     // tri,tri's store,sales,milk,taro flavour,10,5.4,5,review1,review2
@@ -1481,7 +1553,7 @@ public class MarketplaceServer {
                             productName, storeName, productDescription,
                             productQuant, productPrice, productLimit);
                     pw.write(ans);
-                    for (int l = 0; l < reviews.size(); l++ ) {
+                    for (int l = 0; l < reviews.size(); l++) {
                         pw.write(reviews.get(l) + "/-");
                     }
                     pw.write("\n");
@@ -1505,7 +1577,7 @@ public class MarketplaceServer {
                     if (prodHistory.get(k).getReviews() == null) {
                         reviews.add("N/A");
                     } else {
-                        for (int o = 0; o < prodHistory.get(k).getReviews().size(); o++ ) {
+                        for (int o = 0; o < prodHistory.get(k).getReviews().size(); o++) {
                             reviews.add(prodHistory.get(k).getReviews().get(o));
                         }
                     }
@@ -1514,10 +1586,10 @@ public class MarketplaceServer {
                             productName, storeName, productDescription,
                             productQuant, productPrice, productLimit);
                     pw.write(ans);
-                    for (int l = 0; l < reviews.size(); l++ ) {
+                    for (int l = 0; l < reviews.size(); l++) {
                         pw.write(reviews.get(l) + "/-");
                     }
-                    if (k == (prodHistory.size()-1) && i == (customersData.size()-1)) {
+                    if (k == (prodHistory.size() - 1) && i == (customersData.size() - 1)) {
                         pw.write("");
                     } else {
                         pw.write("\n");
@@ -1530,12 +1602,13 @@ public class MarketplaceServer {
             throw new RuntimeException(e);
         }
     }
+
     public synchronized static ArrayList<Customer> readDataCustomer() {
         ArrayList<String> tempList = new ArrayList<>();
         try {
             BufferedReader br = new BufferedReader(new FileReader("CustomerInfo.txt"));
             String line = br.readLine();
-            while (line != null){
+            while (line != null) {
                 tempList.add(line);
                 line = br.readLine();
             }
@@ -1549,7 +1622,7 @@ public class MarketplaceServer {
         int index = 0;
         String custName = "";
         int indexCust = 0;
-        Customer cust ;
+        Customer cust;
         ArrayList<Customer> customerTemp = new ArrayList<>();
         while (index < tempList.size()) {
             // milk,tri's store,taro flavor,10,5.5,7,review1,review2
@@ -1565,7 +1638,7 @@ public class MarketplaceServer {
                 index++;
             } else {
                 ArrayList<Product> listShop = new ArrayList<>();
-                while (arr.length != 1 && arr.length != 2 && index < tempList.size() ) {
+                while (arr.length != 1 && arr.length != 2 && index < tempList.size()) {
                     Product prodShop;
                     ArrayList<String> reviewsTemp = new ArrayList<>();
                     for (int j = 6; j < arr.length; j++) { // create an ArrayList of reviews
