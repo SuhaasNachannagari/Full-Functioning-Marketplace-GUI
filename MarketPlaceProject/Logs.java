@@ -9,6 +9,10 @@ import java.util.List;
  * Allows for easy login and writing to .txt files to save the login information of users. 
  * The logic and methods developed in this are used in ClientSide for implementing the GUIs for logging in.
  *
+  * @author a
+ * <p>Purdue University -- CS18000 -- Fall 2023</p>
+ *
+ * @version December 11th, 2023
  */
 
 
