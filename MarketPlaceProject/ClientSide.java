@@ -6,6 +6,12 @@ import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+*Project 5 ClientSide
+*
+*This class allows the client to independently connect to the server and displays the GUI functionality of this project.
+*/
+
 public class ClientSide extends Thread {
     private static int ind1 = 0;
     private static int ind2 = 0;
