@@ -95,6 +95,15 @@ public class MarketplaceServer {
 
         if (sellers.get(sellerIndex).getStores().get(storeIndex).getProducts().get(0).getName().equals("N/A")) {
             sellers.get(sellerIndex).getStores().remove(storeIndex);
+            if (sellers.get(sellerIndex).getStores().size() == 0) {
+                Product prod = new Product("N/A","N/A","N/A",0,0.0);
+                prod.setLimit(0);
+                prod.setReviews(new ArrayList<>());
+                ArrayList<Product> tempProduct = new ArrayList<>();     tempProduct.add(prod);
+                Store tempStore = new Store(tempProduct, "N/A");
+                tempStore.setSales(0.0);
+                sellers.get(sellerIndex).createStore(tempStore);
+            }
             return "Store removed!";
         } else {
             sellers.get(sellerIndex).getStores().get(storeIndex).deleteProduct(productIndex);
