@@ -55,7 +55,6 @@ public class Seller {
             String toFile = product.getName() + "," + product.getStoreName() + "," + product.getDescription() + "," +
                     product.getQuantAvailable() + "," + product.getPrice();
             writer.write(toFile + "\n");
-            System.out.println("Check");
         } catch (IOException e) {
             e.printStackTrace();
         }
