@@ -57,11 +57,19 @@ public class DashboardIO extends MarketplaceServer {
         String result = "";
         int index = 0;
         for (int i = 0; i < sellerMain.getStores().size(); i++) {
-            String storeNameSeller = sellerMain.getStores().get(i).getName(); //looks at every store that a seller owns
+            String storeNameSeller = sellerMain.getStores().get(i).getName(); //looks at every store that
+            // the seller owns
             ArrayList<Product> productsList = sellerMain.getStores().get(i).getProducts();
             for (int j = 0; j < productsList.size(); j++) {
                 index++;
-                int totalSale = productsList.get(j).getQuantAvailable();
+                int totalSale = 0;
+                for (Customer customer: customers) {
+                    for (Product prod: customer.getPurchaseHistory()) {
+                        if (prod.getName().equals(productsList.get(j).getName())) {
+                            totalSale += prod.getQuantAvailable();
+                        }
+                    }
+                }
                 result += (String.format("%d Store: %s, Product: %s, Sales: %d/-", index, storeNameSeller,
                         productsList.get(j).getName(), totalSale));
                 productsInfo.add(String.format("Store: %s, Product: %s", storeNameSeller,
