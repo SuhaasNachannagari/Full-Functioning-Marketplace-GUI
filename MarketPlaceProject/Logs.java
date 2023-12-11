@@ -3,6 +3,15 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Project 5 - Logs
+ *
+ * Allows for easy login and writing to .txt files to save the login information of users. 
+ * The logic and methods developed in this are used in ClientSide for implementing the GUIs for logging in.
+ *
+ */
+
+
 public class Logs{
 
 
