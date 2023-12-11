@@ -27,53 +27,57 @@ public class ClientSide extends Thread {
         ObjectInputStream inputStream;
 
         try {
-            System.out.println("check1");
             InetAddress ia = InetAddress.getByName("localhost");
-            socket = new Socket(ia,  4242);
+            socket = new Socket("100.69.124.26",  4242);
             bfr = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             pw = new PrintWriter(socket.getOutputStream());
             inputStream = new ObjectInputStream(socket.getInputStream());
             outputStream = new ObjectOutputStream(socket.getOutputStream());
-            System.out.println("check2");
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException();
         }
         outerloop:
         while (true) {
-            List<String> customers = null;
+            String checkUser = "";
             try {
-                customers = (List<String>) inputStream.readObject();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
+                List<String> customers = null;
+                try {
+                    customers = (List<String>) inputStream.readObject();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                List<String> sellers = null;
+                try {
+                    sellers = (List<String>) inputStream.readObject();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+
+                ClientSide client = new ClientSide();
+                List<ClientSide.User> customer = client.toUser(customers);
+                List<ClientSide.User> seller = client.toUser(sellers);
+                List<Object> details = client.LogIn(customer, seller);//0th index is the user, 1st index is seller or customer, 2nd index tells you whether the account already exists.
+                try {
+                    outputStream.writeObject(details);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                String switchToUser = (String) details.get(0);
+                String[] array = switchToUser.split(",");
+                ClientSide.User user = new ClientSide.User(array[0], array[1]);
+                boolean exists;
+                exists = !details.get(2).equals("true");
+                String username = user.getUsername();
+                checkUser = details.get(1).toString();
+            } catch (Exception e) {
+                break outerloop;
             }
-            List<String> sellers = null;
-            try {
-                sellers = (List<String>) inputStream.readObject();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-            ClientSide client = new ClientSide();
-            List<ClientSide.User> customer = client.toUser(customers);
-            List<ClientSide.User> seller = client.toUser(sellers);
-            List<Object> details = client.LogIn(customer,seller);//0th index is the user, 1st index is seller or customer, 2nd index tells you whether the account already exists.
-            try {
-                outputStream.writeObject(details);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            String switchToUser = (String) details.get(0);
-            String[] array = switchToUser.split(",");
-            ClientSide.User user = new ClientSide.User(array[0], array[1]);
-            System.out.println(details.get(0));
-            boolean exists;
-            exists = !details.get(2).equals("true");
-            String username = user.getUsername();
-            String checkUser = details.get(1).toString();
+
             while (true) {
                 try {
                     if (checkUser.equals("Seller")) {
@@ -236,6 +240,9 @@ public class ClientSide extends Thread {
                                 //1cre - showStore
                                 String message3 = bfr.readLine();
                                 String[] stores = message3.split("/-");
+                                if (stores[0].equals("1.N/A")) {
+                                    stores = new String[]{ "1.N/A" };
+                                }
                                 String storeChoice = (String) (JOptionPane.showInputDialog(null,
                                         "Choose the index you want to edit: ", "Choice",
                                         JOptionPane.QUESTION_MESSAGE, null, stores, stores[0]));
@@ -414,7 +421,7 @@ public class ClientSide extends Thread {
                                     pw.write(storeName + "\n");
                                     pw.flush();
                                     JOptionPane.showMessageDialog(null,
-                                            "you must include .txt at the end of the file name",
+                                            "you must include .csv at the end of the file name",
                                             "Explain Message", JOptionPane.INFORMATION_MESSAGE);
                                     //4inEx - Export: file name
                                     String fileName = JOptionPane.showInputDialog(null,
@@ -1144,6 +1151,7 @@ public class ClientSide extends Thread {
                     break outerloop;
                 }
 
+                //final shit
                 int finalQuestion = JOptionPane.showConfirmDialog(null, "Do you want to continue logging in?",
                         "Question",JOptionPane.YES_NO_OPTION);
                 if ( finalQuestion == JOptionPane.YES_OPTION) {
@@ -1154,6 +1162,7 @@ public class ClientSide extends Thread {
                     pw.flush();
                     break;
                 } else if (finalQuestion == -1) {
+                    pw.write("breakOuterLoop" + "\n");  pw.flush();
                     break outerloop;
                 }
             }
