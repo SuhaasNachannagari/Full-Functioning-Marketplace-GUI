@@ -8,6 +8,10 @@ import java.util.ArrayList;
  * It allows the customer to view all the stores and prints out the number of sales for each of them.
  * It also displays the products the customer has bought and the stores they have bought it from.
  *
+  * @author a
+ * <p>Purdue University -- CS18000 -- Fall 2023</p>
+ *
+ * @version December 11th, 2023
  */
 
 public class CustomerDashboard extends main {
