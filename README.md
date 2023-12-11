@@ -3,7 +3,7 @@ To run and Compile our project, you must run both the server, and the client sid
 ![image](https://github.com/SuhaasNachannagari/Project4CSGOld/assets/143854535/2f61bb32-a6c5-44c7-ad02-e91005411eac)
 After the customer/seller signs into their account they are prompted with all the different actions they can perform.
 
-Note: To run the program using any port other than localhost, you must change the port you are connecting the server and client to. On the ClientSide class, on lines 31 and 32, you have to change the port for the socket to whatever you wish.
+Note: To run the program using any port other than localhost, you must change the port you are connecting the server and client to. On the ClientSide class, on lines 31 and 32, you have to change the port for the socket to whatever you wish.  
 Note: To exit the GUI hit the cancel button or close the GUI pop up on the screen.
 
 Raghav - Submitted report on Brightspace  
