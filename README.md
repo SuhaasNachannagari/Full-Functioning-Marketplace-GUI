@@ -42,10 +42,10 @@ Classes:
     
   View - A class that extends main in order to display and enact the code that runs whenever the customer chooses to "sort" in the main method. Includes methods that display the products and allow the user to write a review, buy the product, or add it to their shopping cart
 
-  MarketplaceServer -
+  MarketplaceServer -  A markerplace seller that contains ALL the static methods that make significant changes to the data accessed in the server class. Holds the static sellers and customers objects that are the backbone of the marketplace, and many view and edit methods regarding them are included.
 
   DashboardIO -  This class will be used to display dashboard.
 
-  ServerSide -
+  ServerSide - Establishes multiple connections with clients and recieves and sends information to and from the client and calls methods depending on the data supplied.
 
   ClientSide -  This class allows the client to independently connect to the server and displays the GUI functionality of this project.
