@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 /**
- * Project 4 - Create
+ * Project 5 - Create
  *
  * This class creates new product for a choosen store
  */
