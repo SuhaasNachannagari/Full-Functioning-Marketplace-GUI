@@ -25,7 +25,6 @@ public class Logs{
             String toFile = user.getUsername() + "," + user.getPassword() + "\n";
             writer.write(toFile);
             writer.flush();
-            System.out.println(toFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,6 +98,7 @@ public class Logs{
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("SellerLoginDetails.txt", true))) {
             String toFile = user.getUsername() + "," + user.getPassword() + "\n";
             writer.write(toFile);
+            writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
