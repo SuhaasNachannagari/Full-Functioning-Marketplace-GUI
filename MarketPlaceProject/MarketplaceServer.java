@@ -6,7 +6,16 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.PrimitiveIterator;
 import java.util.Scanner;
-
+/**
+ * A markerplace seller that contains ALL the static methods that make significant changes 
+ * to the data accessed in the server class. Holds the static sellers and customers objects
+ * that are the backbone of the marketplace, and many view and edit methods regarding them 
+ * are include
+ *
+ * <p>Purdue University -- CS18000 -- Fall 2023</p>
+ *
+ * @version December 11, 2023
+ */
 public class MarketplaceServer {
     public static ArrayList<Seller> sellers = new ArrayList<>();
     public static ArrayList<Customer> customers = new ArrayList<>();
