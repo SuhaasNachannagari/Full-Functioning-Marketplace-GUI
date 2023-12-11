@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * Project 4 - Store
+ * Project 5 - Store
  * <p>
  * This class represents a single store.
  */
