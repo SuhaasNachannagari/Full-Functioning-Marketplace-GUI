@@ -1,5 +1,5 @@
 /**
- * Project 4 - User
+ * Project 5 - User
  *
  * This class helps implement the login features of the code by allowing easy storage of username and passwords.
  */
