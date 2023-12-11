@@ -3,7 +3,7 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
- * Project 4 - Delete
+ * Project 5 - Delete
  * <p>
  * This class will be used to delete products.
  */
