@@ -3,7 +3,7 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
- * Project 4 - Customer
+ * Project 5 - Customer
  *
  * This class represents a customer.
  */
