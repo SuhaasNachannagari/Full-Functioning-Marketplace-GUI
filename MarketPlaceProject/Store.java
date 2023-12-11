@@ -56,7 +56,8 @@ public class Store {
         }
     }
     // edit Product: name - name of Product, input - category wants to be edited, val - value to be changed to
-    // the method returns a boolean value to check if the method runs into any error, then we could tell user to do again or not.
+    // the method returns a boolean value to check if the method runs into any error, then we could tell user
+    // to do again or not.
     public boolean editProduct(String name, int input, String val) {
 
         boolean checkItemExist = false;
@@ -98,7 +99,8 @@ public class Store {
     }
 
     // delete product: name - name of product want to be deleted
-    // the method returns a boolean value to check if the method runs into any error, then we could tell user to do again or not.
+    // the method returns a boolean value to check if the method runs into any error, then we could tell
+    // user to do again or not.
     public void deleteProduct(int i) {
         products.remove(i);
     }
